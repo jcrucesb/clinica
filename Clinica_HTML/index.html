@@ -30,14 +30,20 @@
                 <a class="nav-link active" aria-current="page" href="#">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">¿Quienes somos?</a>
+                <a class="nav-link" href="#quienes_somos">¿Quienes Somos?</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#reserva_hora">Reserva de Hora</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#destacados">Destacados</a>
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Mi Portal
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#" style="background: rgb(145, 252, 145);">Login</a></li>
+                  <li><a class="dropdown-item" href="./login.html" style="background: rgb(145, 252, 145);">Login</a></li>
                   <!--<li><a class="dropdown-item" href="#">Another action</a></li>-->
                 </ul>
               </li>
@@ -81,7 +87,7 @@
     <main class="flex-grow-1 mb-5">
       <!-- Contenido de la página, incluyendo las cards -->
       <div id="container_principal" class="container mt-5">
-        <h1 class="text-center">Destacados Clínica BuenPaciente</h1>
+        <h1 class="text-center" id="destacados">Destacados Clínica BuenPaciente</h1>
         <div class="container" style="background: rgb(209, 206, 200);">
           <div class="row mt-5">
             <div class="col">
@@ -119,7 +125,7 @@
               </div>
           </div>
         </div>
-        <h1 class="text-center mt-5">¿Quienes Somos?</h1>
+        <h1 class="text-center mt-5" id="quienes_somos">¿Quienes Somos?</h1>
         <div class="container mt-5" style="background: rgb(233, 226, 226);">
           <div class="row pt-3">
             <div class="col">
@@ -161,7 +167,7 @@
             </div>
           </div>
         </div>
-        <h1 class="text-center mt-5">Reserva tu Hora</h1>
+        <h1 class="text-center mt-5" id="reserva_hora">Reserva tu Hora</h1>
         <div class="container-xl" style="background: rgb(113, 173, 241); border-radius: 1%;">
           <form>
             <div class="mb-3">
@@ -189,7 +195,7 @@
               <input type="date" class="form-control" id="exampleInputPassword1">
             </div>
             <div class="mb-3">
-              <label for="exampleInputPassword1" class="form-label">Fecha</label>
+              <label for="exampleInputPassword1" class="form-label">Hora</label>
               <input type="time" class="form-control" id="exampleInputPassword1">
             </div>
             <div class="d-grid gap-2 pb-2">
