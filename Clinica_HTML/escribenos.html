@@ -50,21 +50,35 @@
         </div>
     </nav>
     <main class="flex-grow-1 mb-5">
-      <!-- Contenido de la página, incluyendo las cards -->
-      <div id="" class="container_login mt-5 " style="background: rgb(172, 169, 169);">
-        <form class="p-2 pt-4">
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label">Username</label>
-              <input type="text" class="form-control" id="username" aria-describedby="emailHelp">
+        <div class="container mt-5" style="background: rgb(172, 169, 169);">
+            <h1 class="text-center">Dejanos tus dudas</h1>
+          <form class="p-2 pt-4">
+            <div class="row row-cols-1 row-cols-md-2 g-3">
+              <div class="col">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" id="nombre" class="form-control">
+              </div>
+              <div class="col">
+                <label for="apPaterno" class="form-label">Ap. Paterno</label>
+                <input type="text" id="apPaterno" class="form-control">
+              </div>
+              <div class="col">
+                <label for="apMaterno" class="form-label">Ap. Materno</label>
+                <input type="text" id="apMaterno" class="form-control">
+              </div>
+              <div class="col">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" class="form-control">
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="exampleInputPassword1" class="form-label">Password</label>
-              <input type="password" class="form-control" id="password">
+            <div class="mb-3 mt-3">
+              <label for="mensaje" class="form-label">Dejanos tus dudas</label>
+              <textarea class="form-control" id="mensaje" rows="3"></textarea>
             </div>
-            <button type="button" onclick="login(this)" class="btn btn-success">Ingresar</button>
+            <button type="button" onclick="consulta(this)" class="btn btn-success">Ingresar</button>
           </form>
-      </div>
-    </main>
+        </div>
+      </main>
     
     <!--FOOTER-->
     <footer class="index_footer mt-5">
@@ -140,6 +154,6 @@
     <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.3/js/dataTables.responsive.min.js"></script>
-    <script src="./static/JS/login_index.js"></script>
+    <script src="./static/JS/consulta.js"></script>
 </body>
 </html>
