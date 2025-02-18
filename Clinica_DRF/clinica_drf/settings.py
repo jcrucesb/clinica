@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     # Genramos el módulo de token de drf.
     'rest_framework.authtoken',
     'consulta',
-    'direccion'
+    'direccion',
+    'grupo'
 ]
 
 MIDDLEWARE = [

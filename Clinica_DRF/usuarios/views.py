@@ -74,10 +74,33 @@ def login(request):
         # Covertimos al usaurios en un JSON.
         dato_serializado = CustomUserSerializer(instance=user)
         return Response({'token':token.key,
-                    'user': dato_serializado.data,
-                    'tipo_user':tipo_user},
-                    # Específicamos el status.
-                    status=status.HTTP_200_OK)
+                        'user': dato_serializado.data,
+                        'tipo_user':tipo_user},
+                        # Específicamos el status.
+                        status=status.HTTP_200_OK)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 1}, status=400)
+
+#
+def usuario_grupo(request):
+    try:
+        
+        return Response({'grupo':1},
+                        # Específicamos el status.
+                        status=status.HTTP_200_OK)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 1}, status=400)
+
+
+#
+def listar_doctor(request):
+    try:
+        
+        return Response({'list_doctor':1},
+                        # Específicamos el status.
+                        status=status.HTTP_200_OK)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         return Response({'error': 1}, status=400)

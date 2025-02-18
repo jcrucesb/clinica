@@ -300,9 +300,9 @@
                 </ul>
               </li>
               <li class="nav-item">
-                <a href="../generate/theme.html" class="nav-link">
+                <a href="#" class="nav-link" onclick="grupos()">
                   <i class="nav-icon bi bi-palette"></i>
-                  <p>Theme Generate</p>
+                  <p>Grupos</p>
                 </a>
               </li>
               <li class="nav-item">
@@ -734,11 +734,32 @@
                     </div>
                   </div>
                   <div class="card-body">
-                    <main>
                       <div class="container-xl" id="container_doctor" style="display: none;">
                         <h1 class="text-center">Panel Doctores</h1>
-
-                      </div>
+                        <div class="container">
+                          <div class="row">
+                            <div class="col-md-6">
+                              <div class="card text-bg-primary mb-3">
+                                <a href="#" class="text-white" onclick="info_doctor(this)">
+                                  <div class="card-header">Información Doctor</div>
+                                <div class="card-body">
+                                  <h5 class="card-title">Primary card title</h5>
+                                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                </div>
+                                </a>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="card text-bg-primary mb-3">
+                                <div class="card-header">Citas</div>
+                                <div class="card-body">
+                                  <h5 class="card-title">Primary card title</h5>
+                                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       <!--Panel Paciente. -->
                       <div class="container" id="container_paciente" style="display: none;">
                         <h1 class="text-center">Panel Paciente</h1>
@@ -747,7 +768,14 @@
                       <div class="container" id="container_secretaria" style="display: none;">
                         <h1 class="text-center">Panel Secretaria</h1>
                       </div>
-                    </main>
+                  </div>
+                  <div class="container mb-3" id="container_grupo" style="display: none;">
+                    <h1 class="text-center">Grupo</h1>
+                      <div class="col-md-12">
+                        <div class="d-grid gap-2">
+                          <button class="btn btn-warning" id="modal_grupo" type="button">Mostrar</button>
+                        </div>
+                      </div>
                   </div>
                   <!-- /.card-body -->
                   <div class="card-footer">Importante</div>
@@ -778,25 +806,122 @@
       </footer>
       <!--end::Footer-->
     </div>
+    <!---->
+    <!-- Button trigger modal -->
+    <!-- Modal Mostrar Información Doctor. -->
+    <div class="modal fade" id="info_doctor" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Info Doctor</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <div class="table-responsive">
+                <table id="listar_doctor" class="table table-striped table-bordered dt-responsive nowrap">
+                  
+                </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Understood</button>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+    <!--Fin Modal Mostrar Información Doctor.-->
+    <!-- Modal Mostrar Grupos. -->
+    <div class="modal fade" id="listar_grupo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background: rgb(255, 252, 69);">
+            <h1 class="modal-title fs-5" id="">Grupos</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <div class="table-responsive">
+                <table id="tabla_grupo" class="display nowrap" style="width:100%">
+                  <div class="col-md-12">
+                    <div class="d-grid gap-2">
+                      <button class="btn mb-2" onclick="nuevo_grupo(this)" style="background: rgb(129, 240, 129);" type="button">Agregar Grupo</button>
+                    </div>
+                  </div>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer" style="background: rgb(255, 252, 69);">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Fin Modal Listar Grupos. -->
+    <!-- Modal Crear Grupo. -->
+    <div class="modal fade" id="crear_grupo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background: rgb(167, 243, 171);">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Crear Grupo</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Nombre Grupo</label>
+                <input type="text" class="form-control" id="nombre_grupo" required aria-describedby="emailHelp">
+              </div>
+          </div>
+          <div class="modal-footer" style="background: rgb(167, 243, 171);">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" id="insertar_grupo" class="btn btn-primary">Crear</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+    <!--Fin Modal Crear Grupo. -->
+    <!-- Modal Editar Nombre Grupo. -->
+    <div class="modal fade" id="modal_editar_grupo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background: rgb(124, 162, 245);">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Editar Grupo</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Nombre Grupo</label>
+                <input type="text" class="form-control" id="edit_nombre_grupo" required aria-describedby="emailHelp">
+              </div>
+          </div>
+          <div class="modal-footer" style="background: rgb(124, 162, 245);">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" id="btn_editar_nombre_grupo" class="btn btn-primary">Editar</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+    <!--Fin Modal Editar Nombre Grupo.-->
     <!--end::App Wrapper-->
     <!--begin::Script-->
     <!--begin::Third Party Plugin(OverlayScrollbars)-->
     <script
       src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/browser/overlayscrollbars.browser.es6.min.js"
-      integrity="sha256-dghWARbRe2eLlIJ56wNB+b760ywulqK3DzZYEpsg2fQ="
-      crossorigin="anonymous"
     ></script>
     <!--end::Third Party Plugin(OverlayScrollbars)--><!--begin::Required Plugin(popperjs for Bootstrap 5)-->
     <script
       src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-      crossorigin="anonymous"
     ></script>
     <!--end::Required Plugin(popperjs for Bootstrap 5)--><!--begin::Required Plugin(Bootstrap 5)-->
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-      integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-      crossorigin="anonymous"
     ></script>
     <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
     <script src="../../lib/js/adminlte.js"></script>
@@ -823,23 +948,23 @@
     </script>
     <!--end::OverlayScrollbars Configure-->
     <!--end::Script-->
+    <!--CDN JQUERY.-->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <!--Agregamos los estilos de BOOTSTRAP 5.-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- aGREGAMOS LA LIBRERÍA DE AXIOS.JS-->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.datatables.net/2.1.6/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/dataTables.buttons.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.dataTables.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.3/js/dataTables.responsive.min.js"></script>
+    <script src="../../JS/panel_admin.js"></script>
   </body>
-  <!--CDN JQUERY.-->
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-  <!--Agregamos los estilos de BOOTSTRAP 5.-->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- aGREGAMOS LA LIBRERÍA DE AXIOS.JS-->
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdn.datatables.net/2.1.6/js/dataTables.js"></script>
-  <script src="https://cdn.datatables.net/buttons/3.1.2/js/dataTables.buttons.js"></script>
-  <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.dataTables.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-  <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.html5.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.print.min.js"></script>
-  <script src="https://cdn.datatables.net/responsive/3.0.3/js/dataTables.responsive.min.js"></script>
-  <script src="../../JS/panel_admin.js"></script>
   <!--end::Body-->
 </html>

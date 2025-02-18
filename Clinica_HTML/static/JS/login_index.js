@@ -22,7 +22,7 @@ function login(){
                 sessionStorage.setItem('token', response.data.token);
                 sessionStorage.setItem('username', username)
                 //localStorage.setItem('usuarios', response.data.list_users)
-                window.location.href = 'http://127.0.0.1:5500/Clinica_HTML/static/Templates/Admin/template_admin.html'; // URL para administradores
+                window.location.href = 'http://127.0.0.1:5500/static/Templates/Admin/template_admin.html'; // URL para administradores
             }
             if (response.data.tipo_user == 0){
                 console.log("Usuario Normal")
