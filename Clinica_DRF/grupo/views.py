@@ -55,10 +55,11 @@ def crear_grupo(request):
     try:
         #print(request.data)
         nombre = request.data["name"]
-        #print(nombre)
-        ver = GroupModel.objects.filter(name=nombre).exists()
-        if ver is False:
-            return Response({'error': 3}, status=status.HTTP_400_BAD_REQUEST)
+        if not nombre:
+            return Response({'error': 'El nombre del grupo es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+        # Verificar si el grupo ya existe
+        if GroupModel.objects.filter(name=nombre).exists():
+            return Response({'error': 'El grupo ya existe'}, status=status.HTTP_400_BAD_REQUEST)
         dato_serializado = GroupSerializer(data=request.data)
         if dato_serializado.is_valid():
             dato_serializado.save()
@@ -96,8 +97,6 @@ def listar_grupo(request):
 @permission_classes([AllowAny])
 def editar_grupo(request, id):
     try:
-        print(id)
-        print(request.data["name"])
         grupo = Group.objects.get(pk=id)
         # Crear una instancia del serializer con el grupo existente y los nuevos datos
         serializer = GroupSerializer(grupo, data=request.data, partial=True)
@@ -122,18 +121,14 @@ def editar_grupo(request, id):
 def eliminar_grupo(request, id):
     try:
         print(id)
-        print(request.data["name"])
         grupo = Group.objects.get(pk=id)
         # Crear una instancia del serializer con el grupo existente y los nuevos datos
-        serializer = GroupSerializer(grupo, data=request.data, partial=True)
-        if serializer.is_valid():
-            # Guardar los cambios
-            serializer.save()
-            return Response({'success': 0, 'grupo': serializer.data},
-                            status=status.HTTP_200_OK)
-        else:
-            return Response({'error':1}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'grupos':serializer.data},
+        # Guardar los datos del grupo antes de eliminarlo
+        serializer = GroupSerializer(grupo)
+        grupo_data = serializer.data
+        # Eliminar el grupo
+        grupo.delete()
+        return Response({'success':1},
                         # Específicamos el status.
                         status=status.HTTP_200_OK)
     except Exception as err:

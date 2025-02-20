@@ -12,6 +12,8 @@ from django.contrib.auth import logout
 # Importamos el status.
 from rest_framework import status
 #
+from django.contrib.auth.models import Group
+#
 import os
 # Verificar si el usuario existe con este import, en caso de no, envía ERROR.
 from django.shortcuts import get_object_or_404 
@@ -29,7 +31,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import authentication_classes, permission_classes
 # La clase IsAuthenticated es un permiso en DRF que verifica si el usuario que realiza la solicitud está autenticado.
 # Cuando se establece IsAuthenticated como permiso para una vista, solo los usuarios autenticados podrán acceder a esa vista. Los usuarios no autenticados no tendrán permiso para realizar la solicitud
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 # Proceso de Autenticación
 # Obtención del Token: Cuando un usuario se autentica, intercambia su nombre de usuario y 
 # contraseña por un token único. Este token se genera y almacena en la base de datos asociado al usuario.
@@ -93,7 +95,6 @@ def usuario_grupo(request):
         print(f"Unexpected {err=}, {type(err)=}")
         return Response({'error': 1}, status=400)
 
-
 #
 def listar_doctor(request):
     try:
@@ -104,3 +105,44 @@ def listar_doctor(request):
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         return Response({'error': 1}, status=400)
+
+#
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def crear_doctor(request):
+    try:
+        username = request.data["username"]
+        password = request.data["password"]
+        first_name = request.data["first_name"]
+        last_name = request.data["last_name"]
+        email = request.data["email"]
+        edad = request.data["edad"]
+        rut = request.data["rut"]
+        fono = request.data["fono"]
+        sexo = request.data["sexo"]
+        #
+        if not username or not password or not password or not first_name or not last_name or not email or not edad or not rut or not fono or not sexo:
+            return Response({'error': 0}, status=status.HTTP_400_BAD_REQUEST)
+        #
+        if CustomersUsers.objects.filter(rut=rut).exists():
+            return Response({'error': 4}, status=status.HTTP_400_BAD_REQUEST)
+        dato_serializado = CustomUserSerializer(data=request.data)
+        try:
+            if dato_serializado.is_valid():
+                # Guardamos el objeto y obtenemos la instancia
+                usuario = dato_serializado.save()
+                # Obtenemos el ID del usuario recién creado
+                nuevo_usuario_id = usuario.id
+                group = Group.objects.get(name='Doctor')
+                usuario.groups.add(group)
+                return Response({'bien': 1}, status=status.HTTP_200_OK)
+            else:
+                #print(dato_serializado.errors)
+                print("Errores de validación:", dato_serializado.errors)
+                return Response({'error': 2, 'details': dato_serializado.errors}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as err:
+            print(f"Unexpected {err=}, {type(err)=}")
+            return Response({'error': 1}, status=400)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 3}, status=400)
