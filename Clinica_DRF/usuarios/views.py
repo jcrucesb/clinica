@@ -5,6 +5,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core import serializers
 from django.http import JsonResponse, HttpResponse
 from rest_framework.response import Response
+#
+from django.contrib.auth.hashers import make_password  # ¡Añade esta importación!
 # El token de DRF.
 from rest_framework.authtoken.models import Token
 # Cerrar la session del usuario actual.
@@ -96,10 +98,17 @@ def usuario_grupo(request):
         return Response({'error': 1}, status=400)
 
 #
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def listar_doctor(request):
     try:
-        
-        return Response({'list_doctor':1},
+        # Obtener el grupo por nombre
+        grupo = Group.objects.get(name='Doctor')
+        # Obtener todos los usuarios del grupo
+        usuarios = grupo.user_set.all()
+        # Serializar los datos
+        serializer = CustomUserSerializer(usuarios, many=True)
+        return Response({'list_doctor':serializer.data},
                         # Específicamos el status.
                         status=status.HTTP_200_OK)
     except Exception as err:
@@ -113,6 +122,7 @@ def crear_doctor(request):
     try:
         username = request.data["username"]
         password = request.data["password"]
+        hashed_password = make_password(password)
         first_name = request.data["first_name"]
         last_name = request.data["last_name"]
         email = request.data["email"]
@@ -130,7 +140,7 @@ def crear_doctor(request):
         try:
             if dato_serializado.is_valid():
                 # Guardamos el objeto y obtenemos la instancia
-                usuario = dato_serializado.save()
+                usuario = dato_serializado.save(password=hashed_password)
                 # Obtenemos el ID del usuario recién creado
                 nuevo_usuario_id = usuario.id
                 group = Group.objects.get(name='Doctor')

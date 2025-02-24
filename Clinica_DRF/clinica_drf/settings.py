@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'consulta',
     'direccion',
-    'grupo'
+    'grupo',
+    'especialidad'
 ]
 
 MIDDLEWARE = [
