@@ -6,36 +6,90 @@ function click_seccion(){
         item.addEventListener('click', function(e) {
             e.preventDefault(); // Evita recargar si es un enlace
             
+            //let pru = e.getAttribute("data-name")
+            console.log(item)
             // Remueve la clase de TODOS los elementos del menú
             menuItems.forEach(a => {
                 a.classList.remove('active-item');
                 a.style.background = ""; // Limpia el estilo en línea
             });
-            
             // Aplica solo al elemento clickeado
             this.classList.add('active-item');
-            this.style.background = "#E6E6E6";
+            this.style.background = "#A4A4A4";
         });
     });
+    //
+    let panel_doctor = document.getElementById("panel_doctor")
+    panel_doctor.addEventListener("click", function(event){
+        event.preventDefault();
+        let panel_doctor = this.getAttribute("data-name")
+        //
+        let container_paciente = document.getElementById("container_paciente")
+        container_paciente.style.display="none"
+        //
+        let container_doctor = document.getElementById(panel_doctor)
+        container_doctor.style.display="block"
+        //
+        let container_secretaria = document.getElementById("container_secretaria")
+        container_secretaria.style.display="none"
+
+    })
+    //
+    let panel_paciente = document.getElementById("panel_paciente")
+    panel_paciente.addEventListener("click", function(event){
+        event.preventDefault();
+        let container_paciente = this.getAttribute("data-name")
+        
+        let ocultar_container_paciente = document.getElementById(container_paciente)
+        ocultar_container_paciente.style.display="block"
+        //
+        let ocultar_container_doctor = document.getElementById("container_doctor")
+        ocultar_container_doctor.style.display="none"
+        //
+        let container_secretaria = document.getElementById("container_secretaria")
+        container_secretaria.style.display="none" 
+        //
+        let container_espe_doctor = document.getElementById("container_espe_doctor")
+        container_espe_doctor.style.display="none"
+    })
+    //
+    let panel_secretaria = document.getElementById("panel_secretaria")
+    panel_secretaria.addEventListener("click", function(event){
+        event.preventDefault();
+        let name_panel_secretaria = this.getAttribute("data-name")
+        let panel_secretaria = document.getElementById(name_panel_secretaria)
+        panel_secretaria.style.display="block"
+        //
+        let container_paciente = document.getElementById("container_paciente")
+        container_paciente.style.display="none"
+        //
+        let ocultar_container_doctor = document.getElementById("container_doctor")
+        ocultar_container_doctor.style.display="none"
+
+        let container_espe_doctor = document.getElementById("container_espe_doctor")
+        container_espe_doctor.style.display="none"
+    })
+    //
+    let seleccion_panel_modulos_usuario = document.getElementById("seleccion_panel_modulos_usuario")
+    seleccion_panel_modulos_usuario.addEventListener("click", function(e){
+        let opcion_secre_doc_pasc = document.getElementById("opcion_secre_doc_pasc")
+        opcion_secre_doc_pasc.style.display = "block"
+        //
+        let container_grupo = document.getElementById("container_grupo")
+        container_grupo.style.display = "none"
+        //
+        let container_esp = document.getElementById("container_secretaria")
+        container_esp.style.display = "none"
+
+        let container_espe_doctor = document.getElementById("container_espe_doctor")
+        container_espe_doctor.style.display="none"
+    })
 }
 click_seccion()
 //
 function panel_doctores(){
-    let opcion_doctor = document.getElementById("panel_doctor")
-    opcion_doctor.addEventListener("click", function(e){
-        let mostrar_panel_doctor = document.getElementById("container_doctor")
-        mostrar_panel_doctor.style.display = 'block'
-        // Ocultar el container del Panel de Grupo.
-        let ocultar_panel_grupo = document.getElementById("container_grupo")
-        ocultar_panel_grupo.style.display = 'none' 
-    })
-    let info = document.getElementById("info_doctor")
+    let info = document.getElementById("panel_doctor")
     info.addEventListener("click", function(e){
-        let modal_info_doctor = document.getElementById("modal_info_doctor")
-        // Crea una instancia del modal de Bootstrap
-        const modalInstance = new bootstrap.Modal(modal_info_doctor);
-        // Abre el modal
-        modalInstance.show();
         //
         const token = sessionStorage.getItem('token');
         let arr =[]
@@ -224,9 +278,6 @@ function nuevo_grupo(e){
     const modalInstance = new bootstrap.Modal(crear_grupo);
     // Abre el modal
     modalInstance.show();
-    // Ocultar el container del Panel de Grupo.
-    let ocultar_panel_grupo = document.getElementById("container_grupo")
-    ocultar_panel_grupo.style.display = 'none'
     // Obtenemos el id del boton clode.
     const elemento = document.querySelector('#cerrar_modal_listar_grupo');
     //
@@ -285,18 +336,21 @@ function nuevo_grupo(e){
 }
 // Función para listar los grupos.
 function grupos(e){
-    let container_doctor = document.getElementById("container_doctor")
-    container_doctor.style.display = 'none'
+    let opcion_secre_doc_pasc = document.getElementById("opcion_secre_doc_pasc")
+    opcion_secre_doc_pasc.style.display = "none"
+    //
     let container_grupo = document.getElementById("container_grupo")
-    container_grupo.style.display = 'block'
+    container_grupo.style.display = "block"
+    //
+    let container_esp = document.getElementById("container_espe_doctor")
+    container_esp.style.display = "none"
 
     let modal_grupo = document.getElementById("modal_grupo")
-    modal_grupo.addEventListener("click", function(e){
-        let listar_grupo = document.getElementById("listar_grupo")
-        // Crea una instancia del modal de Bootstrap
-        const modalInstance = new bootstrap.Modal(listar_grupo);
-        // Abre el modal
-        modalInstance.show();
+        // let listar_grupo = document.getElementById("listar_grupo")
+        // // Crea una instancia del modal de Bootstrap
+        // const modalInstance = new bootstrap.Modal(listar_grupo);
+        // // Abre el modal
+        // modalInstance.show();
         const token = sessionStorage.getItem('token');
         let arr =[]
         axios.get('http://127.0.0.1:8000/grupo/listar_grupo',{
@@ -371,7 +425,6 @@ function grupos(e){
                 console.log('Error Headers:', error.response.headers);
             }
         });
-    })
 }
 //
 function editar_grupo(id, nombre){
@@ -488,14 +541,15 @@ function borrar_grupo(id, nombre_grupo){
     });
 }
 // Solo sección CSS.
-function seccion_especialidad(){
-    // let cambiar_color = document.getElementById("seccion_esp")
-    // cambiar_color.style.background = "#00FFFF"
-    // Ocultamos el container del Doctor.
-    let container_doctor = document.getElementById("container_doctor")
-    container_doctor.style.display = "none" 
-    let container_espe_doctor = document.getElementById("container_espe_doctor")
-    container_espe_doctor.style.display = "block"
+function seccion_especialidad(e){
+    let opcion_secre_doc_pasc = document.getElementById("opcion_secre_doc_pasc")
+    opcion_secre_doc_pasc.style.display = "none"
+    //
+    let container_grupo = document.getElementById("container_grupo")
+    container_grupo.style.display = "none"
+    //
+    let container_esp = document.getElementById("container_espe_doctor")
+    container_esp.style.display = "block"
     //
     const token = sessionStorage.getItem('token');
     let arr =[]
