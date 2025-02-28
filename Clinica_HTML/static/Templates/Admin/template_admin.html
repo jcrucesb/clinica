@@ -819,11 +819,8 @@
                       <label for="inputPassword4" class="col-form-label">Seleccionar Especialidad</label>
                     </div>
                     <div class="col">
-                      <select class="form-select" id="inputGroupSelect01">
-                        <option selected>Choose...</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
+                      <select class="form-select" id="select_especialidad" onfocus="option_especialidad(this)">
+                        <option value="0" selected>Seleccionar</option>
                       </select>
                     </div>
                   </div>
@@ -840,25 +837,25 @@
     </div>
     <!-- Fin Formulario Crear Doctor. -->
     <!-- Modal Crud Especialidades Panel ADMIN.-->
-      <div class="modal fade" id="modal_espe_doctor" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header" style="background: rgb(114, 252, 252);">
-              <h1 class="modal-title fs-5" id="staticBackdropLabel">Especialidades</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="modal_espe_doctor" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background: rgb(114, 252, 252);">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Especialidades</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              
             </div>
-            <div class="modal-body">
-              <div class="container">
-                
-              </div>
-            </div>
-            <div class="modal-footer" style="background: rgb(114, 252, 252);">
-              <button type="button" class="btn btn-secondary" id="cerrar_modal_principal_list_esp" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Understood</button>
-            </div>
+          </div>
+          <div class="modal-footer" style="background: rgb(114, 252, 252);">
+            <button type="button" class="btn btn-secondary" id="cerrar_modal_principal_list_esp" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Understood</button>
           </div>
         </div>
       </div>
+    </div>
     <!-- Fin Modal Crud Especialidades Panel ADMIN.-->
     <!-- Modal Insertar Especialidad Panel ADMIN. -->
     <div class="modal fade" id="modal_insert_especialidad" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -915,6 +912,66 @@
       </div>
     </div>
     <!-- Modal Editar Esp Doctor Panel ADMIN. -->
+    <!-- Modal Listar especialidades en el panel admin, seccion DOCTOR. -->
+    <!-- Modal -->
+    <div class="modal fade" id="todas_esp_doc" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="background:rgb(18, 236, 135)">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Especialidades</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <div class="table-responsive">
+                <table id="tabla_esp_doct_admin" class="display nowrap" style="width:100%">
+                  <div class="col-md-12">
+                    <div class="d-grid gap-2">
+                      <button class="btn mb-2" id="nueva_espdoc_admin" onclick="agregar_esp_doct_admin(this)" style="background: greenyellow;"" type="button">Agregar Especialidad Doctor</button>
+                    </div>
+                  </div>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer" style="background:rgb(18, 236, 135)">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Fin Modal Listar especialidades en el panel admin, seccion DOCTOR. -->
+    <!-- Modal insert una nueva especialidad a un doctor específico. -->
+    <div class="modal fade" id="modal_agregar_nueva_esp_doctor" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="col-md-12">
+              <div class="row g-3 align-items-center">
+                <input type="hidden" id="id_doc" value="">
+                <div class="col-auto">
+                  <label for="inputPassword4" class="col-form-label">Seleccionar Especialidad</label>
+                </div>
+                <div class="col">
+                  <select class="form-select" id="select_especialidad_option" onfocus="option_especialidad_nueva_doc(this)">
+                    <option value="0" selected>Seleccionar</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" onclick="insert_nueva_esp_doctor_Admin(this)" class="btn btn-primary">Agregar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!---->
     <!--end::App Wrapper-->
     <!--begin::Script-->
     <!--begin::Third Party Plugin(OverlayScrollbars)-->

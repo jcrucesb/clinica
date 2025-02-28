@@ -112,15 +112,22 @@ function panel_doctores(){
                 data: arr,
                 columns: [
                     { title: 'ID', data: "id", defaultContent: '' },
-                    { title: 'Nombre Grupo', data: "username", defaultContent: '' },
+                    { title: 'Username', data: "username", defaultContent: '' },
+                    { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
+                    { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                    { title: 'Email', data: "email", defaultContent: '' },
+                    { title: 'Edad', data: "edad", defaultContent: '' },
+                    { title: 'Sexo', data: "sexo", defaultContent: '' },
+                    { title: 'Contacto', data: "fono", defaultContent: '' },
                     { 
                         title: 'Acciones', 
                         data: null,
                         defaultContent: '',
                         orderable: false,
                         render: function(data, type, row) {
-                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_editar_grupo" onclick="editar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_borrar_grupo" onclick="borrar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button>';
+                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_doc" onclick="editar_grupo('+row.id+', \''+row.first_name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_doc" onclick="borrar_user_doctor('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button>';
                         }
                     }
                 ],
@@ -168,6 +175,40 @@ function panel_doctores(){
     })
 }
 panel_doctores()
+// Función para btener los especialidades de la BD de forma dinámica INOUT.
+function option_especialidad(e){
+    let select_especialidad = document.getElementById("select_especialidad")
+    const token = sessionStorage.getItem('token');
+    // Evitar múltiples peticiones si ya hay datos
+    if (select_especialidad.options.length > 1) return;
+    let arr =[]
+    axios.get('http://127.0.0.1:8000/especialidad/especialidad_doctor',{
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        // 
+        const esp = response.data.especialidad;
+        //
+        esp.forEach(element => {
+            // Crear un NUEVO elemento option en cada iteración
+            const elegir_especialidad = document.createElement("option");
+            elegir_especialidad.value = element.id; // Usar ID como valor (mejor práctica)
+            elegir_especialidad.setAttribute("data-esp", element.nombre_especialidad)
+            elegir_especialidad.setAttribute("data-id", element.id)
+            elegir_especialidad.textContent = element.nombre_especialidad;
+            select_especialidad.appendChild(elegir_especialidad);
+        });
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+        }
+    });
+}
 // Solo Modal Crear Doctor.
 function insertar_doctor(e){
     let modal_form_doctor = document.getElementById("modal_form_doctor")
@@ -175,10 +216,6 @@ function insertar_doctor(e){
     const modalInstance = new bootstrap.Modal(modal_form_doctor);
     // Abre el modal
     modalInstance.show();
-}
-//
-function especialidad_doctor(){
-    alert()
 }
 //
 function insertar_bd_doctor(e){
@@ -211,6 +248,11 @@ function insertar_bd_doctor(e){
             console.warn(selectedGenero)
         }
     });
+    let especialidad = document.getElementById("select_especialidad")
+    const valor = especialidad.value;
+    console.log(valor)
+    const texto = especialidad.options[especialidad.selectedIndex].text;
+    //console.log(texto)
     let datos = {
         'username': username,
         'password': password,
@@ -221,8 +263,11 @@ function insertar_bd_doctor(e){
         'rut': rut,
         'fono': fono,
         'sexo': selectedGenero,
+        'especialidad': valor,
     }
+    console.warn(datos)
     //
+    let arr =[]
     axios.post(`http://127.0.0.1:8000/usuario/crear_doctor`, datos, {
         headers: {
             'Authorization': `Token ${token}`
@@ -231,15 +276,77 @@ function insertar_bd_doctor(e){
     .then(function (response) {
         console.warn(response.data);
         console.warn(response.status)
+        let grupos = response.data.list_doctor
+            grupos.forEach(element => {
+                console.log(element.username)
+                arr.push(element)
+            });
+        console.warn(arr)
         if (response.status == 200) {
             Swal.fire({
                 icon: "success",
-                title: "Creado Correctamente",
-                text: "El grupo fue creado correctamente!",
+                title: "Doctor Creado Correctamente",
+                text: "El doctor fue creado correctamente!",
+            });
+            var table = $('#listar_doctor').DataTable({
+                data: grupos,
+                columns: [
+                    { title: 'ID', data: "id", defaultContent: '' },
+                    { title: 'Username', data: "username", defaultContent: '' },
+                    { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
+                    { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                    { title: 'Email', data: "email", defaultContent: '' },
+                    { title: 'Edad', data: "edad", defaultContent: '' },
+                    { title: 'Sexo', data: "sexo", defaultContent: '' },
+                    { title: 'Contacto', data: "fono", defaultContent: '' },
+                    { 
+                        title: 'Acciones', 
+                        data: null,
+                        defaultContent: '',
+                        orderable: false,
+                        render: function(data, type, row) {
+                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_grupo" onclick="editar_grupo('+row.id+', \''+row.first_name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_grupo" onclick="borrar_user_doctor('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button>' ;
+                        }
+                    }
+                ],
+                destroy: true,
+                "dom": 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                "lengthMenu": [
+                    [5,10, 25, 50, -1],
+                    ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+                ],
+                "buttons": {
+                    "pageLength": {
+                        _: "Mostrar %d Registros"
+                    }
+                },
+                "language": {
+                    "decimal": "",
+                    "emptyTable": "No hay información",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                    "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                    "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Mostrar _MENU_ Documentos",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "Sin resultados encontrados",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Ultimo",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
             });
             // Realizamos el click automático.
-            elemento.click();
-            cerrar_modal_listar_doctor.click();
+            // elemento.click();
+            // cerrar_modal_listar_doctor.click();
             reset_input.reset()
         }
     }).catch(error => {
@@ -676,8 +783,7 @@ function form_insert_Esp(e){
             });
         }
         form_esp.reset()
-        // Realizamos el click automático.
-        cancelar_insert_esp.click()
+        
     }).catch(error => {
         if (error.response) {
             console.log('Error Response:', error.response.data);
@@ -956,6 +1062,521 @@ function borrar_esp(id, especialidad){
                                 },
                                 createdCell: function (td, cellData, rowData) {
                                     $(td).attr('id', 'acciones_celda_' + rowData.id); // Ej: acciones_celda_5
+                                }
+                            }
+                        ],
+                        destroy: true,
+                        "dom": 'Bfrtip',
+                        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                        "lengthMenu": [
+                            [5,10, 25, 50, -1],
+                            ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+                        ],
+                        "buttons": {
+                            "pageLength": {
+                                _: "Mostrar %d Registros"
+                            }
+                        },
+                        "language": {
+                            "decimal": "",
+                            "emptyTable": "No hay información",
+                            "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                            "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                            "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                            "infoPostFix": "",
+                            "thousands": ",",
+                            "lengthMenu": "Mostrar _MENU_ Documentos",
+                            "loadingRecords": "Cargando...",
+                            "processing": "Procesando...",
+                            "search": "Buscar:",
+                            "zeroRecords": "Sin resultados encontrados",
+                            "paginate": {
+                                "first": "Primero",
+                                "last": "Ultimo",
+                                "next": "Siguiente",
+                                "previous": "Anterior"
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                if (error.response) {
+                    console.log('Error Response:', error.response.data);
+                    console.log('Error Status:', error.response.status);
+                    console.log('Error Headers:', error.response.headers);
+                    if (error.response.data.error == 3) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "El grupo ya existe",
+                            text: "El grupo fue creado anteriormente!",
+                        });
+                    }
+                }
+            });
+        }
+    });
+}
+//
+function especialidades_list_doc(id, first_name){
+    //
+    const token = sessionStorage.getItem('token');
+    let arr =[]
+    axios.get(`http://127.0.0.1:8000/usuario/esp_doc_list/${id}/`,{
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        // 
+        //console.warn(response.data.grupos[0])
+        let grupos = response.data.list_doctor
+        grupos.forEach(element => {
+            console.log(element.username)
+            arr.push(element)
+        });
+        console.warn(arr)
+        //
+        var table = $('#listar_doctor').DataTable({
+            data: arr,
+            columns: [
+                { title: 'ID', data: "id", defaultContent: '' },
+                { title: 'Username', data: "username", defaultContent: '' },
+                { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
+                { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                { title: 'Email', data: "email", defaultContent: '' },
+                { title: 'Edad', data: "edad", defaultContent: '' },
+                { title: 'Sexo', data: "sexo", defaultContent: '' },
+                { title: 'Contacto', data: "fono", defaultContent: '' },
+                { 
+                    title: 'Acciones', 
+                    data: null,
+                    defaultContent: '',
+                    orderable: false,
+                    render: function(data, type, row) {
+                        return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_doc" onclick="editar_grupo('+row.id+', \''+row.first_name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                                '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_doc" onclick="borrar_grupo('+row.id+', \''+row.first_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button>';
+                    }
+                }
+            ],
+            destroy: true,
+            "dom": 'Bfrtip',
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            "lengthMenu": [
+                [5,10, 25, 50, -1],
+                ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+            ],
+            "buttons": {
+                "pageLength": {
+                    _: "Mostrar %d Registros"
+                }
+            },
+            "language": {
+                "decimal": "",
+                "emptyTable": "No hay información",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ Documentos",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Ultimo",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            }
+        });
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+        }
+    });
+}
+//
+function especialidades_list_doc(id, first_name){
+    let todas_esp_doc = document.getElementById("todas_esp_doc")
+    // Crea una instancia del modal de Bootstrap
+    const modalInstance = new bootstrap.Modal(todas_esp_doc);
+    // Abre el modal
+    modalInstance.show();
+    //
+    let id_doc = document.getElementById("id_doc")
+    id_doc.value = id
+    const token = sessionStorage.getItem('token');
+    let arr =[]
+    axios.get(`http://127.0.0.1:8000/usuario/esp_doc_list/${id}/`,{
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        //console.warn(response.data.grupos[0])
+        let especialidades = response.data.especialidades;
+        console.log(especialidades)
+        //
+        let doc_id = document.getElementById("id_doc").value
+        var table = $('#tabla_esp_doct_admin').DataTable({
+            data: especialidades,
+            columns: [
+                { title: 'ID', data: "id", defaultContent: '' },
+                { title: 'Especialidad', data: "nombre_especialidad", defaultContent: '' },
+                { 
+                    title: 'Acciones', 
+                    data: null,
+                    defaultContent: '',
+                    orderable: false,
+                    render: function(data, type, row) {
+                        return ' <button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_esp_doc_list_esp_doctor" onclick="eliminar_esp_doct_panel_admin('+row.id+', \''+row.nombre_especialidad+'\', '+doc_id+')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                    }
+                }
+            ],
+            destroy: true,
+            "dom": 'Bfrtip',
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            "lengthMenu": [
+                [5,10, 25, 50, -1],
+                ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+            ],
+            "buttons": {
+                "pageLength": {
+                    _: "Mostrar %d Registros"
+                }
+            },
+            "language": {
+                "decimal": "",
+                "emptyTable": "No hay información",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ Documentos",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Ultimo",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            }
+        });
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+        }
+    });
+}
+//
+function option_especialidad_nueva_doc(e){
+    let select_especialidad_option = document.getElementById("select_especialidad_option")
+    const token = sessionStorage.getItem('token');
+    // Evitar múltiples peticiones si ya hay datos
+    if (select_especialidad_option.options.length > 1) return;
+    let arr =[]
+    axios.get('http://127.0.0.1:8000/especialidad/especialidad_doctor',{
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        // 
+        const esp = response.data.especialidad;
+        //
+        esp.forEach(element => {
+            // Crear un NUEVO elemento option en cada iteración
+            const elegir_especialidad = document.createElement("option");
+            elegir_especialidad.value = element.id; // Usar ID como valor (mejor práctica)
+            elegir_especialidad.setAttribute("data-esp", element.nombre_especialidad)
+            elegir_especialidad.setAttribute("data-id", element.id)
+            elegir_especialidad.textContent = element.nombre_especialidad;
+            select_especialidad_option.appendChild(elegir_especialidad);
+        });
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+        }
+    });
+}
+//
+function agregar_esp_doct_admin(e){
+    let modal_agregar_nueva_esp_doctor = document.getElementById("modal_agregar_nueva_esp_doctor")
+    // Crea una instancia del modal de Bootstrap
+    const modalInstance = new bootstrap.Modal(modal_agregar_nueva_esp_doctor);
+    // Abre el modal
+    modalInstance.show();
+}
+//
+function insert_nueva_esp_doctor_Admin(e){
+    //
+    let id_doc = document.getElementById("id_doc").value
+    console.log(id_doc)
+    let especialidad = document.getElementById("select_especialidad_option")
+    const valor = especialidad.value;
+    console.log(valor)
+    const token = sessionStorage.getItem('token');
+     let arr =[]
+    let datos = {
+        'especialidad_id': valor,
+    }
+    axios.post(`http://127.0.0.1:8000/usuario/nueva_esp_doctor_admin/${id_doc}/`,datos,{
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        //console.warn(response.data.grupos[0])
+        let especialidades = response.data.especialidades;
+        console.log(especialidades)
+        let arr = []
+        especialidades.forEach(esp => {
+            console.log(`ID: ${esp.id}, Especialidad: ${esp.especialidad}`);
+            arr.push(esp.id, esp.especialidad)
+        });
+        console.warn(arr)
+        //
+        var table = $('#tabla_esp_doct_admin').DataTable({
+            data: especialidades,
+            columns: [
+                { title: 'ID', data: "id", defaultContent: '' },
+                { title: 'Especialidad', data: "especialidad", defaultContent: '' },
+                { 
+                    title: 'Acciones', 
+                    data: null,
+                    defaultContent: '',
+                    orderable: false,
+                    render: function(data, type, row) {
+                        return ' <button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_esp_doc" onclick="eliminar_esp_doct_panel_admin('+row.id+', \''+row.especialidad+'\', '+id_doc+')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                    }
+                }
+            ],
+            destroy: true,
+            "dom": 'Bfrtip',
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            "lengthMenu": [
+                [5,10, 25, 50, -1],
+                ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+            ],
+            "buttons": {
+                "pageLength": {
+                    _: "Mostrar %d Registros"
+                }
+            },
+            "language": {
+                "decimal": "",
+                "emptyTable": "No hay información",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ Documentos",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Ultimo",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            }
+        });
+    })
+    .catch(error => {
+         if (error.response) {
+             console.log('Error Response:', error.response.data);
+             console.log('Error Status:', error.response.status);
+             console.log('Error Headers:', error.response.headers);
+         }
+    });
+}
+//
+function eliminar_esp_doct_panel_admin(id_especialidad, especialidad, id_doctor){
+    console.warn(id_especialidad)
+    const token = sessionStorage.getItem('token');
+    Swal.fire({
+        title: "¿Desea eliminar la especialidad: " +especialidad+"?",
+        text: "Se eliminará la especialidad al doctor.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "¡Si, borrar!"
+      }).then((result) => {
+        if (result.isConfirmed) {
+            let datos = {
+                'id_especialidad': id_especialidad
+            }
+            axios.delete(`http://127.0.0.1:8000/usuario/borrar_esp_doctor/${id_doctor}/?id_especialidad=${id_especialidad}`,{
+                headers: {
+                    'Authorization': `Token ${token}`
+                }
+            })
+            .then(function (response) {
+                console.warn(response.data);
+                console.warn(response.status)
+                let especialidades = response.data.especialidades;
+                console.warn(especialidades)
+                if (response.status == 200) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Eliminada Especialidad",
+                        text: "La especialidad fué eliminada correctamente!",
+                    });
+                    console.log(especialidades)
+                    //
+                    let doc_id = document.getElementById("id_doc").value
+                    var table = $('#tabla_esp_doct_admin').DataTable({
+                        data: especialidades,
+                        columns: [
+                            { title: 'ID', data: "id", defaultContent: '' },
+                            { title: 'Especialidad', data: "especialidad", defaultContent: '' },
+                            { 
+                                title: 'Acciones', 
+                                data: null,
+                                defaultContent: '',
+                                orderable: false,
+                                render: function(data, type, row) {
+                                    return ' <button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_esp_doc_list_esp_doctor" onclick="eliminar_esp_doct_panel_admin('+row.id+', \''+row.nombre_especialidad+'\', '+doc_id+')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                                }
+                            }
+                        ],
+                        destroy: true,
+                        "dom": 'Bfrtip',
+                        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                        "lengthMenu": [
+                            [5,10, 25, 50, -1],
+                            ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+                        ],
+                        "buttons": {
+                            "pageLength": {
+                                _: "Mostrar %d Registros"
+                            }
+                        },
+                        "language": {
+                            "decimal": "",
+                            "emptyTable": "No hay información",
+                            "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                            "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                            "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                            "infoPostFix": "",
+                            "thousands": ",",
+                            "lengthMenu": "Mostrar _MENU_ Documentos",
+                            "loadingRecords": "Cargando...",
+                            "processing": "Procesando...",
+                            "search": "Buscar:",
+                            "zeroRecords": "Sin resultados encontrados",
+                            "paginate": {
+                                "first": "Primero",
+                                "last": "Ultimo",
+                                "next": "Siguiente",
+                                "previous": "Anterior"
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                if (error.response) {
+                    console.log('Error Response:', error.response.data);
+                    console.log('Error Status:', error.response.status);
+                    console.log('Error Headers:', error.response.headers);
+                    if (error.response.data.error == 3) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "El grupo ya existe",
+                            text: "El grupo fue creado anteriormente!",
+                        });
+                    }
+                }
+            });
+        }
+    });
+}
+//
+function borrar_user_doctor(id_doc, nombres, apellidos){
+    console.log(id_doc)
+    console.log(nombres)
+    console.log(apellidos)
+    const token = sessionStorage.getItem('token');
+    let arr = []
+    Swal.fire({
+        title: "¿Desea eliminaral Doctor: " +nombres + ' ' +apellidos+ "?",
+        text: "Se eliminará al doctor.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "¡Si, borrar!"
+      }).then((result) => {
+        if (result.isConfirmed) {
+            let datos = {
+                'id_especialidad': id_doc
+            }
+            axios.delete(`http://127.0.0.1:8000/usuario/borrar_doctor/${id_doc}/`,{
+                headers: {
+                    'Authorization': `Token ${token}`
+                }
+            })
+            .then(function (response) {
+                console.warn(response.data);
+                console.warn(response.status)
+                let doc = response.data.list_doctor;
+                if (response.status == 200) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Doctor Eliminado",
+                        text: "El Doctor fué eliminado correctamente!",
+                    });
+                    console.log(doc)
+                    //
+                    let grupos = response.data.list_doctor
+                    grupos.forEach(element => {
+                        console.log(element.username)
+                        arr.push(element)
+                    });
+                    console.warn(arr)
+                    //
+                    var table = $('#listar_doctor').DataTable({
+                        data: arr,
+                        columns: [
+                            { title: 'ID', data: "id", defaultContent: '' },
+                            { title: 'Username', data: "username", defaultContent: '' },
+                            { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
+                            { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                            { title: 'Email', data: "email", defaultContent: '' },
+                            { title: 'Edad', data: "edad", defaultContent: '' },
+                            { title: 'Sexo', data: "sexo", defaultContent: '' },
+                            { title: 'Contacto', data: "fono", defaultContent: '' },
+                            { 
+                                title: 'Acciones', 
+                                data: null,
+                                defaultContent: '',
+                                orderable: false,
+                                render: function(data, type, row) {
+                                    return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_doc" onclick="editar_grupo('+row.id+', \''+row.first_name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_doc" onclick="borrar_user_doctor('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button>';
                                 }
                             }
                         ],

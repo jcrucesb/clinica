@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .serializers import GroupSerializer
-from .models import GroupModel
+from django.contrib.auth.models import Group
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core import serializers
 from django.http import JsonResponse, HttpResponse
@@ -58,7 +58,7 @@ def crear_grupo(request):
         if not nombre:
             return Response({'error': 'El nombre del grupo es requerido'}, status=status.HTTP_400_BAD_REQUEST)
         # Verificar si el grupo ya existe
-        if GroupModel.objects.filter(name=nombre).exists():
+        if Group.objects.filter(name=nombre).exists():
             return Response({'error': 'El grupo ya existe'}, status=status.HTTP_400_BAD_REQUEST)
         dato_serializado = GroupSerializer(data=request.data)
         if dato_serializado.is_valid():

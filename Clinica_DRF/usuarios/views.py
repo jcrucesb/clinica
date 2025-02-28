@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import CustomersUsers
+from especialidad.models import Especialidad
 from .serializers import CustomUserSerializer
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core import serializers
@@ -108,6 +109,7 @@ def listar_doctor(request):
         usuarios = grupo.user_set.all()
         # Serializar los datos
         serializer = CustomUserSerializer(usuarios, many=True)
+        print(serializer.data)
         return Response({'list_doctor':serializer.data},
                         # Específicamos el status.
                         status=status.HTTP_200_OK)
@@ -130,8 +132,9 @@ def crear_doctor(request):
         rut = request.data["rut"]
         fono = request.data["fono"]
         sexo = request.data["sexo"]
+        especialidad_id = request.data["especialidad"]
         #
-        if not username or not password or not password or not first_name or not last_name or not email or not edad or not rut or not fono or not sexo:
+        if not username or not password or not password or not first_name or not last_name or not email or not edad or not rut or not fono or not sexo or not especialidad_id:
             return Response({'error': 0}, status=status.HTTP_400_BAD_REQUEST)
         #
         if CustomersUsers.objects.filter(rut=rut).exists():
@@ -143,16 +146,133 @@ def crear_doctor(request):
                 usuario = dato_serializado.save(password=hashed_password)
                 # Obtenemos el ID del usuario recién creado
                 nuevo_usuario_id = usuario.id
+                #print(nuevo_usuario_id)
                 group = Group.objects.get(name='Doctor')
                 usuario.groups.add(group)
-                return Response({'bien': 1}, status=status.HTTP_200_OK)
+                # Obtener el grupo por nombre
+                grupo = Group.objects.get(name='Doctor')
+                #
+                especialidad = Especialidad.objects.get(pk=especialidad_id)
+                # Insertamos en la tabla intermedia la especialidad del doctor.
+                usuario.especialidades.add(especialidad.id)
+                # Obtener todos los usuarios del grupo
+                usuarios = grupo.user_set.all()
+                # Serializar los datos
+                serializer = CustomUserSerializer(usuarios, many=True)
+                print(serializer.data)
+                return Response({'list_doctor': serializer.data}, status=status.HTTP_200_OK)
             else:
                 #print(dato_serializado.errors)
-                print("Errores de validación:", dato_serializado.errors)
+                print("Errores de validación:", serializer.errors)
                 return Response({'error': 2, 'details': dato_serializado.errors}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as err:
             print(f"Unexpected {err=}, {type(err)=}")
             return Response({'error': 1}, status=400)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 3}, status=400)
+
+#
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def esp_doc_list(request, id):
+    try:
+        # Obtener el usuario
+        usuario = CustomersUsers.objects.get(id=id)  # Reemplaza usuario_id con el ID del usuario
+        # Obtener todas las especialidades asociadas al usuario
+        especialidades = usuario.especialidades.all()
+        # Preparar los datos para la respuesta
+        especialidades_list = [
+            {
+                'id': especialidad.id,
+                'nombre_especialidad': especialidad.nombre_especialidad
+            }
+            #
+            for especialidad in especialidades
+        ]
+        #
+        return Response({'especialidades': especialidades_list}, status=status.HTTP_200_OK)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 3}, status=400)
+
+#
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def nueva_esp_doctor_admin(request, id):
+    try:
+        print(id)
+        user = CustomersUsers.objects.get(pk=id)
+        especialidad_id = request.data["especialidad_id"]
+        print(especialidad_id)
+        #
+        especialidad = Especialidad.objects.get(pk=especialidad_id)
+        user.especialidades.add(especialidad)
+        # Obtener todas las especialidades del usuario
+        especialidades_doc = user.especialidades.all()
+        arr = {}
+        especialidades = []
+        # especialidades_list = [esp for esp in especialidades_doc]
+        for esp in especialidades_doc:
+            print(esp.id)
+            print(esp.nombre_especialidad)
+            arr = {
+                'id': esp.id,
+                'especialidad': esp.nombre_especialidad,
+            }
+            especialidades.append(arr)
+        #print(especialidades)
+        return Response({'especialidades': especialidades}, status=status.HTTP_200_OK)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 3}, status=400)
+
+#
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def borrar_esp_doctor(request, id):
+    try:
+        #print(id)
+        id_especialidad = request.query_params.get('id_especialidad')
+        #print(id_especialidad)
+        user = CustomersUsers.objects.get(pk=id)
+        especialidad = Especialidad.objects.get(pk=id_especialidad)
+        #print("Pasamos")
+        user.especialidades.remove(especialidad)
+        # Obtener todas las especialidades del usuario
+        especialidades_doc = user.especialidades.all()
+        especialidades = []
+        for esp in especialidades_doc:
+            #print(esp.id)
+            #print(esp.nombre_especialidad)
+            arr = {
+                'id': esp.id,
+                'especialidad': esp.nombre_especialidad,
+            }
+            especialidades.append(arr)
+        #print(especialidades)
+        return Response({'especialidades': especialidades}, status=status.HTTP_200_OK)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 3}, status=400)
+
+#
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def borrar_doctor(request, id):
+    try:
+        print(id)
+        usuario = CustomersUsers.objects.get(pk=id)
+        usuario.delete()
+        # Obtener el grupo por nombre
+        grupo = Group.objects.get(name='Doctor')
+        # Obtener todos los usuarios del grupo
+        usuarios = grupo.user_set.all()
+        # Serializar los datos
+        serializer = CustomUserSerializer(usuarios, many=True)
+        return Response({'list_doctor':serializer.data},
+                        # Específicamos el status.
+                        status=status.HTTP_200_OK)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         return Response({'error': 3}, status=400)

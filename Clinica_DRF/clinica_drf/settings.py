@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'consulta',
     'direccion',
     'grupo',
-    'especialidad'
+    'especialidad',
 ]
 
 MIDDLEWARE = [
