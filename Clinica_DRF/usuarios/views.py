@@ -1,11 +1,15 @@
 from django.shortcuts import render
 from .models import CustomersUsers
 from especialidad.models import Especialidad
+from direccion.models import DireccionModel
 from .serializers import CustomUserSerializer
+from direccion.serializers import DireccionSerializer
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core import serializers
 from django.http import JsonResponse, HttpResponse
 from rest_framework.response import Response
+# Crear un código de Venta.
+import uuid
 #
 from django.contrib.auth.hashers import make_password  # ¡Añade esta importación!
 # El token de DRF.
@@ -88,6 +92,58 @@ def login(request):
         return Response({'error': 1}, status=400)
 
 #
+@api_view(['POST'])
+def registrar_usuario(request):
+    try:
+        # Hacer una copia mutable de request.data
+        # Esto se hace para poder agregar mas data al array de objetos.
+        data = request.data.copy()
+        username = data.get("username")
+        password = data.get("password")
+        hashed_password = make_password(password)
+        first_name = data.get("first_name")
+        last_name = data.get("last_name")
+        email = data.get("email")
+        edad = data.get("edad")
+        rut = data.get("rut")
+        fono = data.get("fono")
+        sexo = data.get("sexo")
+        vivienda = data.get("vivienda")
+        region = data.get("region")
+        comuna = data.get("comuna")
+        num_vivienda = data.get("num_vivienda")
+        usuario_uuid = str(uuid.uuid4())
+        data.update({'usuario_uuid': usuario_uuid})
+
+        if not all([username, password, first_name, last_name, email, edad, rut, fono, sexo, vivienda, region, comuna, num_vivienda]):
+            return Response({'error': 0}, status=status.HTTP_400_BAD_REQUEST)
+
+        if CustomersUsers.objects.filter(rut=rut).exists():
+            return Response({'error': 4}, status=status.HTTP_400_BAD_REQUEST)
+
+        dato_serializado = CustomUserSerializer(data=data)
+        if dato_serializado.is_valid():
+            usuario = dato_serializado.save(password=hashed_password)
+            # Aquí nos aseguramos de actualizar la copia mutable de los datos
+            data.update({'usuario': usuario.id})
+            #print(data)
+            group = Group.objects.get(name='Pacientes')
+            usuario.groups.add(group)
+            direccion_dato_serializado = DireccionSerializer(data=data)
+            #print(direccion_dato_serializado)
+            if direccion_dato_serializado.is_valid():
+                direccion_dato_serializado.save()
+            grupo = Group.objects.get(name='Pacientes')
+            usuarios = grupo.user_set.all()
+            return Response({'pacientes': 1}, status=status.HTTP_200_OK)
+        else:
+            print("Errores de validación:", dato_serializado.errors)
+            return Response({'error': 2, 'details': dato_serializado.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 1}, status=status.HTTP_400_BAD_REQUEST)
+
+#
 def usuario_grupo(request):
     try:
         
@@ -133,12 +189,17 @@ def crear_doctor(request):
         fono = request.data["fono"]
         sexo = request.data["sexo"]
         especialidad_id = request.data["especialidad"]
+        #print("Productos segmentados:", productos_segmentados)
+        usuario_uuid = uuid.uuid4()
+        usuario_uuid = usuario_uuid,
+        #request.data.update({'usuario_uuid': usuario_uuid})
         #
         if not username or not password or not password or not first_name or not last_name or not email or not edad or not rut or not fono or not sexo or not especialidad_id:
             return Response({'error': 0}, status=status.HTTP_400_BAD_REQUEST)
         #
         if CustomersUsers.objects.filter(rut=rut).exists():
             return Response({'error': 4}, status=status.HTTP_400_BAD_REQUEST)
+        
         dato_serializado = CustomUserSerializer(data=request.data)
         try:
             if dato_serializado.is_valid():
@@ -276,3 +337,191 @@ def borrar_doctor(request, id):
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         return Response({'error': 3}, status=400)
+
+#------------------------- Paciente -----------------
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def listar_paciente(request):
+    try:
+        # Obtener el grupo por nombre
+        grupo = Group.objects.get(name='Pacientes')
+        #print(grupo)
+        # Obtener todos los usuarios del grupo
+        usuarios = grupo.user_set.all()
+        datos = []
+        for users in usuarios:
+            #print(users.id)
+            # Serializar los datos
+            serializer_dir = DireccionModel.objects.filter(usuario_id=users.id)
+            for ser in serializer_dir:
+                print(ser.vivienda)
+                datos.append({'id': users.id, 'username': users.username, 'first_name': users.first_name, 'last_name': users.last_name, 'email': users.email, 'edad': users.edad, 'sexo': users.sexo, 'rut': users.rut, 'fono': users.fono, 'usuario_uuid':users.usuario_uuid, 'password':users.password,'region': ser.region, 'comuna': ser.comuna, 'vivienda': ser.vivienda, 'num_vivienda': ser.num_vivienda, 'usuario_id': ser.usuario_id})
+        print(datos)
+        print("---------------------///****//")
+        return Response({'pacientes':datos},
+                        # Específicamos el status.
+                        status=status.HTTP_200_OK)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 1}, status=400)
+    
+# Crear Paciente Panel ADMIN
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def crear_paciente(request):
+    try:
+        print(request.data)
+        # Hacer una copia mutable de request.data
+        # Esto se hace para poder agregar mas data al array de objetos.
+        data = request.data.copy()
+        username = data.get("username")
+        print(username)
+        password = data.get("password")
+        print(password)
+        hashed_password = make_password(password)
+        first_name = data.get("first_name")
+        last_name = data.get("last_name")
+        email = data.get("email")
+        edad = data.get("edad")
+        rut = data.get("rut")
+        fono = data.get("fono")
+        sexo = data.get("sexo")
+        vivienda = data.get("vivienda")
+        region = data.get("region")
+        comuna = data.get("comuna")
+        num_vivienda = data.get("num_vivienda")
+        usuario_uuid = str(uuid.uuid4())
+        data.update({'usuario_uuid': usuario_uuid})
+
+        if not all([username, password, first_name, last_name, email, edad, rut, fono, sexo, vivienda, region, comuna, num_vivienda]):
+            return Response({'error': 0}, status=status.HTTP_400_BAD_REQUEST)
+
+        if CustomersUsers.objects.filter(rut=rut).exists():
+            return Response({'error': 4}, status=status.HTTP_400_BAD_REQUEST)
+
+        dato_serializado = CustomUserSerializer(data=data)
+        if dato_serializado.is_valid():
+            usuario = dato_serializado.save(password=hashed_password)
+            # Aquí nos aseguramos de actualizar la copia mutable de los datos
+            data.update({'usuario': usuario.id})
+            #print(data)
+            group = Group.objects.get(name='Pacientes')
+            usuario.groups.add(group)
+            direccion_dato_serializado = DireccionSerializer(data=data)
+            #print(direccion_dato_serializado)
+            if direccion_dato_serializado.is_valid():
+                direccion_dato_serializado.save()
+            # Obtener el grupo por nombre
+            grupo = Group.objects.get(name='Pacientes')
+            #print(grupo)
+            # Obtener todos los usuarios del grupo
+            usuarios = grupo.user_set.all()
+            datos = []
+            for users in usuarios:
+                #print(users.id)
+                # Serializar los datos
+                serializer_dir = DireccionModel.objects.filter(usuario_id=users.id)
+                for ser in serializer_dir:
+                    print(ser.vivienda)
+                    datos.append({'id': users.id, 'username': users.username, 'first_name': users.first_name, 'last_name': users.last_name, 'email': users.email, 'edad': users.edad, 'sexo': users.sexo, 'rut': users.rut, 'fono': users.fono, 'usuario_uuid':users.usuario_uuid, 'password': users.password,'region': ser.region, 'comuna': ser.comuna, 'vivienda': ser.vivienda, 'num_vivienda': ser.num_vivienda, 'usuario_id': ser.usuario_id})
+            return Response({'pacientes': datos}, status=status.HTTP_200_OK)
+        else:
+            print("Errores de validación:", dato_serializado.errors)
+            return Response({'error': 2, 'details': dato_serializado.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 1}, status=status.HTTP_400_BAD_REQUEST)
+
+#
+@api_view(['PUT'])
+@permission_classes([AllowAny])
+def update_paciente(request, id):
+    try:
+        # Hacer una copia mutable de request.data
+        # Esto se hace para poder agregar mas data al array de objetos.
+        data = request.data.copy()
+        username = data.get("username")
+        print(username)
+        password = data.get("password")
+        print(password)
+        hashed_password = make_password(password)
+        first_name = data.get("first_name")
+        last_name = data.get("last_name")
+        email = data.get("email")
+        edad = data.get("edad")
+        rut = data.get("rut")
+        fono = data.get("fono")
+        sexo = data.get("sexo")
+        vivienda = data.get("vivienda")
+        region = data.get("region")
+        comuna = data.get("comuna")
+        num_vivienda = data.get("num_vivienda")
+        # Validaciones.
+        if not all([username, password, first_name, last_name, email, edad, rut, fono, sexo, vivienda, region, comuna, num_vivienda]):
+            return Response({'error': 0}, status=status.HTTP_400_BAD_REQUEST)
+        #
+        user = CustomersUsers.objects.get(pk=id)
+        # Validar y actualizar datos
+        serializer = CustomUserSerializer(user, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            # Hashear contraseña si se proporciona
+            if 'password' in request.data:
+                password = request.data['password']
+                serializer.validated_data['password'] = make_password(password)
+                # Actualizar campos adicionales
+                serializer.save()
+            # Buscar la instancia de la dirección existente
+            direccion = DireccionModel.objects.filter(usuario_id=user.id).first()
+            direccion_serializer = DireccionSerializer(direccion, data=request.data, partial=True)
+            if direccion_serializer.is_valid():
+                direccion_serializer.save()
+                # Obtener el grupo por nombre
+                grupo = Group.objects.get(name='Pacientes')
+                # Obtener todos los usuarios del grupo
+                usuarios = grupo.user_set.all()
+                datos = []
+                for users in usuarios:
+                    serializer_dir = DireccionModel.objects.filter(usuario_id=users.id)
+                    for ser in serializer_dir:
+                        datos.append({'id': users.id, 'username': users.username, 'first_name': users.first_name, 'last_name': users.last_name, 'email': users.email, 'edad': users.edad, 'sexo': users.sexo, 'rut': users.rut, 'fono': users.fono, 'usuario_uuid': users.usuario_uuid, 'password': users.password, 'region': ser.region, 'comuna': ser.comuna, 'vivienda': ser.vivienda, 'num_vivienda': ser.num_vivienda, 'usuario_id': ser.usuario_id})
+                
+                return Response({'pacientes': datos}, status=status.HTTP_200_OK)
+            else:
+                return Response(direccion_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+       
+                    
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 1}, status=400)
+
+#
+@api_view(['DELETE'])
+@permission_classes([AllowAny])
+def delete_paciente(request, id):
+    try:
+        user = CustomersUsers.objects.get(pk=id)
+        user.delete()
+        direccion = DireccionModel.objects.get(usuario_id=user.id)
+        direccion.delete()
+        # Obtener el grupo por nombre
+        grupo = Group.objects.get(name='Pacientes')
+        #print(grupo)
+        # Obtener todos los usuarios del grupo
+        usuarios = grupo.user_set.all()
+        datos = []
+        for users in usuarios:
+            #print(users.id)
+            # Serializar los datos
+            serializer_dir = DireccionModel.objects.filter(usuario_id=users.id)
+            for ser in serializer_dir:
+                print(ser.vivienda)
+                datos.append({'id': users.id, 'username': users.username, 'first_name': users.first_name, 'last_name': users.last_name, 'email': users.email, 'edad': users.edad, 'sexo': users.sexo, 'rut': users.rut, 'fono': users.fono, 'usuario_uuid':users.usuario_uuid, 'password':users.password,'region': ser.region, 'comuna': ser.comuna, 'vivienda': ser.vivienda, 'num_vivienda': ser.num_vivienda, 'usuario_id': ser.usuario_id})
+        print(datos)
+        return Response({'pacientes':datos},
+                        # Específicamos el status.
+                        status=status.HTTP_200_OK)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 1}, status=400)
+#------------------------- Fin Pacientes ------------

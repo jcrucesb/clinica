@@ -86,6 +86,7 @@ function click_seccion(){
     })
 }
 click_seccion()
+//----------------------------------- Inicio Módulo Doctor -----------------------------------------------
 //
 function panel_doctores(){
     let info = document.getElementById("panel_doctor")
@@ -125,7 +126,7 @@ function panel_doctores(){
                         defaultContent: '',
                         orderable: false,
                         render: function(data, type, row) {
-                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_doc" onclick="editar_grupo('+row.id+', \''+row.first_name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_doc" onclick="editar_doctor('+row.id+', \''+row.first_name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
                                     '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_doc" onclick="borrar_user_doctor('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
                                     '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button>';
                         }
@@ -385,10 +386,11 @@ function nuevo_grupo(e){
     const modalInstance = new bootstrap.Modal(crear_grupo);
     // Abre el modal
     modalInstance.show();
-    // Obtenemos el id del boton clode.
+    // Obtenemos el id del boton
     const elemento = document.querySelector('#cerrar_modal_listar_grupo');
     //
     let boton_crear_grupo = document.getElementById("insertar_grupo")
+    let arr =[]
     boton_crear_grupo.addEventListener("click", function(e){
         e.preventDefault()
         let name = document.getElementById("nombre_grupo").value
@@ -418,10 +420,65 @@ function nuevo_grupo(e){
                         title: "Creado Correctamente",
                         text: "El grupo fue creado correctamente!",
                     });
-                    // Realizamos el click automático.
-                    elemento.click();
-                    let reset_input = document.getElementById("nombre_grupo")
-                    reset_input.value = ""
+                    let name_text = document.getElementById("nombre_grupo")
+                    name_text.value = ""
+                    //console.warn(response.data.grupos[0])
+                    let grupos = response.data.grupos
+                    grupos.forEach(element => {
+                        console.log(element.name)
+                        arr.push(element)
+                    });
+                    console.warn(arr)
+                    //
+                    var table = $('#tabla_grupo').DataTable({
+                        data: arr,
+                        columns: [
+                            { title: 'ID', data: "id", defaultContent: '' },
+                            { title: 'Nombre Grupo', data: "name", defaultContent: '' },
+                            { 
+                                title: 'Acciones', 
+                                data: null,
+                                defaultContent: '',
+                                orderable: false,
+                                render: function(data, type, row) {
+                                    return '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_editar_grupo" onclick="modal_editar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_borrar_grupo" onclick="borrar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button>';
+                                }
+                            }
+                        ],
+                        destroy: true,
+                        "dom": 'Bfrtip',
+                        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                        "lengthMenu": [
+                            [5,10, 25, 50, -1],
+                            ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+                        ],
+                        "buttons": {
+                            "pageLength": {
+                                _: "Mostrar %d Registros"
+                            }
+                        },
+                        "language": {
+                            "decimal": "",
+                            "emptyTable": "No hay información",
+                            "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                            "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                            "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                            "infoPostFix": "",
+                            "thousands": ",",
+                            "lengthMenu": "Mostrar _MENU_ Documentos",
+                            "loadingRecords": "Cargando...",
+                            "processing": "Procesando...",
+                            "search": "Buscar:",
+                            "zeroRecords": "Sin resultados encontrados",
+                            "paginate": {
+                                "first": "Primero",
+                                "last": "Ultimo",
+                                "next": "Siguiente",
+                                "previous": "Anterior"
+                            }
+                        }
+                    });
                 }
             })
             .catch(error => {
@@ -486,7 +543,7 @@ function grupos(e){
                         defaultContent: '',
                         orderable: false,
                         render: function(data, type, row) {
-                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_editar_grupo" onclick="editar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_editar_grupo" onclick="modal_editar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
                                     '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_borrar_grupo" onclick="borrar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button>';
                         }
                     }
@@ -534,68 +591,124 @@ function grupos(e){
         });
 }
 //
-function editar_grupo(id, nombre){
+function modal_editar_grupo(id, nombre){
     let modal_editar_grupo = document.getElementById("modal_editar_grupo")
     // Crea una instancia del modal de Bootstrap
     const modalInstance = new bootstrap.Modal(modal_editar_grupo);
     // Abre el modal
     modalInstance.show();
-    // Obtenemos el id del boton clode.
-    const elemento = document.querySelector('#cerrar_modal_listar_grupo');
-    //
-    const token = sessionStorage.getItem('token');
     let name_edit = document.getElementById("edit_nombre_grupo")
     name_edit.value = nombre
+    let id_grupo = document.getElementById("id_grupo")
+    id_grupo.value = id
+}
+//
+function editar_nombre_grupo_panel_admin(e){
+    //
+    const token = sessionStorage.getItem('token');
     let btn_editar_nombre_grupo = document.getElementById("btn_editar_nombre_grupo")
-    btn_editar_nombre_grupo.addEventListener("click", function(e){
-        let name = document.getElementById("edit_nombre_grupo").value
-        if (name == null || name == "") {
-            Swal.fire({
-                icon: "error",
-                title: "Falta el nombre del grupo",
-                text: "No puede quedar el campo vacio!",
-            });
-        }else{
-            const token = sessionStorage.getItem('token');
-            let datos = {
-                'name':name
-            }
-            //
-            axios.put(`http://127.0.0.1:8000/grupo/editar_grupo/${id}/`,datos, {
-                headers: {
-                    'Authorization': `Token ${token}`
-                }
-            })
-            .then(function (response) {
-                console.warn(response.data);
-                console.warn(response.status)
-                if (response.status == 200) {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Actualizado Correctamente",
-                        text: "El grupo fue actualizado correctamente!",
-                    });
-                    modalInstance.hide();
-                    // Realizamos el click automático.
-                    elemento.click();
-                }
-            })
-            .catch(error => {
-                if (error.response) {
-                    console.log('Error Response:', error.response.data);
-                    console.log('Error Status:', error.response.status);
-                    console.log('Error Headers:', error.response.headers);
-                    if (error.response.data.error == 3) {
-                        Swal.fire({
-                            icon: "error",
-                            title: "El grupo ya existe",
-                            text: "El grupo fue creado anteriormente!",
-                        });
-                    }
-                }
-            });
+    let id = document.getElementById("id_grupo").value
+    let arr = []
+    let name = document.getElementById("edit_nombre_grupo").value
+    if (name == null || name == "") {
+        Swal.fire({
+            icon: "error",
+            title: "Falta el nombre del grupo",
+            text: "No puede quedar el campo vacio!",
+        });
+    }else{
+        const token = sessionStorage.getItem('token');
+        let datos = {
+            'name':name
         }
-    })
+        //
+        axios.put(`http://127.0.0.1:8000/grupo/editar_grupo/${id}/`,datos, {
+            headers: {
+                'Authorization': `Token ${token}`
+            }
+        })
+        .then(function (response) {
+            console.warn(response.data);
+            console.warn(response.status)
+            if (response.status == 200) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Actualizado Correctamente",
+                    text: "El grupo fue actualizado correctamente!",
+                });
+                let grupos = response.data.grupos
+                grupos.forEach(element => {
+                    console.log(element.name)
+                    arr.push(element)
+                });
+                console.warn(arr)
+                //
+                var table = $('#tabla_grupo').DataTable({
+                    data: arr,
+                    columns: [
+                        { title: 'ID', data: "id", defaultContent: '' },
+                        { title: 'Nombre Grupo', data: "name", defaultContent: '' },
+                        { 
+                            title: 'Acciones', 
+                            data: null,
+                            defaultContent: '',
+                            orderable: false,
+                            render: function(data, type, row) {
+                                return '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_editar_grupo" onclick="modal_editar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                                        '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_borrar_grupo" onclick="borrar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button>';
+                            }
+                        }
+                    ],
+                    destroy: true,
+                    "dom": 'Bfrtip',
+                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                    "lengthMenu": [
+                        [5,10, 25, 50, -1],
+                        ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+                    ],
+                    "buttons": {
+                        "pageLength": {
+                            _: "Mostrar %d Registros"
+                        }
+                    },
+                    "language": {
+                        "decimal": "",
+                        "emptyTable": "No hay información",
+                        "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                        "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                        "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                        "infoPostFix": "",
+                        "thousands": ",",
+                        "lengthMenu": "Mostrar _MENU_ Documentos",
+                        "loadingRecords": "Cargando...",
+                        "processing": "Procesando...",
+                        "search": "Buscar:",
+                        "zeroRecords": "Sin resultados encontrados",
+                        "paginate": {
+                            "first": "Primero",
+                            "last": "Ultimo",
+                            "next": "Siguiente",
+                            "previous": "Anterior"
+                        }
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            if (error.response) {
+                console.log('Error Response:', error.response.data);
+                console.log('Error Status:', error.response.status);
+                console.log('Error Headers:', error.response.headers);
+                if (error.response.data.error == 3) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "El grupo ya existe",
+                        text: "El grupo fue creado anteriormente!",
+                    });
+                }
+            }
+        });
+    }
 }
 //
 function borrar_grupo(id, nombre_grupo){
@@ -620,14 +733,70 @@ function borrar_grupo(id, nombre_grupo){
             .then(function (response) {
                 console.warn(response.data);
                 console.warn(response.status)
+                let arr = []
                 if (response.status == 200) {
                     Swal.fire({
-                        icon: "Eliminado Correctamente",
+                        icon: "success",
                         title: "El grupo fue eliminado correctamente",
                         text: "El grupo fue creado correctamente!",
                     });
-                    // Realizamos el click automático.
-                    elemento.click();
+                    //console.warn(response.data.grupos[0])
+                    let grupos = response.data.grupos
+                    grupos.forEach(element => {
+                        console.log(element.name)
+                        arr.push(element)
+                    });
+                    console.warn(arr)
+                    //
+                    var table = $('#tabla_grupo').DataTable({
+                        data: arr,
+                        columns: [
+                            { title: 'ID', data: "id", defaultContent: '' },
+                            { title: 'Nombre Grupo', data: "name", defaultContent: '' },
+                            { 
+                                title: 'Acciones', 
+                                data: null,
+                                defaultContent: '',
+                                orderable: false,
+                                render: function(data, type, row) {
+                                    return '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_editar_grupo" onclick="modal_editar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_borrar_grupo" onclick="borrar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button>';
+                                }
+                            }
+                        ],
+                        destroy: true,
+                        "dom": 'Bfrtip',
+                        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                        "lengthMenu": [
+                            [5,10, 25, 50, -1],
+                            ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+                        ],
+                        "buttons": {
+                            "pageLength": {
+                                _: "Mostrar %d Registros"
+                            }
+                        },
+                        "language": {
+                            "decimal": "",
+                            "emptyTable": "No hay información",
+                            "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                            "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                            "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                            "infoPostFix": "",
+                            "thousands": ",",
+                            "lengthMenu": "Mostrar _MENU_ Documentos",
+                            "loadingRecords": "Cargando...",
+                            "processing": "Procesando...",
+                            "search": "Buscar:",
+                            "zeroRecords": "Sin resultados encontrados",
+                            "paginate": {
+                                "first": "Primero",
+                                "last": "Ultimo",
+                                "next": "Siguiente",
+                                "previous": "Anterior"
+                            }
+                        }
+                    });
                 }
             })
             .catch(error => {
@@ -859,10 +1028,6 @@ function editar_esp(id, nombre_especialidad){
                         title: "Actualizado Correctamente",
                         text: "El grupo fue actualizado correctamente!",
                     });
-                    
-                    modalInstance.hide();
-                    // Realizamos el click automático.
-                    elemento.click();
                 }
             })
             .catch(error => {
@@ -1154,7 +1319,7 @@ function especialidades_list_doc(id, first_name){
                     defaultContent: '',
                     orderable: false,
                     render: function(data, type, row) {
-                        return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_doc" onclick="editar_grupo('+row.id+', \''+row.first_name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                        return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_doc" onclick="editar_especialidad('+row.id+', \''+row.first_name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
                                 '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_doc" onclick="borrar_grupo('+row.id+', \''+row.first_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
                                 '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button>';
                     }
@@ -1515,9 +1680,6 @@ function eliminar_esp_doct_panel_admin(id_especialidad, especialidad, id_doctor)
 }
 //
 function borrar_user_doctor(id_doc, nombres, apellidos){
-    console.log(id_doc)
-    console.log(nombres)
-    console.log(apellidos)
     const token = sessionStorage.getItem('token');
     let arr = []
     Swal.fire({
@@ -1574,11 +1736,631 @@ function borrar_user_doctor(id_doc, nombres, apellidos){
                                 defaultContent: '',
                                 orderable: false,
                                 render: function(data, type, row) {
-                                    return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_doc" onclick="editar_grupo('+row.id+', \''+row.first_name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                                    return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_doc" onclick="editar_doctor('+row.id+', \''+row.first_name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
                                             '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_doc" onclick="borrar_user_doctor('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
                                             '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button>';
                                 }
                             }
+                        ],
+                        destroy: true,
+                        "dom": 'Bfrtip',
+                        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                        "lengthMenu": [
+                            [5,10, 25, 50, -1],
+                            ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+                        ],
+                        "buttons": {
+                            "pageLength": {
+                                _: "Mostrar %d Registros"
+                            }
+                        },
+                        "language": {
+                            "decimal": "",
+                            "emptyTable": "No hay información",
+                            "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                            "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                            "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                            "infoPostFix": "",
+                            "thousands": ",",
+                            "lengthMenu": "Mostrar _MENU_ Documentos",
+                            "loadingRecords": "Cargando...",
+                            "processing": "Procesando...",
+                            "search": "Buscar:",
+                            "zeroRecords": "Sin resultados encontrados",
+                            "paginate": {
+                                "first": "Primero",
+                                "last": "Ultimo",
+                                "next": "Siguiente",
+                                "previous": "Anterior"
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                if (error.response) {
+                    console.log('Error Response:', error.response.data);
+                    console.log('Error Status:', error.response.status);
+                    console.log('Error Headers:', error.response.headers);
+                    if (error.response.data.error == 3) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "El grupo ya existe",
+                            text: "El grupo fue creado anteriormente!",
+                        });
+                    }
+                }
+            });
+        }
+    });
+}
+//----------------------------------- Fin Módulo Doctor -----------------------------------------------
+//----------------------------------- Inicio Módulo Pacientes -----------------------------------------------
+// Listar todos los Pascientes---------------------------------------------------------------------------
+// 
+function panel_pacientes(){
+    let info = document.getElementById("panel_paciente")
+    info.addEventListener("click", function(e){
+        //
+        const token = sessionStorage.getItem('token');
+        let arr =[]
+        axios.get('http://127.0.0.1:8000/paciente/listar_paciente',{
+            headers: {
+                'Authorization': `Token ${token}`
+            }
+        })
+        .then(function (response) {
+            // 
+            //console.warn(response.data.grupos[0])
+            let grupos = response.data.pacientes
+            grupos.forEach(element => {
+                console.log(element.username)
+                arr.push(element)
+            });
+            console.warn(arr)
+            //
+            var table = $('#tabla_pac').DataTable({
+                responsive: true,
+                data: arr,
+                columns: [
+                    { title: 'ID', data: "id", defaultContent: '' },
+                    { title: 'Username', data: "username", defaultContent: '' },
+                    { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
+                    { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                    { title: 'Email', data: "email", defaultContent: '' },
+                    { title: 'Edad', data: "edad", defaultContent: '' },
+                    { title: 'Sexo', data: "sexo", defaultContent: '' },
+                    { title: 'Contacto', data: "fono", defaultContent: '' },
+                    { title: 'Region', data: "region", defaultContent: '' },
+                    { title: 'Comuna', data: "comuna", defaultContent: '' },
+                    { title: 'Vivienda', data: "vivienda", defaultContent: '' },
+                    { title: 'num_vivienda', data: "num_vivienda", defaultContent: '' },
+                    { title: 'Cod. Paciente', data: "usuario_uuid", defaultContent: '' },
+                    { 
+                        title: 'Acciones', 
+                        data: null,
+                        responsivePriority: 1, // Prioridad máxima (no se oculta)
+                        className: 'no-wrap', // Clase para evitar saltos de línea
+                        orderable: false,
+                        render: function(data, type, row) {
+                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_pac_adm" onclick="editar_paciente('+row.id+', \''+row.username+'\', \''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
+                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                        }
+                    },
+                    { title: 'Password', data: "password", defaultContent: '' },
+                ],
+                destroy: true,
+                "dom": 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                "lengthMenu": [
+                    [5,10, 25, 50, -1],
+                    ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+                ],
+                "buttons": {
+                    "pageLength": {
+                        _: "Mostrar %d Registros"
+                    }
+                },
+                "language": {
+                    "decimal": "",
+                    "emptyTable": "No hay información",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                    "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                    "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Mostrar _MENU_ Documentos",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "Sin resultados encontrados",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Ultimo",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            if (error.response) {
+                console.log('Error Response:', error.response.data);
+                console.log('Error Status:', error.response.status);
+                console.log('Error Headers:', error.response.headers);
+            }
+        });
+    })
+}
+panel_pacientes()
+//
+function abrir_modal_crear_paciente(e){
+    let nuevo_pac_admin_panel = document.getElementById("nuevo_pac_admin_panel")
+    // Crea una instancia del modal de Bootstrap
+    const modalInstance = new bootstrap.Modal(nuevo_pac_admin_panel);
+    // Abre el modal
+    modalInstance.show();
+}
+// Enviar datos a la BD.
+function adm_registrar_paciente(){
+    let username = document.getElementById("adm_paciente_username").value
+    let password = document.getElementById("paciente_password").value
+    let first_name = document.getElementById("adm_paciente_first_name").value
+    let last_name = document.getElementById("adm_paciente_last_name").value
+    let email = document.getElementById("adm_paciente_email").value
+    let edad = document.getElementById("adm_paciente_edad").value
+    let fono = document.getElementById("adm_paciente_fono").value
+    let rut = document.getElementById("adm_paciente_rut").value
+    let num_vivienda = document.getElementById("adm_paciente_num_vivienda").value
+    //------- Valor Radio Button Sexo ---------
+    let sexo = document.getElementsByName("adm_paciente_sexo")
+    let valor_radio;
+    sexo.forEach(radio => {
+        if (radio.checked) {
+            valor_radio = radio.value;
+        }
+    });
+    //------- Fin Valor Radio Button Sexo ---------
+    //------- Valor Radio Button Vivienda---------
+    let vivienda = document.getElementsByName("adm_paciente_tipo_vivienda")
+    let valor_vivienda;
+    vivienda.forEach(radio => {
+        if (radio.checked) {
+            valor_vivienda = radio.value;
+        }
+    });
+    console.log(valor_vivienda)
+    //------- Fin Valor Radio Button Vivienda ---------
+    //-------------------- Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Región.
+    let id_region = document.getElementById("region").value
+    let region = document.getElementById("region_" + id_region).getAttribute("data-region")
+    console.log(region)
+    //------ Fin Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Comuna.
+    let comuna = document.getElementById("comuna").value
+    console.log(comuna)
+    let arr = []
+    //------ Fin Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Comuna.
+    //-----  Creamos el array de bjetos. -------------
+    let datos = {
+        'username': username ,
+        'password': password ,
+        'first_name': first_name ,
+        'last_name': last_name ,
+        'email': email ,
+        'edad': edad ,
+        'fono': fono ,
+        'rut': rut ,
+        'num_vivienda': num_vivienda ,
+        'sexo': valor_radio ,
+        'vivienda': valor_vivienda ,
+        'region': region ,
+        'comuna': comuna ,
+    }
+    console.log(datos)
+    axios.post(`http://127.0.0.1:8000/paciente/crear_paciente`,datos, {
+        
+    })
+    .then(function (response) {
+        console.warn(response.data);
+        console.warn(response.status)
+        if (response.status == 200) {
+            Swal.fire({
+                icon: "success",
+                title: "Paciente Registrado  Correctamente",
+                text: "paciente registrado",
+            });
+            //console.warn(response.data.grupos[0])
+            let paciente = response.data.pacientes
+            paciente.forEach(element => {
+                console.log(element.username)
+                arr.push(element)
+            });
+            console.warn(arr)
+            //
+            var table = $('#tabla_pac').DataTable({
+                responsive: true,
+                data: arr,
+                columns: [
+                    { title: 'ID', data: "id", defaultContent: '' },
+                    { title: 'Username', data: "username", defaultContent: '' },
+                    { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
+                    { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                    { title: 'Email', data: "email", defaultContent: '' },
+                    { title: 'Edad', data: "edad", defaultContent: '' },
+                    { title: 'Sexo', data: "sexo", defaultContent: '' },
+                    { title: 'Contacto', data: "fono", defaultContent: '' },
+                    { title: 'Region', data: "region", defaultContent: '' },
+                    { title: 'Comuna', data: "comuna", defaultContent: '' },
+                    { title: 'Vivienda', data: "vivienda", defaultContent: '' },
+                    { title: 'N° Vivienda', data: "num_vivienda", defaultContent: '' },
+                    { title: 'Cod. Paciente', data: "usuario_uuid", defaultContent: '' },
+                    { 
+                        title: 'Acciones', 
+                        data: null,
+                        responsivePriority: 1, // Prioridad máxima (no se oculta)
+                        className: 'no-wrap', // Clase para evitar saltos de línea
+                        orderable: false,
+                        render: function(data, type, row) {
+                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_pac_adm" onclick="editar_paciente('+row.id+', \''+row.username+'\',\''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\',\''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
+                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                        }
+                    },
+                    { title: 'Password', data: "password", defaultContent: '' },
+                ],
+                destroy: true,
+                "dom": 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                "lengthMenu": [
+                    [5,10, 25, 50, -1],
+                    ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+                ],
+                "buttons": {
+                    "pageLength": {
+                        _: "Mostrar %d Registros"
+                    }
+                },
+                "language": {
+                    "decimal": "",
+                    "emptyTable": "No hay información",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                    "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                    "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Mostrar _MENU_ Documentos",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "Sin resultados encontrados",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Ultimo",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
+            });
+        }
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+            if (error.response.data.error == 3) {
+                Swal.fire({
+                    icon: "error",
+                    title: "El usuario ya existe",
+                    text: "El usuario fue creado anteriormente!",
+                });
+            }
+        }
+    });
+}
+//
+function editar_paciente(id, username,first_name, last_name, email,edad,sexo,rut,fono,region,comuna,vivienda, num_vivienda,password){
+    let modal_edit_pac_admin_panel = document.getElementById("modal_edit_pac_admin_panel")
+    // Crea una instancia del modal de Bootstrap
+    const modalInstance = new bootstrap.Modal(modal_edit_pac_admin_panel);
+    // Abre el modal
+    modalInstance.show();
+    //
+    let id_usuuario_pac = document.getElementById("id_usuuario_pac")
+    id_usuuario_pac.value = id
+    let usernames = document.getElementById("edit_adm_paciente_username")
+    usernames.value = username
+    let passwords = document.getElementById("edit_adm_paciente_pass")
+    passwords.value = password
+    let first_namess = document.getElementById("edit_adm_paciente_first_name")
+    first_namess.value = first_name
+    let edit_adm_paciente_num_viviendalast_names = document.getElementById("edit_adm_paciente_last_name")
+    edit_adm_paciente_num_viviendalast_names.value = last_name
+    let edit_adm_paciente_num_viviendaemail = document.getElementById("edit_adm_paciente_email")
+    edit_adm_paciente_num_viviendaemail.value = email
+    let edit_adm_paciente_num_viviendaedad = document.getElementById("edit_adm_paciente_edad")
+    edit_adm_paciente_num_viviendaedad.value = edad
+    let edit_adm_paciente_num_viviendafono = document.getElementById("edit_adm_paciente_fono")
+    edit_adm_paciente_num_viviendafono.value = fono
+    let edit_adm_paciente_num_viviendarut = document.getElementById("edit_adm_paciente_rut")
+    edit_adm_paciente_num_viviendarut.value = rut
+    let edit_adm_paciente_num_viviendanum_vivienda = document.getElementById("edit_adm_paciente_num_vivienda")
+    edit_adm_paciente_num_viviendanum_vivienda.value = num_vivienda
+    //---------------------- Vivienda --------------------
+    let adm_paciente_tipo_vivienda = document.getElementsByName("edit_adm_paciente_tipo_vivienda")
+    adm_paciente_tipo_vivienda.forEach(radio => {
+        if (radio.value === vivienda) {
+            console.log(radio)
+                radio.checked = true;
+            }
+    });
+    //---------------------- Fin Vivienda ----------------
+    //---------------------- Sexo --------------------
+    let edit_sexo = document.getElementsByName("edit_adm_paciente_sexo")
+    edit_sexo.forEach(radio => {
+        if (radio.value === sexo) {
+            console.log(radio)
+                radio.checked = true;
+            }
+    });
+    //---------------------- Fin Sexo ----------------
+    //------- Valor Radio Button Sexo ---------
+    let edit_region = document.getElementById("region")
+    // Iterar sobre las opciones del select
+    for (let i = 0; i < edit_region.options.length; i++) {
+        let option = edit_region.options[i];
+        // Verificar si el texto de la opción es "Valparaiso"
+        if (option.text === region) {
+            // Seleccionar la opción
+            option.selected = true;
+            break;
+        }
+    }
+    // Llamamos la funcion para que nos cargue las Comunas una vez seleccionada la Región.
+    buscar_ciudad()
+    // Comuna
+    let edit_comuna = document.getElementById("comuna")
+    // edit_comuna
+    let option_comuna = edit_comuna.querySelector("option")
+    option_comuna.innerText = comuna
+    option_comuna.value = comuna
+    option_comuna.selected = true
+}
+//
+function edit_panel_adm_paciente(e){
+    let id_usuuario_pac = document.getElementById("id_usuuario_pac").value
+    let username = document.getElementById("edit_adm_paciente_username").value
+    console.warn(username)
+    let password = document.getElementById("edit_adm_paciente_pass").value
+    console.warn(password)
+    let first_name = document.getElementById("edit_adm_paciente_first_name").value
+    console.warn(first_name)
+    let last_name = document.getElementById("edit_adm_paciente_last_name").value
+    console.warn(last_name)
+    let email = document.getElementById("edit_adm_paciente_email").value
+    console.warn(email)
+    let edad = document.getElementById("edit_adm_paciente_edad").value
+    console.warn(edad)
+    let fono = document.getElementById("edit_adm_paciente_fono").value
+    console.warn(fono)
+    let rut = document.getElementById("edit_adm_paciente_rut").value
+    console.warn(rut)
+    let num_vivienda = document.getElementById("edit_adm_paciente_num_vivienda").value
+    //------- Valor Radio Button Sexo ---------
+    let sexo = document.getElementsByName("edit_adm_paciente_sexo")
+    let valor_radio;
+    sexo.forEach(radio => {
+        if (radio.checked) {
+            valor_radio = radio.value;
+        }
+    });
+    console.log(valor_radio)
+    //------- Fin Valor Radio Button Sexo ---------
+    //------- Valor Radio Button Vivienda---------
+    let vivienda = document.getElementsByName("edit_adm_paciente_tipo_vivienda")
+    let valor_vivienda;
+    vivienda.forEach(radio => {
+        if (radio.checked) {
+            valor_vivienda = radio.value;
+        }
+    });
+    console.log(valor_vivienda)
+    //------- Fin Valor Radio Button Vivienda ---------
+    //-------------------- Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Región.
+    let id_region = document.getElementById("region").value
+    let region = document.getElementById("region_" + id_region).getAttribute("data-region")
+    console.log(region)
+    //------ Fin Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Comuna.
+    let comuna = document.getElementById("comuna").value
+    console.log(comuna)
+    let arr = []
+    //------ Fin Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Comuna.
+    //-----  Creamos el array de bjetos. -------------
+    let datos = {
+        'username': username ,
+        'password': password ,
+        'first_name': first_name ,
+        'last_name': last_name ,
+        'email': email ,
+        'edad': edad ,
+        'fono': fono ,
+        'rut': rut ,
+        'num_vivienda': num_vivienda ,
+        'sexo': valor_radio ,
+        'vivienda': valor_vivienda ,
+        'region': region ,
+        'comuna': comuna ,
+    }
+    console.log(datos)
+    axios.put(`http://127.0.0.1:8000/paciente/update_paciente/${id_usuuario_pac}/`,datos, {
+        
+    })
+    .then(function (response) {
+        console.warn(response.data);
+        console.warn(response.status)
+        if (response.status == 200) {
+            Swal.fire({
+                icon: "success",
+                title: "Paciente Registrado  Correctamente",
+                text: "paciente registrado",
+            });
+            //console.warn(response.data.grupos[0])
+            let paciente = response.data.pacientes
+            paciente.forEach(element => {
+                console.log(element.username)
+                arr.push(element)
+            });
+            console.warn(arr)
+            //
+            var table = $('#tabla_pac').DataTable({
+                responsive: true,
+                data: arr,
+                columns: [
+                    { title: 'ID', data: "id", defaultContent: '' },
+                    { title: 'Username', data: "username", defaultContent: '' },
+                    { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
+                    { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                    { title: 'Email', data: "email", defaultContent: '' },
+                    { title: 'Edad', data: "edad", defaultContent: '' },
+                    { title: 'Sexo', data: "sexo", defaultContent: '' },
+                    { title: 'Contacto', data: "fono", defaultContent: '' },
+                    { title: 'Region', data: "region", defaultContent: '' },
+                    { title: 'Comuna', data: "comuna", defaultContent: '' },
+                    { title: 'Vivienda', data: "vivienda", defaultContent: '' },
+                    { title: 'N° Vivienda', data: "num_vivienda", defaultContent: '' },
+                    { title: 'Cod. Paciente', data: "usuario_uuid", defaultContent: '' },
+                    { 
+                        title: 'Acciones', 
+                        data: null,
+                        responsivePriority: 1, // Prioridad máxima (no se oculta)
+                        className: 'no-wrap', // Clase para evitar saltos de línea
+                        orderable: false,
+                        render: function(data, type, row) {
+                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_pac_adm" onclick="editar_paciente('+row.id+', \''+row.username+'\',\''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\',\''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
+                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                        }
+                    },
+                    { title: 'Password', data: "password", defaultContent: '' },
+                ],
+                destroy: true,
+                "dom": 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                "lengthMenu": [
+                    [5,10, 25, 50, -1],
+                    ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+                ],
+                "buttons": {
+                    "pageLength": {
+                        _: "Mostrar %d Registros"
+                    }
+                },
+                "language": {
+                    "decimal": "",
+                    "emptyTable": "No hay información",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                    "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                    "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Mostrar _MENU_ Documentos",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "Sin resultados encontrados",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Ultimo",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
+            });
+        }
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+            if (error.response.data.error == 3) {
+                Swal.fire({
+                    icon: "error",
+                    title: "El usuario ya existe",
+                    text: "El usuario fue creado anteriormente!",
+                });
+            }
+        }
+    });
+}
+//
+function borrar_user_paciente(id, first_name, last_name){
+    const token = sessionStorage.getItem('token');
+    let arr = []
+    Swal.fire({
+        title: "¿Desea eliminaral Doctor: " +first_name + ' ' +last_name+ "?",
+        text: "Se eliminará al doctor.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "¡Si, borrar!"
+      }).then((result) => {
+        if (result.isConfirmed) {
+            let datos = {
+                'id_especialidad': id_doc
+            }
+            axios.delete(`http://127.0.0.1:8000/paciente/delete_paciente/${id}/`,{
+                headers: {
+                    'Authorization': `Token ${token}`
+                }
+            })
+            .then(function (response) {
+                console.warn(response.data);
+                console.warn(response.status)
+                let doc = response.data.list_doctor;
+                if (response.status == 200) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Paciente Eliminado",
+                        text: "El Paciente fué eliminado correctamente!",
+                    });
+                    console.log(doc)
+                    //
+                    let grupos = response.data.pacientes
+                    grupos.forEach(element => {
+                        console.log(element.username)
+                        arr.push(element)
+                    });
+                    console.warn(arr)
+                    //
+                    var table = $('#tabla_pac').DataTable({
+                        responsive: true,
+                        data: arr,
+                        columns: [
+                            { title: 'ID', data: "id", defaultContent: '' },
+                            { title: 'Username', data: "username", defaultContent: '' },
+                            { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
+                            { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                            { title: 'Email', data: "email", defaultContent: '' },
+                            { title: 'Edad', data: "edad", defaultContent: '' },
+                            { title: 'Sexo', data: "sexo", defaultContent: '' },
+                            { title: 'Contacto', data: "fono", defaultContent: '' },
+                            { title: 'Region', data: "region", defaultContent: '' },
+                            { title: 'Comuna', data: "comuna", defaultContent: '' },
+                            { title: 'Vivienda', data: "vivienda", defaultContent: '' },
+                            { title: 'num_vivienda', data: "num_vivienda", defaultContent: '' },
+                            { title: 'Cod. Paciente', data: "usuario_uuid", defaultContent: '' },
+                            { 
+                                title: 'Acciones', 
+                                data: null,
+                                responsivePriority: 1, // Prioridad máxima (no se oculta)
+                                className: 'no-wrap', // Clase para evitar saltos de línea
+                                orderable: false,
+                                render: function(data, type, row) {
+                                    return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_pac_adm" onclick="editar_paciente('+row.id+', \''+row.username+'\', \''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
+                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                                }
+                            },
+                            { title: 'Password', data: "password", defaultContent: '' },
                         ],
                         destroy: true,
                         "dom": 'Bfrtip',

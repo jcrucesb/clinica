@@ -49,6 +49,7 @@
     <!--begin::Required Plugin(AdminLTE)-->
     <link rel="stylesheet" href="../../lib/css/adminlte.min.css"/>
     <!--end::Required Plugin(AdminLTE)-->
+    <link rel="stylesheet" href="../../CSS/panel_admin.css"/>
   </head>
   <!--end::Head-->
   <!--begin::Body-->
@@ -541,8 +542,19 @@
                       </div>
                     <!-- Fin Container Panel ADMIN. -->
                     <!--Panel Paciente. -->
-                    <div class="container-xl container_paciente" id="container_paciente" style="display: none;">
+                    <div class="container container_paciente" id="container_paciente" style="display: none;">
                       <h1 class="text-center">Panel Paciente</h1>
+                      <div class="container">
+                        <div class="table-responsive">
+                          <table id="tabla_pac" class="display nowrap" style="width:100%">
+                            <div class="col-md-12">
+                              <div class="d-grid gap-2">
+                                <button class="btn mb-2" id="nuevo_pac" onclick="abrir_modal_crear_paciente(this)" style="background: rgb(106, 162, 247);"" type="button">Agregar Paciente</button>
+                              </div>
+                            </div>
+                          </table>
+                        </div>
+                      </div>
                     </div>
                     <!--Fin Panel Paciente ADMIN. -->
                     <!--Panel Secretaria-->
@@ -692,13 +704,14 @@
           <div class="modal-body">
             <form>
               <div class="mb-3">
+                <input type="hidden" id="id_grupo" value="">
                 <label for="exampleInputEmail1" class="form-label">Nombre Grupo</label>
                 <input type="text" class="form-control" id="edit_nombre_grupo" required aria-describedby="emailHelp">
               </div>
           </div>
           <div class="modal-footer" style="background: rgb(124, 162, 245);">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" id="btn_editar_nombre_grupo" class="btn btn-primary">Editar</button>
+            <button type="button" id="btn_editar_nombre_grupo" onclick="editar_nombre_grupo_panel_admin(this)" class="btn btn-primary">Editar</button>
           </div>
         </form>
         </div>
@@ -972,6 +985,263 @@
       </div>
     </div>
     <!---->
+    <!-- Modal Insertar Paciente Panel ADMIN.  -->
+    <div class="modal fade" id="nuevo_pac_admin_panel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Registrar Paciente</h1>
+          </div>
+          <div class="modal-body">
+            <!-- Contenido de la página, incluyendo las cards -->
+            <div class="container mt-5 mt-5 d-flex justify-content-center" id=""  style="background: rgb(231, 230, 229);" style="border-color: rgb(196, 69, 235)">
+              <div class="col-md-8 mt-3">
+                  <div class="row mb-3">
+                      <div class="col-md-6 mb-3"">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="adm_paciente_username" placeholder="Username" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="paciente_password" placeholder="Password" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="first_name" class="form-label">Nombres</label>
+                        <input type="text" class="form-control" id="adm_paciente_first_name" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="last_name" class="form-label">Apellidos</label>
+                        <input type="text" class="form-control" id="adm_paciente_last_name" placeholder="Apellidos" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <!---->
+                      <div class="col-md-6 mb-3"">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="adm_paciente_email" placeholder="name@example.com" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="edad" class="form-label">Edad</label>
+                        <input type="number" class="form-control" id="adm_paciente_edad" placeholder="Edad" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                    <!---->
+                    <div class="col-md-6 mb-3">
+                      <label for="vivienda" class="form-label">Sexo</label>
+                      <div class="d-flex flex-column"> <!-- Cambiado a dirección vertical -->
+                          <div class="form-check mb-2"> <!-- Añadido margen inferior -->
+                              <input class="form-check-input" type="radio" name="adm_paciente_sexo" id="adm_masculino" value="M" style="border-color: rgb(196, 69, 235)">
+                              <label class="form-check-label" for="adm_masculino"> Masculino </label>
+                          </div>
+                          <div class="form-check mb-2"> <!-- Añadido margen inferior -->
+                              <input class="form-check-input" type="radio" name="adm_paciente_sexo" id="adm_Femenino" value="F" style="border-color: rgb(196, 69, 235)">
+                              <label class="form-check-label" for="adm_Femenino"> Femenino </label>
+                          </div>
+                      </div>
+                    </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="fono" class="form-label">Contacto</label>
+                        <input type="text" class="form-control" id="adm_paciente_fono" placeholder="Contacto" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="fono" class="form-label">RUT</label>
+                        <input type="text" class="form-control" id="adm_paciente_rut" placeholder="RUT" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="vivienda" class="form-label">Tipo Vivienda</label>
+                        <div class="d-flex flex-column"> <!-- Cambiado a dirección vertical -->
+                            <div class="form-check mb-2"> <!-- Añadido margen inferior -->
+                                <input class="form-check-input" type="radio" name="adm_paciente_tipo_vivienda" id="adm_vivienda" value="Casa" style="border-color: rgb(196, 69, 235)">
+                                <label class="form-check-label" for="adm_vivienda"> Casa </label>
+                            </div>
+                            <div class="form-check mb-2"> <!-- Añadido margen inferior -->
+                                <input class="form-check-input" type="radio" name="adm_paciente_tipo_vivienda" id="adm_vivienda_2" value="Condominio" style="border-color: rgb(196, 69, 235)">
+                                <label class="form-check-label" for="adm_vivienda_2"> Condominio </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="adm_paciente_tipo_vivienda" id="adm_vivienda_3" value="Departamento" style="border-color: rgb(196, 69, 235)">
+                                <label class="form-check-label" for="adm_vivienda_3"> Departamento </label>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="num_vivienda" class="form-label">N° Vivienda</label>
+                        <input type="text" class="form-control" id="adm_paciente_num_vivienda" placeholder="Num Vivienda" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                      <div class="input-group me-2">
+                        <label class="input-group-text" for="select1">Región</label>
+                        <select class="form-select" id="region" onchange="buscar_ciudad()" style="border-color: rgb(196, 69, 235)">
+                          <option data-id="0" data-region = "null" value="0" selected="selected">Regiones</option>
+                          <option  id="region_15" data-region ="Arica y Parinacota" value="15">Arica y Parinacota</option>
+                          <option id="region_1" data-region ="Tarapacá" value="1">Tarapacá</option>
+                          <option id="region_2" data-region ="Antofagasta" value="2">Antofagasta</option>
+                          <option id="region_3" data-region ="Atacama" value="3">Atacama</option>
+                          <option id="region_4" data-region ="Coquimbo" value="4">Coquimbo</option>
+                          <option id="region_5" data-region ="Valparaiso" value="5">Valparaiso</option>
+                          <option id="region_13" data-region ="Metropolitana" value="13">Metropolitana</option>
+                          <option id="region_6" data-region ="O'Higgins" value="6">O'Higgins</option>
+                          <option id="region_7" data-region ="Maule" value="7">Maule</option>
+                          <option id="region_16" data-region ="Ñuble" value="16">Ñuble</option>
+                          <option id="region_8" data-region ="Bio - Bio" value="8">Bio - Bio</option>
+                          <option id="region_9" data-region ="Araucania" value="9">Araucania</option>
+                          <option id="region_14" data-region ="Los Rios" value="14">Los Rios</option>
+                          <option id="region_10" data-region ="Los Lagos" value="10">Los Lagos</option>
+                          <option id="region_11" data-region ="Aisen" value="11">Aisen</option>
+                          <option id="region_12" data-region ="Magallanes Y Antártica" value="12">Magallanes Y Antartica</option>
+                        </select>
+                      </div>
+                      <div class="input-group">
+                        <label class="input-group-text" for="select2">Comuna</label>
+                        <select class="form-control" style="border-color: rgb(196, 69, 235)" name="comuna" id="comuna">
+                          <option value="0">Comunas por Region</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="d-grid gap-2 mb-2">
+                        <button class="btn btn-success" id="adm_regis_pac" onclick="adm_registrar_paciente(this)" type="button">Registrarme</button>
+                    </div>
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <div class="container">
+              <div class="d-grid gap-2">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Fin Modal Insertar Paciente Panel ADMIN.  -->
+     <!-- Modal Editar Paciente Panel ADMIN.  -->
+    <div class="modal fade" id="modal_edit_pac_admin_panel" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Editar Paciente</h1>
+          </div>
+          <div class="modal-body">
+            <!-- Contenido de la página, incluyendo las cards -->
+            <div class="container mt-5 mt-5 d-flex justify-content-center" id=""  style="background: rgb(231, 230, 229);" style="border-color: rgb(196, 69, 235)">
+              <div class="col-md-8 mt-3">
+                  <div class="row mb-3">
+                      <div class="col-md-6 mb-3"">
+                        <input type="hidden" id="id_usuuario_pac">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="edit_adm_paciente_username" placeholder="Username" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="edit_adm_paciente_pass" placeholder="Password" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="first_name" class="form-label">Nombres</label>
+                        <input type="text" class="form-control" id="edit_adm_paciente_first_name" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="last_name" class="form-label">Apellidos</label>
+                        <input type="text" class="form-control" id="edit_adm_paciente_last_name" placeholder="Apellidos" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <!---->
+                      <div class="col-md-6 mb-3"">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="edit_adm_paciente_email" placeholder="name@example.com" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="edad" class="form-label">Edad</label>
+                        <input type="number" class="form-control" id="edit_adm_paciente_edad" placeholder="Edad" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                    <!---->
+                    <div class="col-md-6 mb-3">
+                      <label for="vivienda" class="form-label">Sexo</label>
+                      <div class="d-flex flex-column"> <!-- Cambiado a dirección vertical -->
+                          <div class="form-check mb-2"> <!-- Añadido margen inferior -->
+                              <input class="form-check-input" type="radio" name="edit_adm_paciente_sexo" id="edit_adm_masculino" value="M" style="border-color: rgb(196, 69, 235)">
+                              <label class="form-check-label" for="edit_adm_masculino"> Masculino </label>
+                          </div>
+                          <div class="form-check mb-2"> <!-- Añadido margen inferior -->
+                              <input class="form-check-input" type="radio" name="edit_adm_paciente_sexo" id="edit_adm_Femenino" value="F" style="border-color: rgb(196, 69, 235)">
+                              <label class="form-check-label" for="edit_adm_Femenino"> Femenino </label>
+                          </div>
+                      </div>
+                    </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="fono" class="form-label">Contacto</label>
+                        <input type="text" class="form-control" id="edit_adm_paciente_fono" placeholder="Contacto" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="fono" class="form-label">RUT</label>
+                        <input type="text" class="form-control" id="edit_adm_paciente_rut" placeholder="RUT" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="vivienda" class="form-label">Tipo Vivienda</label>
+                        <div class="d-flex flex-column"> <!-- Cambiado a dirección vertical -->
+                            <div class="form-check mb-2"> <!-- Añadido margen inferior -->
+                                <input class="form-check-input" type="radio" name="edit_adm_paciente_tipo_vivienda" id="edit_adm_vivienda" value="Casa" style="border-color: rgb(196, 69, 235)">
+                                <label class="form-check-label" for="edit_adm_vivienda"> Casa </label>
+                            </div>
+                            <div class="form-check mb-2"> <!-- Añadido margen inferior -->
+                                <input class="form-check-input" type="radio" name="edit_adm_paciente_tipo_vivienda" id="edit_adm_vivienda_2" value="Condominio" style="border-color: rgb(196, 69, 235)">
+                                <label class="form-check-label" for="edit_adm_vivienda_2"> Condominio </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="edit_adm_paciente_tipo_vivienda" id="edit_adm_vivienda_3" value="Departamento" style="border-color: rgb(196, 69, 235)">
+                                <label class="form-check-label" for="edit_adm_vivienda_3"> Departamento </label>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="num_vivienda" class="form-label">N° Vivienda</label>
+                        <input type="text" class="form-control" id="edit_adm_paciente_num_vivienda" placeholder="Num Vivienda" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                      <div class="input-group me-2">
+                        <label class="input-group-text" for="select1">Región</label>
+                        <select class="form-select" id="region" onchange="buscar_ciudad()" style="border-color: rgb(196, 69, 235)">
+                          <option data-id="0" data-region = "null" value="0" selected="selected">Regiones</option>
+                          <option  id="region_15" data-region ="Arica y Parinacota" value="15">Arica y Parinacota</option>
+                          <option id="region_1" data-region ="Tarapacá" value="1">Tarapacá</option>
+                          <option id="region_2" data-region ="Antofagasta" value="2">Antofagasta</option>
+                          <option id="region_3" data-region ="Atacama" value="3">Atacama</option>
+                          <option id="region_4" data-region ="Coquimbo" value="4">Coquimbo</option>
+                          <option id="region_5" data-region ="Valparaiso" value="5">Valparaiso</option>
+                          <option id="region_13" data-region ="Metropolitana" value="13">Metropolitana</option>
+                          <option id="region_6" data-region ="O'Higgins" value="6">O'Higgins</option>
+                          <option id="region_7" data-region ="Maule" value="7">Maule</option>
+                          <option id="region_16" data-region ="Ñuble" value="16">Ñuble</option>
+                          <option id="region_8" data-region ="Bio - Bio" value="8">Bio - Bio</option>
+                          <option id="region_9" data-region ="Araucania" value="9">Araucania</option>
+                          <option id="region_14" data-region ="Los Rios" value="14">Los Rios</option>
+                          <option id="region_10" data-region ="Los Lagos" value="10">Los Lagos</option>
+                          <option id="region_11" data-region ="Aisen" value="11">Aisen</option>
+                          <option id="region_12" data-region ="Magallanes Y Antártica" value="12">Magallanes Y Antartica</option>
+                        </select>
+                      </div>
+                      <div class="input-group">
+                        <label class="input-group-text" for="select2">Comuna</label>
+                        <select class="form-control" style="border-color: rgb(196, 69, 235)" name="comuna" id="comuna">
+                          <option value="0">Comunas por Region</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="d-grid gap-2 mb-2">
+                        <button class="btn btn-success" id="edit_adm_regis_pac" onclick="edit_panel_adm_paciente(this)" type="button">Registrarme</button>
+                    </div>
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <div class="container">
+              <div class="d-grid gap-2">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Fin Modal Editar Paciente Panel ADMIN.  -->
     <!--end::App Wrapper-->
     <!--begin::Script-->
     <!--begin::Third Party Plugin(OverlayScrollbars)-->
@@ -1028,6 +1298,7 @@
     <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.3/js/dataTables.responsive.min.js"></script>
     <script src="../../JS/panel_admin.js"></script>
+    <script src="../../JS/regiones.js"></script>
   </body>
   <!--end::Body-->
 </html>

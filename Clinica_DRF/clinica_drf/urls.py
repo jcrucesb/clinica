@@ -22,5 +22,9 @@ urlpatterns = [
     path('', include('usuarios.urls')),
     path('', include('consulta.urls')),
     path('', include('grupo.urls')),
-    path('', include('especialidad.urls'))
+    path('', include('especialidad.urls')),
+    path('', include('direccion.urls')),
+    path('', include('reserva.urls')),
+    path('', include('debito.urls')),
+    path('', include('credito.urls')),
 ]

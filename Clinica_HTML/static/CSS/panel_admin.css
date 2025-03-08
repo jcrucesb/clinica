@@ -1,0 +1,9 @@
+/* Evitar que los botones se oculten en responsive */
+@media screen and (max-width: 768px) {
+    #tabla_pac_wrapper {
+        overflow-x: auto; /* Scroll horizontal si es necesario */
+    }
+    .no-wrap {
+        white-space: nowrap; /* Evita saltos de línea en los botones */
+    }
+}

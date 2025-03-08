@@ -63,7 +63,13 @@ def crear_grupo(request):
         dato_serializado = GroupSerializer(data=request.data)
         if dato_serializado.is_valid():
             dato_serializado.save()
-            return Response({'bien': 1}, status=status.HTTP_200_OK)
+            grupo = Group.objects.all()
+            # Serializar los datos
+            serializer = GroupSerializer(grupo, many=True)
+            # Obtener todos los usuarios del grupo
+            #pacientes = grupo.user_set.all()
+            print(serializer.data)
+            return Response({'grupos': serializer.data}, status=status.HTTP_200_OK)
         else:
             #print(dato_serializado.errors)
             # Si la validación falla, devolvemos los errores
@@ -103,7 +109,10 @@ def editar_grupo(request, id):
         if serializer.is_valid():
             # Guardar los cambios
             serializer.save()
-            return Response({'success': 0, 'grupo': serializer.data},
+            grupo = Group.objects.all()
+            # Serializar los datos
+            serializer = GroupSerializer(grupo, many=True)
+            return Response({'grupos': serializer.data, 'grupo': serializer.data},
                             status=status.HTTP_200_OK)
         else:
             return Response({'error':1}, status=status.HTTP_400_BAD_REQUEST)
@@ -113,7 +122,6 @@ def editar_grupo(request, id):
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         return Response({'error': 2}, status=400)
-    
 #
 @api_view(['DELETE'])
 # Para este formulario NO se necesita token; @permission_classes([AllowAny])
@@ -128,7 +136,13 @@ def eliminar_grupo(request, id):
         grupo_data = serializer.data
         # Eliminar el grupo
         grupo.delete()
-        return Response({'success':1},
+        grupo = Group.objects.all()
+        # Serializar los datos
+        serializer = GroupSerializer(grupo, many=True)
+        # Obtener todos los usuarios del grupo
+        #pacientes = grupo.user_set.all()
+        print(serializer.data)
+        return Response({'grupos':serializer.data},
                         # Específicamos el status.
                         status=status.HTTP_200_OK)
     except Exception as err:

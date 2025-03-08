@@ -49,6 +49,9 @@ INSTALLED_APPS = [
     'direccion',
     'grupo',
     'especialidad',
+    'reserva',
+    'credito',
+    'debito',
 ]
 
 MIDDLEWARE = [
