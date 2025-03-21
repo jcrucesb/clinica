@@ -27,4 +27,8 @@ urlpatterns = [
     path('', include('reserva.urls')),
     path('', include('debito.urls')),
     path('', include('credito.urls')),
+    path('', include('comuna_clinica.urls')),
+    path('', include('doctor.urls')),
+    path('', include('secretaria.urls')),
+    path('', include('paciente.urls')),
 ]

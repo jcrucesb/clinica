@@ -173,43 +173,173 @@
         </div>
         <h1 class="text-center mt-5" id="reserva_hora">Reserva tu Hora</h1>
         <div class="container-xl" style="background: rgb(113, 173, 241); border-radius: 1%;">
-          <form>
-            <div class="mb-3">
-              <label for="exampleInputPassword1" class="form-label">Especialidad</label>
-              <select class="form-select" aria-label="Default select example">
-                <option selected>Open this select menu</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
-              </select>
-            </div>
-            <div style="display: none;">
-              <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Especialidad</label>
-                <select class="form-select" aria-label="Default select example">
-                  <option selected>Open this select menu</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
-                </select>
+          <!--------------------------------------------------------------------------------------------->
+          <div class="container mt-5 mt-5 d-flex justify-content-center" id="" >
+              <div class="col-md-8 mt-3">
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3"">
+                      <label for="first_name" class="form-label">Nombres</label>
+                      <input type="text" class="form-control" id="first_name" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
+                    </div>
+                    <div class="col-md-6 mb-3"">
+                      <label for="last_name" class="form-label">Apellidos</label>
+                      <input type="text" class="form-control" id="last_name" placeholder="Apellidos" style="border-color: rgb(196, 69, 235)">
+                    </div>
+                    <!---->
+                    <div class="col-md-6 mb-3"">
+                      <label for="email" class="form-label">Email</label>
+                      <input type="email" class="form-control" id="email" placeholder="name@example.com" style="border-color: rgb(196, 69, 235)">
+                    </div>
+                    <div class="col-md-6 mb-3"">
+                      <label for="edad" class="form-label">Edad</label>
+                      <input type="number" class="form-control" id="edad" placeholder="Edad" style="border-color: rgb(196, 69, 235)">
+                    </div>
+                    <!---->
+                    <div class="col-md-6 mb-3">
+                      <label for="vivienda" class="form-label">Sexo</label>
+                      <div class="d-flex flex-column"> <!-- Cambiado a dirección vertical -->
+                          <div class="form-check mb-2"> <!-- Añadido margen inferior -->
+                              <input class="form-check-input" type="radio" name="sexo" id="masculino" value="M" style="border-color: rgb(196, 69, 235)">
+                              <label class="form-check-label" for="masculino"> Masculino </label>
+                          </div>
+                          <div class="form-check mb-2"> <!-- Añadido margen inferior -->
+                              <input class="form-check-input" type="radio" name="sexo" id="femenino" value="F" style="border-color: rgb(196, 69, 235)">
+                              <label class="form-check-label" for="femenino"> Femenino </label>
+                          </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3"">
+                      <label for="fono" class="form-label">Contacto</label>
+                      <input type="text" class="form-control" id="fono" placeholder="Contacto" style="border-color: rgb(196, 69, 235)">
+                    </div>
+                    <div class="col-md-6 mb-3"">
+                      <label for="fono" class="form-label">RUT</label>
+                      <input type="text" class="form-control" id="rut" placeholder="RUT" style="border-color: rgb(196, 69, 235)">
+                    </div>
+                    <label for="fono" class="form-label">Especialidad</label>
+                    <div class="d-flex mb-3">
+                      <div class="input-group me-2">
+                        <select class="form-select" id="index_especialidad" name="select_index_especialidad" onfocus="select_esp_index(this)" aria-label="Default select example" style="border-color: rgb(196, 69, 235)"">
+                          <option selected>Seleccionar Especialidad</option>
+                        </select>
+                      </div>
+                    </div>
+                    <label for="fono" class="form-label">Seleccionar Doctor</label>
+                    <div class="d-flex mb-3">
+                      <div class="input-group me-2">
+                        <select class="form-select" id="index_doctor" onfocus="valor_select_esp_index()" name="select_index_doc" aria-label="Default select example" style="border-color: rgb(196, 69, 235)"">
+                          <option selected>Doctor</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="container" id="mostrar_cita_disponible" style="display: none;">
+                    <h4 class="text-center" style="color: brown;">Citas Disponibles</h4>
+                    <div id="mostrar_citas_alert">
+                    </div>
+                  </div>
+                  <div class="d-grid gap-2 mb-2">
+                    <label for="exampleInputPassword1" class="form-label">Método Pago</label>
+                    <!-- Reemplazar estos dos divs separados -->
+                    <div class="row g-2">  <!-- Agregar row con gutter -->
+                        <div class="col-md-6">  <!-- Columna para débito -->
+                            <button class="btn w-100" id="metodo_pago_cita_index_opcion_debito" 
+                                    onclick="metodo_pago_debito(this)" type="button" 
+                                    style="background: rgb(253, 208, 156);">
+                                Debito
+                            </button>
+                        </div>
+                        <div class="col-md-6">  <!-- Columna para crédito -->
+                            <button class="btn w-100" id="metodo_pago_cita_index_opcion_credito" 
+                                    onclick="metodo_pago_credito(this)" type="button" 
+                                    style="background: rgb(226, 138, 248);">
+                                Crédito
+                            </button>
+                        </div>
+                    </div>
+                </div>
               </div>
             </div>
-            <div class="mb-3">
-              <label for="exampleInputPassword1" class="form-label">Fecha</label>
-              <input type="date" class="form-control" id="exampleInputPassword1">
-            </div>
-            <div class="mb-3">
-              <label for="exampleInputPassword1" class="form-label">Hora</label>
-              <input type="time" class="form-control" id="exampleInputPassword1">
-            </div>
-            <div class="d-grid gap-2 pb-2">
-              <button class="btn" style="background: rgb(161, 247, 144);" type="button">Reservar</button>
-            </div>
-          </form>
+          <!--------------------------------------------------------------------------------------------->
         </div>
       </div>
+      <!-- Modal Debito. -->
+      <div class="modal fade" id="modal_debito" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="staticBackdropLabel">Resumen Reserva Cita Débito</h1>
+            </div>
+            <div class="modal-body">
+              <div class="col-md-12 mt-3">
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3"">
+                      <label for="first_name" class="form-label">Nombres</label>
+                      <input type="text" class="form-control" id="cita_reserva_debito_first_name" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
+                    </div>
+                    <div class="col-md-6 mb-3"">
+                      <label for="last_name" class="form-label">Apellidos</label>
+                      <input type="text" class="form-control" id="cita_reserva_debito_last_name" placeholder="Apellidos" style="border-color: rgb(196, 69, 235)">
+                    </div>
+                    <!---->
+                    <div class="col-md-6 mb-3"">
+                      <label for="email" class="form-label">Email</label>
+                      <input type="email" class="form-control" id="cita_reserva_debito_email" placeholder="name@example.com" style="border-color: rgb(196, 69, 235)">
+                    </div>
+                    <div class="col-md-6 mb-3"">
+                      <label for="edad" class="form-label">Edad</label>
+                      <input type="number" class="form-control" id="cita_reserva_debito_edad" placeholder="Edad" style="border-color: rgb(196, 69, 235)">
+                    </div>
+                    <!---->
+                    <div class="col-md-6 mb-3">
+                      <label for="vivienda" class="form-label">Sexo</label>
+                      <div class="d-flex flex-column"> <!-- Cambiado a dirección vertical -->
+                          <div class="form-check mb-2"> <!-- Añadido margen inferior -->
+                              <input class="form-check-input" type="radio" name="cita_reserva_sexo" id="reserva_masculino" value="M" style="border-color: rgb(196, 69, 235)">
+                              <label class="form-check-label" for="reserva_masculino"> Masculino </label>
+                          </div>
+                          <div class="form-check mb-2"> <!-- Añadido margen inferior -->
+                              <input class="form-check-input" type="radio" name="cita_reserva_sexo" id="reserva_femenino" value="F" style="border-color: rgb(196, 69, 235)">
+                              <label class="form-check-label" for="reserva_femenino"> Femenino </label>
+                          </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3"">
+                      <label for="fono" class="form-label">Contacto</label>
+                      <input type="text" class="form-control" id="cita_reserva_debito_fono" placeholder="Contacto" style="border-color: rgb(196, 69, 235)">
+                    </div>
+                    <div class="col-md-6 mb-3"">
+                      <label for="fono" class="form-label">RUT</label>
+                      <input type="text" class="form-control" id="cita_reserva_debito_rut" placeholder="RUT" style="border-color: rgb(196, 69, 235)">
+                    </div>
+                    <label for="reserva_cita_index" class="form-label">Especialidad</label>
+                    <div class="d-flex mb-3">
+                      <div class="input-group me-2">
+                        <select class="form-select" id="reserva_index_especialidad" name="select_index_especialidad" onfocus="select_esp_index(this)" aria-label="Default select example" style="border-color: rgb(196, 69, 235)"">
+                          <option selected>Seleccionar Especialidad</option>
+                        </select>
+                      </div>
+                    </div>
+                    <label for="fono" class="form-label">Seleccionar Doctor</label>
+                    <div class="d-flex mb-3">
+                      <div class="input-group me-2">
+                        <select class="form-select" id="index_doctor" onfocus="valor_select_esp_index()" name="select_index_doc" aria-label="Default select example" style="border-color: rgb(196, 69, 235)"">
+                          <option selected>Doctor</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Understood</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Fin Modal Débito. -->
     </main>
-    
     <!--FOOTER-->
     <footer class="index_footer mt-5">
       <div class="footer">
@@ -284,5 +414,6 @@
     <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.html5.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.print.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.3/js/dataTables.responsive.min.js"></script>
+    <script src="./static/JS/reserva_cita_index.js"></script>
 </body>
 </html>

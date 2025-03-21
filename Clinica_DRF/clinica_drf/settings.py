@@ -52,6 +52,10 @@ INSTALLED_APPS = [
     'reserva',
     'credito',
     'debito',
+    'doctor',
+    'paciente',
+    'secretaria',
+    'comuna_clinica'
 ]
 
 MIDDLEWARE = [

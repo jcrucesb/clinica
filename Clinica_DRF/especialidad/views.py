@@ -64,7 +64,11 @@ def insertar_especialidad(request ):
         dato_serializado = EspecialidadSerializers(data=request.data)
         if dato_serializado.is_valid():
             dato_serializado.save()
-            return Response({'success':1},
+            especialidad = Especialidad.objects.all().values()
+            # Debemos serializarlos.
+            serializer = EspecialidadSerializers(especialidad, many=True)
+            print(serializer)
+            return Response({'especialidad':serializer.data},
                         # Específicamos el status.
                         status=status.HTTP_200_OK)
         else:
