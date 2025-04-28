@@ -77,6 +77,8 @@ function click_seccion(){
         //
         let container_espe_doctor = document.getElementById("container_espe_doctor")
         container_espe_doctor.style.display="none"
+        // Llamamos a la función del Full calendar.
+        //reserva_calendar()
     })
     //
     let panel_secretaria = document.getElementById("panel_secretaria")
@@ -123,7 +125,7 @@ function click_seccion(){
         let ocultar_container_doctor = document.getElementById("container_doctor")
         ocultar_container_doctor.style.display="none"
     })
-    //
+    // 
     let seleccion_panel_modulos_info_citas = document.getElementById("seleccion_panel_modulos_info_citas")
     seleccion_panel_modulos_info_citas.addEventListener("click", function (){
         //
@@ -140,22 +142,9 @@ function click_seccion(){
         container_espe_doctor.style.display="none"
         //
         let container_cita_user_info = document.getElementById("container_cita_user_info")
-        container_cita_user_info.style.display = "none"
-    })
-    let panel_cita_cardiologia = document.getElementById("panel_cita_cardiologia")
-    panel_cita_cardiologia.addEventListener("click", function(){
-        let container_cita_user_info = document.getElementById("container_cita_user_info")
         container_cita_user_info.style.display = "block"
-        let container_panel_cardiologia = document.getElementById("container_panel_cardiologia")
-        console.log(container_panel_cardiologia)
-        container_panel_cardiologia.style.display = "block"
-        cargar_info_cardiologia()
-
-        // let container_panel_pediatria = document.getElementById("container_panel_pediatria")
-        // container_panel_pediatria.style.display = "none"
-
-        // let container_panel_modulo_psicologia = document.getElementById("container_panel_modulo_psicologia")
-        // container_panel_modulo_psicologia.style.display = "none"
+        //
+        historial_citas()
     })
 }
 click_seccion()
@@ -948,9 +937,13 @@ function insertar_bd_doctor(e){
     //console.warn(username)
     let password = document.getElementById("password").value
     //console.warn(password)
-    let first_name = document.getElementById("first_name").value
+    let primer_nombre = document.getElementById("primer_nombre").value
     //console.warn(first_name)
-    let last_name = document.getElementById("last_name").value
+    let segundo_nombre = document.getElementById("segundo_nombre").value
+    //
+    let ap_paterno = document.getElementById("ap_paterno").value
+    //
+    let ap_materno = document.getElementById("ap_materno").value
     //console.warn(last_name)
     let email = document.getElementById("email").value
     //console.warn(email)
@@ -974,14 +967,14 @@ function insertar_bd_doctor(e){
     const valor = especialidad.value;
     let select_clinica = document.getElementById("select_clinica")
     const valor_select_clinica = select_clinica.value;
-    console.log(valor_select_clinica)
     //const texto = especialidad.options[especialidad.selectedIndex].text;
-    //console.log(texto)
     let datos = {
         'username': username,
         'password': password,
-        'first_name': first_name,
-        'last_name': last_name,
+        'primer_nombre': primer_nombre,
+        'segundo_nombre': segundo_nombre,
+        'ap_paterno': ap_paterno,
+        'ap_materno': ap_materno,
         'email': email,
         'edad': edad,
         'rut': rut,
@@ -2988,7 +2981,7 @@ function panel_pacientes(){
                     { title: 'Comuna', data: "comuna", defaultContent: '' },
                     { title: 'Vivienda', data: "vivienda", defaultContent: '' },
                     { title: 'num_vivienda', data: "num_vivienda", defaultContent: '' },
-                    { title: 'Cod. Paciente', data: "usuario_uuid", defaultContent: '' },
+                    { title: 'Cod. Usuario', data: "usuario_uuid", defaultContent: '' },
                     { 
                         title: 'Acciones', 
                         data: null,
@@ -2997,7 +2990,8 @@ function panel_pacientes(){
                         orderable: false,
                         render: function(data, type, row) {
                             return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_pac_adm" onclick="editar_paciente('+row.id+', \''+row.username+'\', \''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_historial_pac_adm" onclick="historial_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-info btn-sm ">Historial Citas</button> ';
                         }
                     },
                     { title: 'Password', data: "password", defaultContent: '' },
@@ -3046,8 +3040,142 @@ function panel_pacientes(){
     })
 }
 panel_pacientes()
+// Función para obtener la data de las reservas de los pacientes.
+function reserva_calendar(){
+    let select_adm_com_clin_pac = document.getElementById("select_adm_com_clin_pac").value
+    let reserva_adm_pac_especialidad = document.getElementById("reserva_adm_pac_especialidad").value
+    let select_adm_esp_pac = document.getElementById("select_adm_esp_pac").value
+    let datos = {
+        'id_clinica': select_adm_com_clin_pac,
+        'id_especialidad': reserva_adm_pac_especialidad,
+        'id_usuario': select_adm_esp_pac
+    }
+    // Full Callendar.
+    let request_calendar = 'http://127.0.0.1:8000/paciente/reserva_paciente'
+    //let request_calendar = '../../JS/events.json'
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        // Agregamos el idioma Español.
+        locale: 'es',
+        //initialView: 'dayGridMonth',
+        initialView: 'timeGridWeek', // Vista inicial con horas
+        slotDuration: '00:30:00', // Duración de los intervalos (30 minutos)
+        slotMinTime: '08:00:00', // Mostrar desde las 8:00 AM
+        slotMaxTime: '23:00:00', // Mostrar hasta las 8:00 PM
+        validRange: {
+            start: new Date().toLocaleDateString('en-CA') // Formato YYYY-MM-DD en la zona horaria local
+        },
+        // Agregamos los eventos.
+        events: function(info, successCallback, failureCallback){
+            fetch(request_calendar, {
+                method: 'POST', // Cambiamos el método a POST
+                headers: {
+                    'Content-Type': 'application/json', // Indicamos que estamos enviando JSON
+                },
+                body: JSON.stringify(datos) // Convertimos el objeto "datos" a una cadena JSON y lo enviamos en el cuerpo
+            })
+            .then(function(data){
+                console.warn(data)
+                let events = data.events.map(function(event){
+                    //console.warn(event.eventTitle)
+                    // Estos son los formatos que tebemos de ejemplo.
+                    return {
+                        title: event.eventTitle,
+                        start: new Date(event.eventStartDate),
+                        end: new Date(event.eventEndDate),
+                        url: event.eventUrl,
+                        location: event.eventLocation,
+                        timeStart: event.eventStartTime,
+                        timeEnd: event.eventEndTime,
+                    }
+                })
+                successCallback(events)
+            })
+            .catch(function(error){
+                failureCallback(error)
+            })
+        },
+        // Escuchador de eventos para clic en una hora
+        dateClick: function(info) {
+            console.warn(info.dateStr)
+            // Muestra el modal aquí.
+            abrir_modal_crear_paciente();
+            let fechaFormateada = info.dateStr.toLocaleString('es-CL', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+            });
+        },
+        // Traemos todos los eventos disponibles.
+        eventContent: function(info){
+            // info; Nos devuelce todas las operaciones que odeos hacer con full calendar.
+            //console.log(info)
+            // Debemos retornar un Objeto.
+            return {
+                html: `
+                    <div style="overflow: hidden; font-size:12px; position: relative; cursor: pointer; font-family: 'Inter', sans-serif; ">${info.event.title}
+
+                        <div>Location:${info.event.extendedProps.location}</div>
+                        <div>Date:${info.event.start.toLocaleDateString(
+                            "es-US",
+                            {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                            }
+                        )}</div>
+                        <div>Time: ${info.event.extendedProps.timeStart} - ${info.event.extendedProps.timeEnd}
+                        </div>
+                    </div>
+                `
+            }
+        },
+        // Evento de Mouse.
+        eventMouseEnter: function(mouseEnterInfo){
+            // Elemento Visible.
+            let el = mouseEnterInfo.el
+            el.classList.add("relative")
+            //
+            let newEl = document.createElement("div")
+            let newElTitle = mouseEnterInfo.event.title
+            let newElLocation = mouseEnterInfo.event.extendedProps.location
+            newEl.innerHTML = `
+                <div
+                    class="fc-hoverable-event"
+                    style="position: absolute; bottom: 100%; left: 0; width: 300px; height: auto;
+                    background-color: white; z-index: 50; border: 1px solid #e2e8f0; border-radius: 0.375rem;
+                    padding: 0.75rem; font-size: 14px; font-family: 'Inter', sans-serif; cursor: pointer;"
+                    >
+                    <strong>${newElTitle}</strong>
+                    <div>${newElLocation}</div>
+                </div>
+            `
+            el.after(newEl)
+        },
+        // Método para ocultar la info una vez pasado el mouse.
+        eventMouseLeave: function(mouseLeaveInfo){
+            // Nosmuestra las clases que tenemos.
+            console.warn(mouseLeaveInfo)
+            // Obtenemos la clase del elementos que creamos arriba.
+            let el = document.querySelector(".fc-hoverable-event").remove()
+        },
+        dayCellContent: function(dayCellContent) {
+            let today = new Date();
+            let cellDate = dayCellContent.date;
+        
+            if (cellDate < today) {
+                return {
+                    html: `<div style="color: gray; pointer-events: none;">${cellDate.getDate()}</div>`
+                };
+            }
+        },
+    });
+    calendar.render();
+}
 //
-function abrir_modal_crear_paciente(e){
+function abrir_modal_crear_paciente(){
     let nuevo_pac_admin_panel = document.getElementById("nuevo_pac_admin_panel")
     // Crea una instancia del modal de Bootstrap
     const modalInstance = new bootstrap.Modal(nuevo_pac_admin_panel);
@@ -3056,6 +3184,7 @@ function abrir_modal_crear_paciente(e){
 }
 // Enviar datos a la BD.
 function adm_registrar_paciente(){
+    //
     let username = document.getElementById("adm_paciente_username").value
     let password = document.getElementById("paciente_password").value
     let first_name = document.getElementById("adm_paciente_first_name").value
@@ -3082,15 +3211,12 @@ function adm_registrar_paciente(){
             valor_vivienda = radio.value;
         }
     });
-    console.log(valor_vivienda)
     //------- Fin Valor Radio Button Vivienda ---------
     //-------------------- Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Región.
     let id_region = document.getElementById("region").value
     let region = document.getElementById("region_" + id_region).getAttribute("data-region")
-    console.log(region)
     //------ Fin Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Comuna.
     let comuna = document.getElementById("comuna").value
-    console.log(comuna)
     let arr = []
     //------ Fin Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Comuna.
     //-----  Creamos el array de bjetos. -------------
@@ -3146,7 +3272,7 @@ function adm_registrar_paciente(){
                     { title: 'Comuna', data: "comuna", defaultContent: '' },
                     { title: 'Vivienda', data: "vivienda", defaultContent: '' },
                     { title: 'N° Vivienda', data: "num_vivienda", defaultContent: '' },
-                    { title: 'Cod. Paciente', data: "usuario_uuid", defaultContent: '' },
+                    { title: 'Cod. Usuario', data: "usuario_uuid", defaultContent: '' },
                     { 
                         title: 'Acciones', 
                         data: null,
@@ -3155,7 +3281,8 @@ function adm_registrar_paciente(){
                         orderable: false,
                         render: function(data, type, row) {
                             return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_pac_adm" onclick="editar_paciente('+row.id+', \''+row.username+'\',\''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\',\''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_historial_pac_adm" onclick="historial_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-info btn-sm ">Historial Citas</button> ';
                         }
                     },
                     { title: 'Password', data: "password", defaultContent: '' },
@@ -3209,6 +3336,8 @@ function adm_registrar_paciente(){
             }
         }
     });
+    // Agregamos el método para obtener todos losd pacientes.
+    //paciente_nombre_clinica_paciente_registrado()
 }
 //
 function editar_paciente(id, username,first_name, last_name, email,edad,sexo,rut,fono,region,comuna,vivienda, num_vivienda,password){
@@ -3390,7 +3519,8 @@ function edit_panel_adm_paciente(e){
                         orderable: false,
                         render: function(data, type, row) {
                             return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_pac_adm" onclick="editar_paciente('+row.id+', \''+row.username+'\',\''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\',\''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_historial_pac_adm" onclick="historial_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-info btn-sm ">Historial Citas</button> ';
                         }
                     },
                     { title: 'Password', data: "password", defaultContent: '' },
@@ -3450,7 +3580,7 @@ function borrar_user_paciente(id, first_name, last_name){
     const token = sessionStorage.getItem('token');
     let arr = []
     Swal.fire({
-        title: "¿Desea eliminaral Doctor: " +first_name + ' ' +last_name+ "?",
+        title: "¿Desea eliminar al Paciente: " +first_name + ' ' +last_name+ "?",
         text: "Se eliminará al doctor.",
         icon: "warning",
         showCancelButton: true,
@@ -3511,7 +3641,8 @@ function borrar_user_paciente(id, first_name, last_name){
                                 orderable: false,
                                 render: function(data, type, row) {
                                     return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_pac_adm" onclick="editar_paciente('+row.id+', \''+row.username+'\', \''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
-                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_historial_pac_adm" onclick="historial_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-info btn-sm ">Historial Citas</button> ';
                                 }
                             },
                             { title: 'Password', data: "password", defaultContent: '' },
@@ -3568,12 +3699,274 @@ function borrar_user_paciente(id, first_name, last_name){
         }
     });
 }
-function valor_select_esp_adm_pac(){
+//
+function historial_user_paciente(id_usuario, nombre, apellido){
+    let modal_historial_citas = document.getElementById("modal_historial_citas")
+    // Crea una instancia del modal de Bootstrap
+    const modalInstance = new bootstrap.Modal(modal_historial_citas);
+    // Abre el modal
+    modalInstance.show();
+    // Pasamos el id al input oculto.
+    let id_paciente = document.getElementById("id_user_pac_reserva")
+    id_paciente.value = id_usuario
     //
-    let select_especialidad = document.getElementById("index_especialidad")
-    let index_doctor = document.getElementById("index_doctor");
+    const token = sessionStorage.getItem('token');
+    let arr =[]
+    axios.get(`http://127.0.0.1:8000/paciente/historial_user_paciente/${id_usuario}`,{
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        // 
+        //console.warn(response.data.grupos[0])
+        let reserva = response.data.pacientes
+        console.log(reserva)
+        reserva.forEach(element => {
+            arr.push(element)
+        });
+        //
+        var table = $('#tabla_reserva_paciente_panel_admin').DataTable({
+            responsive: true,
+            data: arr,
+            columns: [
+                { title: 'ID Users', data: "fk_usuario", defaultContent: '' },
+                { title: 'Fecha Reserva', data: "fecha_reserva", defaultContent: '' },
+                { title: 'Especialidad', data: "especialidad", defaultContent: '' },
+                { title: 'N. Doctor', data: "nombre_doctor", defaultContent: '' },
+                { title: 'Tipo Pago', data: "tipo_pago", defaultContent: '' },
+                { title: 'Cod. Reserva', data: "reserva_uuid", defaultContent: '' },
+                { title: 'Comuna Clínica', data: "comuna_clinica", defaultContent: '' },
+                { title: 'Dirección Clínica', data: "direccion_clinica", defaultContent: '' },
+                { title: 'Nombre Clínica', data: "nombre_clinica", defaultContent: '' },
+                { title: 'Hora Inicio', data: "hora_inicio", defaultContent: '' },
+                { title: 'Hora Término', data: "hora_termino", defaultContent: '' },
+                { 
+                    title: 'Acciones', 
+                    data: null,
+                    responsivePriority: 1, // Prioridad máxima (no se oculta)
+                    className: 'no-wrap', // Clase para evitar saltos de línea
+                    orderable: false,
+                    render: function(data, type, row) {
+                        return '<button type="button" id="btn_borrar_cita_pac_adm" onclick="borrar_cita_user_paciente('+row.fk_usuario+', \''+row.nombre_paciente+'\',\''+row.fecha_reserva+'\', \''+row.especialidad+'\', \''+row.nombre_doctor+'\', \''+row.reserva_uuid+'\', \''+row.comuna_clinica+'\', \''+row.direccion_clinica+'\', \''+row.nombre_clinica+'\', \''+row.hora_inicio+'\', \''+row.hora_termino+'\')" class="btn btn-danger btn-sm">Borrar Cita</button> ';
+                    }
+                },
+            ],
+            destroy: true,
+            "dom": 'Bfrtip',
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            "lengthMenu": [
+                [5,10, 25, 50, -1],
+                ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+            ],
+            "buttons": {
+                "pageLength": {
+                    _: "Mostrar %d Registros"
+                }
+            },
+            "language": {
+                "decimal": "",
+                "emptyTable": "No hay información",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ Documentos",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Ultimo",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            }
+        });
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+        }
+    });
+}
+//
+function borrar_cita_user_paciente(fk_usuario, nombre_paciente,fecha_reserva,especialidad,nombre_doctor,reserva_uuid,comuna_clinica,direccion_clinica,nombre_clinica,hora_inicio, hora_termino){
+    const token = sessionStorage.getItem('token');
+    let arr = []
+    let res_uuid = reserva_uuid
+    Swal.fire({
+        title: "¿Desea eliminar la cita del paciente: " +nombre_paciente + ' y su especialidad: ' +especialidad+ "?",
+        text: "Se eliminará al doctor.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "¡Si, borrar!"
+      }).then((result) => {
+        if (result.isConfirmed) {
+            axios.delete(`http://127.0.0.1:8000/reserva/delete_pac_reserva/${fk_usuario}/`,{
+                headers: {
+                    'Authorization': `Token ${token}`
+                },
+                data: {
+                    res_uuid: res_uuid // Enviar res_uuid como dato
+                }
+            })
+            .then(function (response) {
+                console.warn(response.data);
+                console.warn(response.status)
+                if (response.status == 200) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Cita Eliminada Correctamente",
+                        text: "La cita fué eliminada",
+                    });
+                    //console.warn(response.data.grupos[0])
+                    let secretarias = response.data.reserva
+                    secretarias.forEach(element => {
+                        console.log(element.username)
+                        arr.push(element)
+                    });
+                    console.warn(arr)
+                    //
+                    var table = $('#tabla_reserva_paciente_panel_admin').DataTable({
+                        responsive: true,
+                        data: arr,
+                        columns: [
+                            { title: 'ID', data: "id", defaultContent: '' },
+                            { title: 'Fecha Reserva', data: "fecha_reserva", defaultContent: '' },
+                            { title: 'Especialidad', data: "especialidad", defaultContent: '' },
+                            { title: 'N. Doctor', data: "nombre_doctor", defaultContent: '' },
+                            { title: 'Tipo Pago', data: "tipo_pago", defaultContent: '' },
+                            { title: 'Cod. Reserva', data: "cod_reserva", defaultContent: '' },
+                            { title: 'Comuna Clínica', data: "comuna_clinica", defaultContent: '' },
+                            { title: 'Dirección Clínica', data: "direccion_clinica", defaultContent: '' },
+                            { title: 'Nombre Clínica', data: "nombre_clinica", defaultContent: '' },
+                            { title: 'Hora Inicio', data: "hora_inicio", defaultContent: '' },
+                            { title: 'Hora Término', data: "hora_termino", defaultContent: '' },
+                            { 
+                                title: 'Acciones', 
+                                data: null,
+                                responsivePriority: 1, // Prioridad máxima (no se oculta)
+                                className: 'no-wrap', // Clase para evitar saltos de línea
+                                orderable: false,
+                                render: function(data, type, row) {
+                                    return '<button type="button" id="btn_borrar_cita_pac_adm" onclick="borrar_cita_user_paciente('+row.id+', \''+row.nombre_paciente+'\',\''+row.fecha_reserva+'\', \''+row.especialidad+'\', \''+row.nombre_doctor+'\', \''+row.reserva_uuid+'\', \''+row.comuna_clinica+'\', \''+row.direccion_clinica+'\', \''+row.nombre_clinica+'\', \''+row.hora_inicio+'\', \''+row.hora_termino+'\')" class="btn btn-danger btn-sm">Borrar Cita</button> ';
+                                }
+                            },
+                        ],
+                        destroy: true,
+                        "dom": 'Bfrtip',
+                        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                        "lengthMenu": [
+                            [5,10, 25, 50, -1],
+                            ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+                        ],
+                        "buttons": {
+                            "pageLength": {
+                                _: "Mostrar %d Registros"
+                            }
+                        },
+                        "language": {
+                            "decimal": "",
+                            "emptyTable": "No hay información",
+                            "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                            "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                            "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                            "infoPostFix": "",
+                            "thousands": ",",
+                            "lengthMenu": "Mostrar _MENU_ Documentos",
+                            "loadingRecords": "Cargando...",
+                            "processing": "Procesando...",
+                            "search": "Buscar:",
+                            "zeroRecords": "Sin resultados encontrados",
+                            "paginate": {
+                                "first": "Primero",
+                                "last": "Ultimo",
+                                "next": "Siguiente",
+                                "previous": "Anterior"
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                if (error.response) {
+                    console.log('Error Response:', error.response.data);
+                    console.log('Error Status:', error.response.status);
+                    console.log('Error Headers:', error.response.headers);
+                    if (error.response.data.error == 3) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "El grupo ya existe",
+                            text: "El grupo fue creado anteriormente!",
+                        });
+                    }
+                }
+            });
+        }
+    });
+}
+//
+function comuna_clinica_paciente_registrado(){
+    let select_comuna = document.getElementById("select_adm_com_clin_pac_registrado")
+    console.log(select_comuna)
+    // // Reiniciar el select de "Doctor" a su estado por defecto
+    select_comuna.innerHTML = '<option selected>Comuna</option>';
+    // // Evitar múltiples peticiones si ya hay datos
+    if (select_comuna.options.length > 1) return;
+    // //
+    let arr =[]
+    const token = sessionStorage.getItem('token');
+    axios.get('http://127.0.0.1:8000/clinica/listar_clinica_adm',{
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        // 
+        //console.warn(response.data.grupos[0])
+        let list_clinica = response.data.list_clinica
+        //
+        //
+        list_clinica.forEach(element => {
+            // Crear un NUEVO elemento option en cada iteración
+            const elegir_especialidad = document.createElement("option");
+            elegir_especialidad.value = element.id; // Usar ID como valor (mejor práctica)
+            elegir_especialidad.textContent = element.nombre_clinica;
+            elegir_especialidad.setAttribute("data-comuna", element.comuna_clinica)
+            elegir_especialidad.setAttribute("data-direccion", element.direccion_clinica)
+            select_comuna.appendChild(elegir_especialidad);
+        });
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+            if (error.response.data.error == 1) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "No existe el grupo!",
+                });
+            }
+        }
+    });
+}
+// Seleccionar especialidad en el panel de adm con paciente registrado.
+function select_esp_adm_panel_pac_registrado(){
+    //
+    let select_especialidad = document.getElementById("reserva_adm_pac_registrado_especialidad")
+    select_especialidad.innerHTML = '<option selected>Seleccionar Especialidad</option>';
+    //let index_doctor = document.getElementById("index_doctor");
     // Reiniciar el select de "Doctor" a su estado por defecto
-    index_doctor.innerHTML = '<option selected>Doctor</option>';
+    //index_doctor.innerHTML = '<option selected>Doctor</option>';
     // Evitar múltiples peticiones si ya hay datos
     if (select_especialidad.options.length > 1) return;
     //
@@ -3600,6 +3993,644 @@ function valor_select_esp_adm_pac(){
             console.log('Error Response:', error.response.data);
             console.log('Error Status:', error.response.status);
             console.log('Error Headers:', error.response.headers);
+        }
+    });
+}
+//
+function valor_select_esp_adm_pac_registrado(){
+    //
+    const token = sessionStorage.getItem('token');
+    //
+    let select_adm_com_clin_pac = document.getElementById("select_adm_com_clin_pac_registrado").value
+    console.log(select_adm_com_clin_pac)
+    let select_especialidad = document.getElementById("reserva_adm_pac_registrado_especialidad").value
+    console.log(select_especialidad)
+    let select_adm_esp_pac = document.getElementById("select_adm_esp_pac_registrado");
+    // // Reiniciar el select de "Doctor" a su estado por defecto
+    select_adm_esp_pac.innerHTML = '<option selected>Doctor</option>';
+    // // Evitar múltiples peticiones si ya hay datos
+    if (select_adm_esp_pac.options.length > 1) return;
+    // //
+    let arr =[]
+    let datos = {
+        'id_clinica': select_adm_com_clin_pac,
+        'id_especialidad': select_especialidad,
+    }
+    console.warn(datos)
+    //
+    axios.get(`http://127.0.0.1:8000/doctor/esp_doc_list_reserva_panel_adm`, {
+        params: {
+            id_clinica: select_adm_com_clin_pac,
+            id_especialidad: select_especialidad
+        },
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        // 
+        const esp = response.data.doctores;
+        //
+        esp.forEach(element => {
+            console.log(element)
+            // Crear un NUEVO elemento option en cada iteración
+            const elegir_especialidad = document.createElement("option");
+            elegir_especialidad.value = element.id_doc_user; // Usar ID como valor (mejor práctica)
+            elegir_especialidad.textContent = element.nombres + ' ' + element.apellidos;
+            select_adm_esp_pac.appendChild(elegir_especialidad);
+        });
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+        }
+    });
+}
+function agregar_nueva_reserva_panel_adm(){
+    //
+    let modal_crear_cita_usuario_adm = document.getElementById("modal_crear_cita_usuario_adm")
+    // Crea una instancia del modal de Bootstrap.
+    const modalInstance = new bootstrap.Modal(modal_crear_cita_usuario_adm);
+    // Abre el modal
+    modalInstance.show();
+}
+//
+var calendar;
+// Botón para generar la reserva de un paciente REGISTRADO.
+function reserva_calendar_pac_registrado(){
+    //
+    let select_adm_com_clin_pac = document.getElementById("select_adm_com_clin_pac_registrado").value
+    console.log(select_adm_com_clin_pac)
+    let select_especialidad = document.getElementById("reserva_adm_pac_registrado_especialidad").value
+    console.log(select_especialidad)
+    let select_adm_esp_pac = document.getElementById("select_adm_esp_pac_registrado").value;
+    console.log(select_adm_esp_pac)
+    let id_usuario = document.getElementById("paciente_registrado").value
+    console.log(id_usuario)
+    if (select_adm_com_clin_pac == 0 || select_especialidad == 0 || select_adm_esp_pac == 0 || id_usuario == 0) {
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Faltan seleccionar campos",
+        });
+    }else{
+        //
+        let datos = {
+            'id_clinica': select_adm_com_clin_pac,
+            'id_especialidad': select_especialidad,
+            'id_usuario_doctor': select_adm_esp_pac,
+            'id_usuario': id_usuario
+        }
+        console.log(datos)
+        // Full Callendar.
+        let request_calendar = `http://127.0.0.1:8000/paciente/reserva_paciente_registrado`
+        //let request_calendar = '../../JS/events.json'
+        var calendarEl = document.getElementById('calendar_pac_registrado');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            // Agregamos el idioma Español.
+            locale: 'es',
+            //initialView: 'dayGridMonth',
+            initialView: 'timeGridWeek', // Vista inicial con horas
+            slotDuration: '01:00:00', // Duración de los intervalos (30 minutos)
+            slotMinTime: '08:00:00', // Mostrar desde las 8:00 AM
+            slotMaxTime: '23:00:00', // Mostrar hasta las 8:00 PM
+            // validRange: {
+            //     start: new Date().toLocaleDateString('en-CA') // Formato YYYY-MM-DD en la zona horaria local
+            // },
+            navLinks: true, // can click day/week names to navigate views
+            editable: true,
+            weekends: true,
+            // Agregamos los eventos.
+            events: function(info, successCallback, failureCallback){
+                fetch(request_calendar, {
+                    method: 'POST', // Cambiamos el método a POST
+                    headers: {
+                        'Content-Type': 'application/json', // Indicamos que estamos enviando JSON
+                    },
+                    body: JSON.stringify(datos) // Convertimos el objeto "datos" a una cadena JSON y lo enviamos en el cuerpo
+                })
+                .then(function(response) {
+                    if (!response.ok) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Faltan seleccionar campos",
+                        });
+                        throw new Error('Error en la respuesta del servidor');
+                    }
+                    return response.json(); // Procesa la respuesta como JSON
+                })
+                .then(function(data){
+                    console.warn(data.pacientes)
+                    //console.warn(data.pacientes[0]["title"]); // Aquí ves la data que llega desde el backend
+                    // Transforma los datos recibidos en el formato esperado por FullCalendar
+                    let events = data.pacientes.map(paciente => ({
+                        title: `${paciente.title}`,
+                        start: `${paciente.start}`, // Fecha y hora de inicio
+                        end: `${paciente.end}`, // Fecha y hora de fin
+                        reserva_uuid: `${paciente.reserva_uuid}`,
+                        nombre_paciente: `${paciente.nombre_paciente}`,
+                    }));
+                    console.log(events)
+                    successCallback(events)
+                })
+                .catch(function(error){
+                    failureCallback(error)
+                })
+            },
+            // Hacer click en un evento.
+            eventClick: function(clickInfo) {
+                clickInfo.jsEvent.preventDefault();
+                // Extraemos la información del evento al hacer clic
+                let eventTitle = clickInfo.event.title;
+                let eventStart = clickInfo.event.start.toLocaleString('es-CL');
+                let eventEnd = clickInfo.event.end.toLocaleString('es-CL');
+                let eventUuid = clickInfo.event.extendedProps.reserva_uuid;
+                let paciente_nombre = clickInfo.event.extendedProps.nombre_paciente;
+                //
+                moda_mostrar_informacion_cita_calendar(eventTitle, paciente_nombre, eventStart, eventEnd, eventUuid)
+                // Swal.fire({
+                //     title: "Info Reserva",
+                //     text: "Especialidad: " + eventTitle + " - " + "Cod. Reserva: " + eventUuid + " - " + "Nombre Paciente: " + paciente_nombre,
+                //     icon: "info",
+                //     showConfirmButton: false,
+                //     focusConfirm: false
+                // });
+            },
+            // Escuchador de eventos para clic en una hora
+            dateClick: function(info) {
+                var actual = new Date();
+                if (info.date >= actual) {
+                    // Obtén el elemento correspondiente a la hora clicada
+                    const slotElements = document.querySelectorAll('.fc-timegrid-slot');
+                    let fechaFormateada = info.dateStr.toLocaleString('es-CL', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                    });
+                    abrir_modal_nueva_cita_pa_registrado(fechaFormateada)
+                    
+                }
+            },
+            // Traemos todos los eventos disponibles.
+            eventContent: function(info) {
+                return {
+                    html: `
+                        <div>
+                            <strong>${info.event.title}</strong>
+                            <div>${info.event.start.toLocaleTimeString()} - ${info.event.end.toLocaleTimeString()}</div>
+                            <div>${info.event.end.toLocaleTimeString()} - ${info.event.end.toLocaleTimeString()}</div>
+                        </div>
+                    `
+                };
+            },
+            // Evento de Mouse.
+            eventMouseEnter: function(mouseEnterInfo){
+                // Elemento Visible.
+                let el = mouseEnterInfo.el
+                el.classList.add("relative")
+                //
+                let newEl = document.createElement("div")
+                let newElTitle = mouseEnterInfo.event.title
+                let newElLocation = mouseEnterInfo.event.start
+                let newEluuid = mouseEnterInfo.event.extendedProps.reserva_uuid;
+                newEl.innerHTML = `
+                    <div
+                        class="fc-hoverable-event"
+                        style="position: absolute; bottom: 100%; left: 0; width: 300px; height: auto;
+                        background-color: white; z-index: 50; border: 1px solid #e2e8f0; border-radius: 0.375rem;
+                        padding: 0.75rem; font-size: 14px; font-family: 'Inter', sans-serif; cursor: pointer;"
+                        >
+                        <div>${newEluuid}</div>
+                        <strong>${newElTitle}</strong>
+                        <div>${newElLocation}</div>
+                    </div>
+                `
+                el.after(newEl)
+            },
+            // Método para ocultar la info una vez pasado el mouse.
+            eventMouseLeave: function(mouseLeaveInfo){
+                // Nosmuestra las clases que tenemos.
+                console.warn(mouseLeaveInfo)
+                // Obtenemos la clase del elementos que creamos arriba.
+                let el = document.querySelector(".fc-hoverable-event").remove()
+            },
+            dayCellContent: function(dayCellContent) {
+                let today = new Date();
+                today.setHours(0, 0, 0, 0); // Ignorar la hora
+                let cellDate = new Date(dayCellContent.date);
+                cellDate.setHours(0, 0, 0, 0);
+                ///console.log(cellDate)
+                console.log(today)
+                // Solo cambia el color pero permite eventos
+                if (cellDate < today) {
+                    return {
+                        html: `<div style="color: gray;">${cellDate.getDate()}</div>`
+                    };
+                }
+            },
+        });
+        calendar.render();
+    }
+}
+//
+function moda_mostrar_informacion_cita_calendar(eventTitle, paciente_nombre, eventStart, eventEnd, eventUuid){
+    //
+    let modal_info_full_calendar = document.getElementById("modal_info_full_calendar")
+    // Crea una instancia del modal de Bootstrap.
+    const modalInstance = new bootstrap.Modal(modal_info_full_calendar);
+    // Abre el modal
+    modalInstance.show();
+    let info_nombre_paciente_registrado = document.getElementById("info_nombre_paciente_registrado")
+    info_nombre_paciente_registrado.readOnly = true;
+    info_nombre_paciente_registrado.value = paciente_nombre
+    let info_especialidad_paciente_Registrado = document.getElementById("info_especialidad_paciente_Registrado")
+    info_especialidad_paciente_Registrado.readOnly = true;
+    info_especialidad_paciente_Registrado.value = eventTitle
+    let cod_reserva_paciente_registrado = document.getElementById("cod_reserva_paciente_registrado")
+    cod_reserva_paciente_registrado.readOnly = true;
+    cod_reserva_paciente_registrado.value = eventUuid
+}
+// 
+function paciente_nombre_clinica_paciente_registrado(){
+    //
+    let paciente_registrado = document.getElementById("paciente_registrado")
+    //
+    paciente_registrado.innerHTML = "";
+    // Evitar múltiples peticiones si ya hay datos
+    if (paciente_registrado.options.length > 1) return;
+    
+    //
+    const token = sessionStorage.getItem('token');
+    axios.get(`http://127.0.0.1:8000/paciente/listar_paciente`, {
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        // 
+        const esp = response.data.pacientes;
+        //
+        esp.forEach(element => {
+            console.log(element)
+            // Crear un NUEVO elemento option en cada iteración
+            const elegir_especialidad = document.createElement("option");
+            elegir_especialidad.value = element.id; // Usar ID como valor (mejor práctica)
+            elegir_especialidad.textContent = element.first_name + ' ' + element.last_name;
+            paciente_registrado.appendChild(elegir_especialidad);
+        });
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+        }
+    });
+}
+// Crear elementos Alert para mostrar la info de la cita creada a un paciente registrado.
+function abrir_modal_nueva_cita_pa_registrado(fechaFormateada){
+    let modal_crear_cita_pac_resgistrado_panel_adm = document.getElementById("modal_crear_cita_pac_resgistrado_panel_adm")
+    // Crea una instancia del modal de Bootstrap.
+    const modalInstance = new bootstrap.Modal(modal_crear_cita_pac_resgistrado_panel_adm);
+    // Abre el modal
+    modalInstance.show();
+    let select_adm_com_clin_pac_registrado = document.getElementById("select_adm_com_clin_pac_registrado").value
+    let select_adm_com_clin_pac_registrado_get = document.getElementById("select_adm_com_clin_pac_registrado")
+    let data_comuna = null; // Variable para almacenar el valor del atributo data.
+    let direccion_clinica = null; // Variable para almacenar el valor del atributo data.
+    let nombre_clinica = null; // Variable para almacenar el valor del atributo data.
+    let id_especialidad = null;
+    let especialidad = null;
+    let id_user_doctor = null;
+    let nombre_doctor = null;
+    //
+    Array.from(select_adm_com_clin_pac_registrado_get.options).forEach(option => {
+        if (option.value === select_adm_com_clin_pac_registrado) {
+            // Obtén el valor del atributo data-info
+            data_comuna = option.getAttribute("data-comuna");
+            // Dirección Clínica.
+            direccion_clinica = option.getAttribute("data-direccion");
+            //
+            nombre_clinica = option.innerText;
+        }
+    });
+    // Escucha el evento de cambio (opcional, si necesitas que se detecte al seleccionar una opción)
+    let reserva_adm_pac_registrado_especialidad = document.getElementById("reserva_adm_pac_registrado_especialidad").value
+    // Escucha el evento de cambio (opcional, si necesitas que se detecte al seleccionar una opción)
+    let opcion_reserva_adm_pac_registrado_especialidad = document.getElementById("reserva_adm_pac_registrado_especialidad")
+    Array.from(opcion_reserva_adm_pac_registrado_especialidad.options).forEach(option => {
+        if (option.value === reserva_adm_pac_registrado_especialidad) {
+            // Obtén el valor del atributo data-info
+            id_especialidad = option.getAttribute("data-id");
+            // Dirección Clínica.
+            especialidad = option.getAttribute("data-esp");
+        }
+    });
+    //
+    let select_adm_esp_pac_registrado = document.getElementById("select_adm_esp_pac_registrado").value
+    let option_select_adm_esp_pac_registrado = document.getElementById("select_adm_esp_pac_registrado")
+    Array.from(option_select_adm_esp_pac_registrado.options).forEach(option => {
+        if (option.value === select_adm_esp_pac_registrado) {
+            // Dirección Clínica.
+            nombre_doctor = option.innerText;
+        }
+    });
+    //
+    let alert_info = document.getElementById("info_nueva_reserva_pac_reistrado")
+    // Limpia los elementos previos
+    while (alert_info.firstChild) {
+        alert_info.removeChild(alert_info.firstChild);
+    }
+    // Crear un nuevo elemento (por ejemplo, un div)
+    let fk_usuario = document.getElementById("paciente_registrado").value
+    let solo_paciente = document.getElementById("paciente_registrado")
+    // Obtén el índice del option seleccionado
+    let selectedIndex = solo_paciente.selectedIndex;
+    // Obtén el innerText del option seleccionado
+    let selectedText = solo_paciente.options[selectedIndex].innerText;
+    
+    let div_nombre_paciente = document.createElement("div");
+    div_nombre_paciente.classList = "alert alert-success"
+    div_nombre_paciente.role = "alert"
+    div_nombre_paciente.innerText = "Nombre Paciente: " + selectedText
+    alert_info.appendChild(div_nombre_paciente);
+    // Crear un nuevo elemento (por ejemplo, un div)
+    let div_alert_nombre_clinica = document.createElement("div");
+    div_alert_nombre_clinica.classList = "alert alert-primary"
+    div_alert_nombre_clinica.role = "alert"
+    div_alert_nombre_clinica.innerText = "Nombre Clínica: " + nombre_clinica
+    alert_info.appendChild(div_alert_nombre_clinica);
+    // Crear un nuevo elemento (por ejemplo, un div)
+    let div_alert_comuna_clinica = document.createElement("div");
+    div_alert_comuna_clinica.classList = "alert alert-primary"
+    div_alert_comuna_clinica.role = "alert"
+    div_alert_comuna_clinica.innerText = "Comuna Clínica: " + data_comuna
+    alert_info.appendChild(div_alert_comuna_clinica);
+    // Info Dirección Clínica.
+    let div_alert_direccion_clinica = document.createElement("div");
+    div_alert_direccion_clinica.classList = "alert alert-primary"
+    div_alert_direccion_clinica.role = "alert"
+    div_alert_direccion_clinica.innerText = "Dirección Clínica: " + direccion_clinica
+    alert_info.appendChild(div_alert_direccion_clinica);
+    // Info Especialidad.
+    let div_alert_especialidad = document.createElement("div");
+    div_alert_especialidad.classList = "alert alert-primary"
+    div_alert_especialidad.role = "alert"
+    div_alert_especialidad.innerText = "Especialidad: " + especialidad
+    alert_info.appendChild(div_alert_especialidad);
+    // Info Doctor.
+    let div_alert_doctor = document.createElement("div");
+    div_alert_doctor.classList = "alert alert-primary"
+    div_alert_doctor.role = "alert"
+    div_alert_doctor.innerText = "Nombre Doctor: " + nombre_doctor
+    alert_info.appendChild(div_alert_doctor);
+    // Info Fecha Reserva..
+    let div_alert_fecha_reserva = document.createElement("div");
+    div_alert_fecha_reserva.classList = "alert alert-primary"
+    div_alert_fecha_reserva.role = "alert"
+    div_alert_fecha_reserva.innerText = "Fecha Cita: " + fechaFormateada
+    alert_info.appendChild(div_alert_fecha_reserva);
+    //
+    nueva_cita_pac_registrado(fk_usuario, nombre_clinica ,data_comuna ,direccion_clinica, especialidad ,nombre_doctor ,fechaFormateada)
+}
+// Enviar información sobre la nueva cita al paciente registrado.
+function nueva_cita_pac_registrado(fk_usuario,nombre_clinica ,data_comuna ,direccion_clinica, especialidad ,nombre_doctor ,fechaFormateadas){
+    // let id_user_pac = document.getElementById("id_user_paciente_registrado").value
+    // Fecha inicial en formato "T-03:00"
+    const fechaInicial = "T-03:00";
+
+    // Crear un objeto de fecha.
+    const fechaBase = new Date(fechaFormateadas);
+
+    // Ajustar la hora de acuerdo al huso horario local
+    let opcionesFecha = { timeZone: "America/Santiago", hour12: false };
+    //const fechaFormateada = fechaBase.toLocaleDateString("es-CL", opcionesFecha);
+    const horaFormateada = fechaBase.toLocaleTimeString("es-CL", opcionesFecha);
+
+    // Sumar una hora adicional (si es necesario)
+    fechaBase.setHours(fechaBase.getHours() + 1);
+    const horaConUnaHoraMas = fechaBase.toLocaleTimeString("es-CL", opcionesFecha);
+    console.log(fechaBase)
+    //console.log(`Fecha: ${fechaFormateada}, Hora Inicio: ${horaFormateada}`);
+    //console.log(`Hora Termino: ${horaConUnaHoraMas}`);
+    //
+    const token = sessionStorage.getItem('token');
+    // Creamos un evento para obtener los valores necesarios para crear la cita.
+    let btn_crear_cita_pac_registrado_panel_adm = document.getElementById("btn_crear_cita_pac_registrado_panel_adm")
+    // 🔴 Remover cualquier evento previo antes de agregar el nuevo
+    btn_crear_cita_pac_registrado_panel_adm.removeEventListener("click", crearCita);
+
+    // ✅ Agregar un nuevo evento con una función separada
+    btn_crear_cita_pac_registrado_panel_adm.addEventListener("click", crearCita, { once: true });
+    function crearCita(e){
+        e.preventDefault()
+         // Creamos el array de objetos.
+        let datos = {
+            'fecha_reserva': fechaFormateadas,
+            'especialidad': especialidad,
+            'nombre_doctor': nombre_doctor,
+            'comuna_clinica': data_comuna,
+            'fk_usuario': fk_usuario,
+            'direccion_clinica': direccion_clinica,
+            'nombre_clinica': nombre_clinica,
+            'hora_inicio': horaFormateada,
+            'hora_termino': horaConUnaHoraMas
+        }
+        console.warn(datos)
+        //
+        axios.post(`http://127.0.0.1:8000/paciente/crear_reserva_pac_registrado`, datos, {
+            headers: {
+                'Authorization': `Token ${token}`
+            }
+        })
+        .then(function (response) {
+            // 
+            if (response.status = 200) {
+                console.log(response.data.pacientes)
+                response.data.pacientes.forEach(element => {
+                    if (calendar) {
+                        calendar.addEvent({
+                            title: element.especialidad,
+                            start: element.hora_inicio,
+                            end: element.hora_termino,
+                            // extendedProps: {
+                            //     nombre_paciente: nombre_clinica
+                            // }
+                        });
+                    }
+                    calendar.refetchEvents();
+                });
+                //
+                Swal.fire({
+                    title: "Cita Registrada Correctamente",
+                    text: "Cita Generada",
+                    icon: "success"
+                });
+            }
+        })
+        .catch(error => {
+            if (error.response) {
+                console.log('Error Response:', error.response.data);
+                console.log('Error Status:', error.response.status);
+                console.log('Error Headers:', error.response.headers);
+                if (error.response.status == 400){
+                    Swal.fire({
+                        title: "Error",
+                        text: "El usuario ya tiene una cita con esa especialidad",
+                        icon: "error"
+                    });
+                }
+            }
+        });
+    }
+}
+// Abre el modal cuando se cierra el modal del full calendar.
+function abrir_modal_anterior(){
+    let modal_historial_citas = document.getElementById("modal_historial_citas")
+    // Crea una instancia del modal de Bootstrap.
+    const modalInstance = new bootstrap.Modal(modal_historial_citas);
+    // Abre el modal
+    modalInstance.show();
+}
+// Listar las especialidades disponibles para la creación de un Paciente con reserva de hra.
+function select_esp_adm_panel_pac(){
+    //
+    let select_especialidad = document.getElementById("reserva_adm_pac_especialidad")
+    select_especialidad.innerHTML = '<option selected>Seleccionar Especialidad</option>';
+    //let index_doctor = document.getElementById("index_doctor");
+    // Reiniciar el select de "Doctor" a su estado por defecto
+    //index_doctor.innerHTML = '<option selected>Doctor</option>';
+    // Evitar múltiples peticiones si ya hay datos
+    if (select_especialidad.options.length > 1) return;
+    //
+    let arr =[]
+    //
+    axios.get('http://127.0.0.1:8000/especialidad/listar_esp_index',{
+    })
+    .then(function (response) {
+        // 
+        const esp = response.data.especialidad;
+        //
+        esp.forEach(element => {
+            // Crear un NUEVO elemento option en cada iteración
+            const elegir_especialidad = document.createElement("option");
+            elegir_especialidad.value = element.id; // Usar ID como valor (mejor práctica)
+            elegir_especialidad.setAttribute("data-esp", element.nombre_especialidad)
+            elegir_especialidad.setAttribute("data-id", element.id)
+            elegir_especialidad.textContent = element.nombre_especialidad;
+            select_especialidad.appendChild(elegir_especialidad);
+        });
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+        }
+    });
+}
+//
+function valor_select_esp_adm_pac(){
+    //
+    const token = sessionStorage.getItem('token');
+    //
+    let select_adm_com_clin_pac = document.getElementById("select_adm_com_clin_pac").value
+    console.log(select_adm_com_clin_pac)
+    let select_especialidad = document.getElementById("reserva_adm_pac_especialidad").value
+    console.log(select_especialidad)
+    let select_adm_esp_pac = document.getElementById("select_adm_esp_pac");
+    // // Reiniciar el select de "Doctor" a su estado por defecto
+    select_adm_esp_pac.innerHTML = '<option selected>Doctor</option>';
+    // // Evitar múltiples peticiones si ya hay datos
+    if (select_adm_esp_pac.options.length > 1) return;
+    // //
+    let arr =[]
+    let datos = {
+        'id_clinica': select_adm_com_clin_pac,
+        'id_especialidad': select_especialidad,
+    }
+    console.warn(datos)
+    // //
+    axios.get(`http://127.0.0.1:8000/doctor/esp_doc_list_reserva_panel_adm`, {
+        params: {
+            id_clinica: select_adm_com_clin_pac,
+            id_especialidad: select_especialidad
+        },
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        // 
+        const esp = response.data.doctores;
+        //
+        esp.forEach(element => {
+            console.log(element)
+            // Crear un NUEVO elemento option en cada iteración
+            const elegir_especialidad = document.createElement("option");
+            elegir_especialidad.value = element.id_doc_user; // Usar ID como valor (mejor práctica)
+            elegir_especialidad.textContent = element.nombres + ' ' + element.apellidos;
+            select_adm_esp_pac.appendChild(elegir_especialidad);
+        });
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+        }
+    });
+}
+//
+function comuna_clinica(){
+    //
+    let select_comuna = document.getElementById("select_adm_com_clin_pac")
+    console.log(select_comuna)
+    // // Reiniciar el select de "Doctor" a su estado por defecto
+    select_comuna.innerHTML = '<option selected>Comuna</option>';
+    // // Evitar múltiples peticiones si ya hay datos
+    if (select_comuna.options.length > 1) return;
+    // //
+    let arr =[]
+    const token = sessionStorage.getItem('token');
+    axios.get('http://127.0.0.1:8000/clinica/listar_clinica_adm',{
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        // 
+        //console.warn(response.data.grupos[0])
+        let list_clinica = response.data.list_clinica
+        //
+        //
+        list_clinica.forEach(element => {
+            // Crear un NUEVO elemento option en cada iteración
+            const elegir_especialidad = document.createElement("option");
+            elegir_especialidad.value = element.id; // Usar ID como valor (mejor práctica)
+            elegir_especialidad.textContent = element.nombre_clinica;
+            elegir_especialidad.setAttribute("data-comuna", element.comuna_clinica)
+            elegir_especialidad.setAttribute("data-direccion", element.direccion_clinica)
+            select_comuna.appendChild(elegir_especialidad);
+        });
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+            if (error.response.data.error == 1) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "No existe el grupo!",
+                });
+            }
         }
     });
 }
@@ -3641,7 +4672,7 @@ function panel_secretaria(){
                     { title: 'Comuna', data: "comuna", defaultContent: '' },
                     { title: 'Vivienda', data: "vivienda", defaultContent: '' },
                     { title: 'num_vivienda', data: "num_vivienda", defaultContent: '' },
-                    { title: 'Cod. Paciente', data: "usuario_uuid", defaultContent: '' },
+                    { title: 'Cod. Secretaria', data: "secretaria_uuid", defaultContent: '' },
                     { 
                         title: 'Acciones', 
                         data: null,
@@ -3797,7 +4828,7 @@ function registrar_secretaria(e){
                     { title: 'Comuna', data: "comuna", defaultContent: '' },
                     { title: 'Vivienda', data: "vivienda", defaultContent: '' },
                     { title: 'N° Vivienda', data: "num_vivienda", defaultContent: '' },
-                    { title: 'Cod. Paciente', data: "usuario_uuid", defaultContent: '' },
+                    { title: 'Cod. Secretaria', data: "secretaria_uuid", defaultContent: '' },
                     { 
                         title: 'Acciones', 
                         data: null,
@@ -3997,8 +5028,8 @@ function editando_secretaria(){
         if (response.status == 200) {
             Swal.fire({
                 icon: "success",
-                title: "Secretaria Registrada Correctamente",
-                text: "secretaria registrada",
+                title: "Secretaria Editada Correctamente",
+                text: "Se edita la información de la secretaria",
             });
             //console.warn(response.data.grupos[0])
             let secretarias = response.data.secretarias
@@ -4024,7 +5055,7 @@ function editando_secretaria(){
                     { title: 'Comuna', data: "comuna", defaultContent: '' },
                     { title: 'Vivienda', data: "vivienda", defaultContent: '' },
                     { title: 'N° Vivienda', data: "num_vivienda", defaultContent: '' },
-                    { title: 'Cod. Paciente', data: "usuario_uuid", defaultContent: '' },
+                    { title: 'Cod. Scretaria', data: "secretaria_uuid", defaultContent: '' },
                     { 
                         title: 'Acciones', 
                         data: null,
@@ -4140,7 +5171,7 @@ function borrar_user_secretaria(id, primer_nombre, segundo_nombre){
                             { title: 'Comuna', data: "comuna", defaultContent: '' },
                             { title: 'Vivienda', data: "vivienda", defaultContent: '' },
                             { title: 'N° Vivienda', data: "num_vivienda", defaultContent: '' },
-                            { title: 'Cod. Paciente', data: "usuario_uuid", defaultContent: '' },
+                            { title: 'Cod. Secretaria', data: "secretaria_uuid", defaultContent: '' },
                             { 
                                 title: 'Acciones', 
                                 data: null,
@@ -4299,3 +5330,140 @@ function cargar_info_cardiologia(){
     });
 }
 //----------------------------------- Fin Módulo Cardiología. --------------------------------------------------
+//----------------------------------- Módulo Info Historial Citas -----------------------------------------------
+function historial_citas(){
+    let arr =[]
+    //
+    axios.get('http://127.0.0.1:8000/reserva/historial_reserva',{
+    })
+    .then(function (response) {
+        // 
+        const esp = response.data.reserva;
+        //
+        esp.forEach(element => {
+            // Crear un NUEVO elemento option en cada iteración
+            console.log(element)
+            arr.push(element)
+        });
+        console.warn(arr)
+        //
+        var table = $('#tabla_info_historial_reserva').DataTable({
+            responsive: arr,
+            data: arr,
+            columns: [
+                { title: 'ID', data: "id_reserva", defaultContent: '' },
+                { title: 'Nombre Paciente', data: "nombre_paciente", defaultContent: '' },
+                { title: 'Especialidad', data: "especialidad", defaultContent: '' },
+                { title: 'Nombre Doctor', data: "nombre_doctor", defaultContent: '' },
+                { title: 'Nombre Clínica', data: "nombre_clinica", defaultContent: '' },
+                { title: 'Comuna Clínica', data: "comuna_clinica", defaultContent: '' },
+                { title: 'Dirección Clínica', data: "direccion_clinica", defaultContent: '' },
+                { 
+                    title: 'Fecha Reserva', 
+                    data: "fecha_reserva", 
+                    defaultContent: '',
+                    render: function (data, type, row) {
+                        if (!data) return '';
+                    
+                        let partes = data.split('-'); // Separar el año, mes y día
+                        let dia = partes[2];
+                        let mes = partes[1];
+                        let anio = partes[0];
+                    
+                        return `${dia}-${mes}-${anio}`;
+                    }
+                },
+                { title: 'Hora Inicio', data: "hora_inicio", defaultContent: '' },
+                { title: 'Hora Término', data: "hora_termino", defaultContent: '' },
+                { 
+                    title: 'Fecha Creación Reserva', 
+                    data: "fecha_creacion_reserva", 
+                    defaultContent: '',
+                    render: function (data, type, row) {
+                        if (!data) return '';
+                
+                        let fecha = new Date(data); 
+                        let dia = ('0' + fecha.getDate()).slice(-2);
+                        let mes = ('0' + (fecha.getMonth() + 1)).slice(-2);
+                        let anio = fecha.getFullYear().toString().slice(-2); // Obtener solo los últimos dos dígitos del año
+                
+                        return `${dia}-${mes}-${anio}`;
+                    }
+                },
+                { title: 'Cod. Reserva', data: "reserva_uuid", defaultContent: '' },
+            ],
+            destroy: true,
+            "dom": 'Bfrtip',
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            "lengthMenu": [
+                [5,10, 25, 50, -1],
+                ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+            ],
+            "buttons": {
+                "pageLength": {
+                    _: "Mostrar %d Registros"
+                }
+            },
+            "language": {
+                "decimal": "",
+                "emptyTable": "No hay información",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Mostrar _MENU_ Documentos",
+                "loadingRecords": "Cargando...",
+                "processing": "Procesando...",
+                "search": "Buscar:",
+                "zeroRecords": "Sin resultados encontrados",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Ultimo",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
+            }
+        });
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+        }
+    });
+}
+//----------------------------------- Fin Módulo Info Historial Citas -----------------------------------------------
+// Función para cerrar la sessión.
+function cerrar_session(){
+    //
+    const username = sessionStorage.getItem('username');
+    const token = sessionStorage.getItem('token');
+    //
+    let datos = {
+        'username': username,
+        'token': token
+    }
+    //
+    axios.post(`http://127.0.0.1:8000/usuario/cerrar_sesion`,datos, {
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        console.warn(response.data);
+        console.warn(response.status)
+        // Eliminar el token del almacenamiento local
+        if (response.status == 200) {
+            sessionStorage.removeItem('token');
+            window.location.href = 'http://127.0.0.1:5500/index.html'
+        }
+    }).catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+        }
+    });
+}

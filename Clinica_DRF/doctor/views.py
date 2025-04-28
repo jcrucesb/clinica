@@ -1,8 +1,11 @@
 from django.shortcuts import render
 from comuna_clinica.models import ComunaClinicaModel
+# Serializar las clínicas
+from comuna_clinica.serializers import ComunaClinicaSerializer
 from usuarios.models import CustomersUsers
 from especialidad.models import Especialidad
 from .models import DoctorModel
+from .serializers import DoctorSerializer
 from direccion.models import DireccionModel
 from usuarios.serializers import CustomUserSerializer
 from direccion.serializers import DireccionSerializer
@@ -89,8 +92,10 @@ def crear_doctor(request):
         username = request.data["username"]
         password = request.data["password"]
         hashed_password = make_password(password)
-        first_name = request.data["first_name"]
-        last_name = request.data["last_name"]
+        primer_nombre = request.data["primer_nombre"]
+        segundo_nombre = request.data["segundo_nombre"]
+        ap_paterno = request.data["ap_paterno"]
+        ap_materno = request.data["ap_materno"]
         email = request.data["email"]
         edad = request.data["edad"]
         rut = request.data["rut"]
@@ -103,25 +108,45 @@ def crear_doctor(request):
         request.data.update({'doctor_uuid': usuario_uuid})
         request.data.pop("especialidad", None)  # Remover 'especialidad' del diccionario
         request.data.pop("comunaclinicamodelid", None)
-        print(request.data)
+        # Data User.
+        data_user = {
+            'username': username,
+            'password': password,
+            'email': email,
+            'usuario_uuid': usuario_uuid,
+        }
         # Validar campos obligatorios
-        if not all([username, password, first_name, last_name, email, edad, rut, fono, sexo, especialidad_ids]):
+        if not all([username, password, primer_nombre, segundo_nombre, ap_paterno, ap_materno,email, edad, rut, fono, sexo, especialidad_ids]):
             return Response({'error': 0}, status=status.HTTP_400_BAD_REQUEST)
 
         # Verificar si ya existe un usuario con el mismo RUT
-        if CustomersUsers.objects.filter(rut=rut).exists():
+        if DoctorModel.objects.filter(rut=rut).exists():
             return Response({'error': 4}, status=status.HTTP_400_BAD_REQUEST)
 
         # Crear usuario
-        dato_serializado = CustomUserSerializer(data=request.data)
+        dato_serializado = CustomUserSerializer(data=data_user)
         if dato_serializado.is_valid():
             usuario = dato_serializado.save(password=hashed_password)
+            print("usuario")
             group = Group.objects.get(name='Doctor')
             usuario.groups.add(group)  # Añadir usuario al grupo 'Doctor'
-
+            # Data Doctor.
+            data_doctor = {
+                'fk_user': usuario,
+                'primer_nombre': primer_nombre,
+                'segundo_nombre': segundo_nombre,
+                'ap_paterno': ap_paterno,
+                'ap_materno': ap_materno,
+                'edad': edad,
+                'rut': rut,
+                'fono': fono,
+                'sexo': sexo,
+            }
             # Crear instancia de DoctorModel y asignar especialidades
-            doctor = DoctorModel.objects.create(fk_user=usuario, doctor_uuid=usuario_uuid)
-
+            doctor_serializer  = DoctorSerializer(data=data_doctor)
+            if doctor_serializer.is_valid():
+                print("Entramos")
+                doctor = doctor_serializer.save()
             # Asignar las especialidades al doctor usando add()
             for especialidad_id in especialidad_ids:  # Iterar sobre la lista de IDs
                 especialidad = Especialidad.objects.get(pk=especialidad_id)
@@ -409,3 +434,95 @@ def delete_clinica_doctor(request, id):
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         return Response({'error': 2}, status=400)
+
+#
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def esp_doc_list_reserva_panel_adm(request):
+    try:
+        # Obtener los datos enviados como parámetros en la URL
+        id_clinica = request.GET.get("id_clinica")  # Accede al ID de la clínica
+        id_especialidad = request.GET.get("id_especialidad")  # Accede al ID de la especialidad
+
+        # Validar que los parámetros existen
+        if not id_clinica or not id_especialidad:
+            return Response({'error': 'Faltan parámetros id_clinica o id_especialidad'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Filtrar doctores relacionados con la clínica y la especialidad
+        doctores = DoctorModel.objects.filter(doctor_clinica__id=id_clinica, especialidades__id=id_especialidad)
+        print(doctores)
+        print("----------------")
+        # Crear una lista para almacenar los resultados
+        datos = []
+        for doctor in doctores:
+            print(doctor.doctor_uuid)
+            
+            # Obtener información del usuario asociado al doctor (fk_user)
+            usuario = CustomersUsers.objects.get(username=doctor.fk_user)
+            datos.append({
+                'id_doc_user': usuario.id,
+                'nombres': usuario.first_name,
+                'apellidos': usuario.last_name,
+                'especialidad': Especialidad.objects.get(pk=id_especialidad).nombre_especialidad,
+                'clinica': ComunaClinicaModel.objects.get(pk=id_clinica).nombre_clinica
+            })
+        # Retornar la lista de doctores con su especialidad y clínica
+        return Response({'doctores': datos}, status=status.HTTP_200_OK)
+    except DoctorModel.DoesNotExist:
+        return Response({'error': 'Doctor no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+#
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def listar_datos_doctor(request):
+    try:
+        print(request.user.id)
+        datos = []
+        dato_doctor = CustomersUsers.objects.filter(pk=request.user.id)
+        dato_doctor_data = CustomUserSerializer(dato_doctor, many=True)
+        #print(dato_doctor_data.data)
+        # Retornar la lista de doctores con su especialidad y clínica
+        return Response({'dato_doctor': dato_doctor_data.data}, status=status.HTTP_200_OK)
+    except DoctorModel.DoesNotExist:
+        return Response({'error': 'Doctor no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+    
+#
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_panel_doctor(request, id):
+    try:
+        # 
+        usuario_doctor = CustomersUsers.objects.get(pk=id)
+        # 
+        update_doctor_datos = CustomUserSerializer(instance=usuario_doctor, data=request.data)
+        #
+        if update_doctor_datos.is_valid():
+            update_doctor_datos.save()
+        dato_usuario_doctor = CustomersUsers.objects.filter(pk=id)
+        usuario_doctor_data = CustomUserSerializer(dato_usuario_doctor, many=True)
+        # Retornar la lista de doctores con su especialidad y clínica
+        return Response({'dato_doctor': usuario_doctor_data.data}, status=status.HTTP_200_OK)
+    except DoctorModel.DoesNotExist:
+        return Response({'error': 'Doctor no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+#
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def listar_doctor(request, username):
+    try:
+        # Obtener el usuario del doctor
+        id_user = CustomersUsers.objects.get(username=username)
+        # Obtener el doctor asociado a ese usuario
+        doctor = DoctorModel.objects.get(fk_user=id_user.id)
+        # Obtener todas las clínicas en las que trabaja este doctor
+        clinicas = doctor.doctor_clinica.all()
+        # Obtener todos los doctores que trabajan en esas clínicas
+        doctores = DoctorModel.objects.filter(doctor_clinica__in=clinicas).distinct()
+        print(f"Total de doctores en esas clínicas: {doctores.count()}")
+        #dato_doctor = CustomersUsers.objects.filter(pk=doctores.fk_user)
+        # Extraer la lista de usuarios de los doctores
+        usuarios = [doctor.fk_user for doctor in doctores]  # Extrae solo los objetos CustomersUsers
+        usuarios_serializados = CustomUserSerializer(usuarios, many=True).data
+        return Response({'dato_doctor': usuarios_serializados}, status=status.HTTP_200_OK)
+    except DoctorModel.DoesNotExist:
+        return Response({'error': 'Doctor no encontrado'}, status=status.HTTP_404_NOT_FOUND)

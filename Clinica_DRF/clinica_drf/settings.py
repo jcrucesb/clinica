@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'doctor',
     'paciente',
     'secretaria',
-    'comuna_clinica'
+    'comuna_clinica',
+    'historial_clinico'
 ]
 
 MIDDLEWARE = [
@@ -125,12 +126,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Santiago'
+USE_TZ = True  # Habilita el soporte para zonas horarias
 
 USE_I18N = True
-
-USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -143,3 +142,22 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'usuarios.CustomersUsers'
+
+#Configuracion de Correo EMAIL para el envío de correos.
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "jaircrucesb@gmail.com"
+EMAIL_HOST_PASSWORD = "godjbyrzlhlzpiyk"
+
+# Configuración de Django Rest Framework (DRF)
+# Este código siempre debe estar.
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}

@@ -12,4 +12,9 @@ urlpatterns = [
     path('doctor/doctor_nueva_clinica/<int:id>/', views.doctor_nueva_clinica, name='doctor_nueva_clinica'),
     path('doctor/delete_clinica_doctor/<int:id>/', views.delete_clinica_doctor, name='delete_clinica_doctor'),
     path('doctor/update_doctor/<int:id>/', views.update_doctor, name='update_doctor'),
+    path('doctor/esp_doc_list_reserva_panel_adm', views.esp_doc_list_reserva_panel_adm, name='esp_doc_list_reserva_panel_adm'),
+    # Panel Doctor.
+    path('doctor/listar_datos_doctor/', views.listar_datos_doctor, name='listar_datos_doctor'),
+    path('doctor/update_panel_doctor/<int:id>/', views.update_doctor, name='update_doctor'),
+    path('doctor/listar_doctor/<str:username>/', views.listar_doctor, name='listar_doctor'),
 ]

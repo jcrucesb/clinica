@@ -1,11 +1,12 @@
 from django.shortcuts import render
-from usuarios.models import CustomersUsers
-from especialidad.models import Especialidad
-from direccion.models import DireccionModel
-from usuarios.serializers import CustomUserSerializer
-from direccion.serializers import DireccionSerializer
-from django.shortcuts import render, redirect, get_object_or_404
 from django.core import serializers
+from secretaria.models import SecretariaModel
+from secretaria.serializers import SecretariaSerializer
+from direccion.models import DireccionModel
+from direccion.serializers import DireccionSerializer
+from usuarios.models import CustomersUsers
+from usuarios.serializers import CustomUserSerializer
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from rest_framework.response import Response
 # Crear un código de Venta.
@@ -69,12 +70,28 @@ def listar_secretaria(request):
         usuarios = grupo.user_set.all()
         datos = []
         for users in usuarios:
-            #print(users.id)
-            # Serializar los datos
             serializer_dir = DireccionModel.objects.filter(usuario_id=users.id)
+            serializer_secretaria = SecretariaModel.objects.filter(fk_user=users.id)
+
             for ser in serializer_dir:
-                print(ser.vivienda)
-                datos.append({'id': users.id, 'username': users.username, 'first_name': users.first_name, 'last_name': users.last_name, 'email': users.email, 'edad': users.edad, 'sexo': users.sexo, 'rut': users.rut, 'fono': users.fono, 'usuario_uuid':users.usuario_uuid, 'password':users.password,'region': ser.region, 'comuna': ser.comuna, 'vivienda': ser.vivienda, 'num_vivienda': ser.num_vivienda, 'usuario_id': ser.usuario_id})
+                for secre in serializer_secretaria:
+                    datos.append({
+                        'id': users.id,
+                        'username': users.username,
+                        'first_name': users.first_name,
+                        'last_name': users.last_name,
+                        'email': users.email,
+                        'edad': users.edad,
+                        'sexo': users.sexo,
+                        'rut': users.rut,
+                        'fono': users.fono,
+                        'password': users.password,
+                        'region': ser.region,
+                        'comuna': ser.comuna,
+                        'vivienda': ser.vivienda,
+                        'num_vivienda': ser.num_vivienda,
+                        'secretaria_uuid': secre.secretaria_uuid
+                    })
         print(datos)
         print("---------------------///****//")
         return Response({'secretarias':datos},
@@ -109,8 +126,7 @@ def crear_secretaria(request):
         comuna = data.get("comuna")
         num_vivienda = data.get("num_vivienda")
         usuario_uuid = str(uuid.uuid4())
-        data.update({'usuario_uuid': usuario_uuid})
-
+        #data.update({'usuario_uuid': usuario_uuid})
         if not all([username, password, first_name, last_name, email, edad, rut, fono, sexo, vivienda, region, comuna, num_vivienda]):
             return Response({'error': 0}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -125,6 +141,12 @@ def crear_secretaria(request):
             #print(data)
             group = Group.objects.get(name='Secretarias')
             usuario.groups.add(group)
+            secretarias_data = {'fk_user': usuario.id, 'secretaria_uuid': usuario_uuid}
+            secretaria = SecretariaSerializer(data=secretarias_data)
+            if secretaria.is_valid():
+                secretaria.save()
+            print("Pasamos")
+            # Insertar infrmación domicilio secretaria, OPCIONAL.
             direccion_dato_serializado = DireccionSerializer(data=data)
             #print(direccion_dato_serializado)
             if direccion_dato_serializado.is_valid():
@@ -136,12 +158,29 @@ def crear_secretaria(request):
             usuarios = grupo.user_set.all()
             datos = []
             for users in usuarios:
-                #print(users.id)
-                # Serializar los datos
                 serializer_dir = DireccionModel.objects.filter(usuario_id=users.id)
+                serializer_secretaria = SecretariaModel.objects.filter(fk_user=users.id)
+
                 for ser in serializer_dir:
-                    print(ser.vivienda)
-                    datos.append({'id': users.id, 'username': users.username, 'first_name': users.first_name, 'last_name': users.last_name, 'email': users.email, 'edad': users.edad, 'sexo': users.sexo, 'rut': users.rut, 'fono': users.fono, 'usuario_uuid':users.usuario_uuid, 'password': users.password,'region': ser.region, 'comuna': ser.comuna, 'vivienda': ser.vivienda, 'num_vivienda': ser.num_vivienda, 'usuario_id': ser.usuario_id})
+                    for secre in serializer_secretaria:
+                        datos.append({
+                            'id': users.id,
+                            'username': users.username,
+                            'first_name': users.first_name,
+                            'last_name': users.last_name,
+                            'email': users.email,
+                            'edad': users.edad,
+                            'sexo': users.sexo,
+                            'rut': users.rut,
+                            'fono': users.fono,
+                            'password': users.password,
+                            'region': ser.region,
+                            'comuna': ser.comuna,
+                            'vivienda': ser.vivienda,
+                            'num_vivienda': ser.num_vivienda,
+                            'secretaria_uuid': secre.secretaria_uuid
+                        })
+            print(datos)
             return Response({'secretarias': datos}, status=status.HTTP_200_OK)
         else:
             print("Errores de validación:", dato_serializado.errors)
@@ -225,12 +264,29 @@ def delete_secretaria(request, id):
         usuarios = grupo.user_set.all()
         datos = []
         for users in usuarios:
-            #print(users.id)
-            # Serializar los datos
             serializer_dir = DireccionModel.objects.filter(usuario_id=users.id)
+            serializer_secretaria = SecretariaModel.objects.filter(fk_user=users.id)
+
             for ser in serializer_dir:
-                print(ser.vivienda)
-                datos.append({'id': users.id, 'username': users.username, 'first_name': users.first_name, 'last_name': users.last_name, 'email': users.email, 'edad': users.edad, 'sexo': users.sexo, 'rut': users.rut, 'fono': users.fono, 'usuario_uuid':users.usuario_uuid, 'password': users.password,'region': ser.region, 'comuna': ser.comuna, 'vivienda': ser.vivienda, 'num_vivienda': ser.num_vivienda, 'usuario_id': ser.usuario_id})
+                for secre in serializer_secretaria:
+                    datos.append({
+                        'id': users.id,
+                        'username': users.username,
+                        'first_name': users.first_name,
+                        'last_name': users.last_name,
+                        'email': users.email,
+                        'edad': users.edad,
+                        'sexo': users.sexo,
+                        'rut': users.rut,
+                        'fono': users.fono,
+                        'password': users.password,
+                        'region': ser.region,
+                        'comuna': ser.comuna,
+                        'vivienda': ser.vivienda,
+                        'num_vivienda': ser.num_vivienda,
+                        'secretaria_uuid': secre.secretaria_uuid
+                    })
+        print(datos)
         return Response({'secretarias': datos}, status=status.HTTP_200_OK)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")

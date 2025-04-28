@@ -7,4 +7,4 @@ class DireccionModel(models.Model):
     comuna = models.TextField(max_length=250, null=True)
     vivienda = models.TextField(max_length=250, null=True)
     num_vivienda = models.TextField(max_length=250, null=True)
-    usuario = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, unique=True)
+    fk_paciente = models.OneToOneField('paciente.PacienteModel', on_delete=models.CASCADE, null=True, unique=True)

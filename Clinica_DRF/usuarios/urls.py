@@ -26,4 +26,6 @@ urlpatterns = [
     #-------------------- Inicio Panel Cardiologia Admin. ------------------------------------------------
     path('cardiologia/listar_info_cardiologia', views.listar_info_cardiologia, name='listar_info_cardiologia'),
     #-------------------- Fin Inicio Panel Cardiologia Admin. --------------------------------------------
+    #----------------- Cerrar Sessión. -------------------------------------------------------------------
+    path('usuario/cerrar_sesion', views.cerrar_sesion, name='cerrar_sesion'),
 ]

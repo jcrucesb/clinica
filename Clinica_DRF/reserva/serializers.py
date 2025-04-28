@@ -6,4 +6,4 @@ from .models import ReservaModel
 class ReservaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReservaModel
-        fields = ['id', 'fecha_reserva', 'hora_reserva', 'especialidad','nombre_doctor', 'tipo_pago', 'usuario_uuid', 'reserva_uuid']
+        fields = ['id', 'fecha_reserva', 'especialidad','nombre_doctor', 'tipo_pago', 'reserva_uuid', 'comuna_clinica', 'fk_usuario','direccion_clinica', 'nombre_clinica', 'hora_inicio','hora_termino']
