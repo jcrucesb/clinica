@@ -59,7 +59,7 @@ import pdfkit
 
 # Create your views here.
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def listar_clinica_adm(request):
     try:
         # Obtener el grupo por nombre

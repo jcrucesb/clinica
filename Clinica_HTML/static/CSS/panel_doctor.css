@@ -1,3 +1,22 @@
+/*Cambiar de color la celda del fiull calendar si se encuentra cerrada la reserva.*/
+.reserva-cerrada {
+    background-color: green !important; /* Verde para reservas cerradas */
+    color: white !important;
+}
+/**/
+.reserva-abierta {
+    background-color: blue !important; /* Azul para reservas abiertas */
+    color: white !important;
+}
+/*Iconos*/
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+/**/
 .material-symbols-outlined {
   font-variation-settings:
   'FILL' 0,

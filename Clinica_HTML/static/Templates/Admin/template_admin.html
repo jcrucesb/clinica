@@ -412,7 +412,7 @@
                   <!-- Panel ADMIN; Doctor, Paciente y Secretaria. -->
                   <div class="" id="opcion_secre_doc_pasc" style="display: none;">
                     <!-- Todo el Container del Panel de ADMIN. -->
-                      <div class="container-xl panel_doctor" id="container_doctor" style="display: none;">
+                      <div class="container panel_doctor" id="container_doctor" style="display: none;">
                         <h1 class="text-center">Panel Doctores</h1>
                         <div class="container">
                           <div class="table-responsive">
@@ -728,36 +728,6 @@
               <div class="col-md-6">
                 <div class="row g-3 align-items-center">
                   <div class="col-auto">
-                    <label for="edit_doc_password" class="col-form-label">Password</label>
-                  </div>
-                  <div class="col">
-                    <input type="password" name="password" id="edit_doc_password" class="form-control" aria-describedby="passwordHelpInline">
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="row g-3 align-items-center">
-                  <div class="col-auto">
-                    <label for="edit_doc_first_name" class="col-form-label">First Name</label>
-                  </div>
-                  <div class="col">
-                    <input type="text" id="edit_doc_first_name" name="edit_doc_first_name" class="form-control" aria-describedby="passwordHelpInline">
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="row g-3 align-items-center">
-                  <div class="col-auto">
-                    <label for="edit_doc_last_name" class="col-form-label">Last Name</label>
-                  </div>
-                  <div class="col">
-                    <input type="text" id="edit_doc_last_name" name="edit_doc_last_name" class="form-control" aria-describedby="passwordHelpInline">
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="row g-3 align-items-center">
-                  <div class="col-auto">
                     <label for="edit_doc_email" class="col-form-label">email</label>
                   </div>
                   <div class="col">
@@ -768,10 +738,50 @@
               <div class="col-md-6">
                 <div class="row g-3 align-items-center">
                   <div class="col-auto">
+                    <label for="edit_doc_primer_nombre" class="col-form-label">Primer Nombre</label>
+                  </div>
+                  <div class="col">
+                    <input type="text" id="edit_doc_primer_nombre" name="edit_doc_primer_nombre" class="form-control" aria-describedby="passwordHelpInline">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="row g-3 align-items-center">
+                  <div class="col-auto">
+                    <label for="edit_doc_segundo_nombre" class="col-form-label">Segundo Nombre</label>
+                  </div>
+                  <div class="col">
+                    <input type="text" id="edit_doc_segundo_nombre" name="edit_doc_segundo_nombre" class="form-control" aria-describedby="passwordHelpInline">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="row g-3 align-items-center">
+                  <div class="col-auto">
+                    <label for="edit_doc_last_name" class="col-form-label">Ap. Paterno</label>
+                  </div>
+                  <div class="col">
+                    <input type="text" id="edit_doc_ap_paterno" name="edit_doc_ap_paterno" class="form-control" aria-describedby="passwordHelpInline">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="row g-3 align-items-center">
+                  <div class="col-auto">
+                    <label for="edit_doc_last_name" class="col-form-label">Ap. Materno</label>
+                  </div>
+                  <div class="col">
+                    <input type="text" id="edit_doc_ap_materno" name="edit_doc_ap_materno" class="form-control" aria-describedby="passwordHelpInline">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="row g-3 align-items-center">
+                  <div class="col-auto">
                     <label for="edit_doc_edad" class="col-form-label">Edad</label>
                   </div>
                   <div class="col">
-                    <input type="number" id="edit_doc_edad" name="edit_doc_edad" class="form-control" aria-describedby="passwordHelpInline">
+                    <input type="number" id="edit_doc_edad" name="edit_doc_edad" min="0" class="form-control" aria-describedby="passwordHelpInline">
                   </div>
                 </div>
               </div>
@@ -808,6 +818,16 @@
                       <input type="radio" class="btn-check" name="edit_doc_genero" id="doc_femenino_edit" autocomplete="off" value="F">
                       <label class="btn btn-outline-primary" for="doc_femenino_edit">Femenino</label>
                     </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6" style="background: rgb(169, 250, 236);">
+                <div class="row g-3 align-items-center">
+                  <div class="col-auto">
+                    <label for="edit_doc_pass" class="col-form-label">Password</label>
+                  </div>
+                  <div class="col">
+                    <input type="password" id="edit_doc_pass" name="edit_doc_pass" class="form-control" aria-describedby="passwordHelpInline">
                   </div>
                 </div>
               </div>
@@ -923,7 +943,7 @@
     </div>
     <!--Fin Modal Crear Grupo. -->
     <!-- Modal Editar Nombre Grupo. -->
-    <div class="modal fade" id="modal_editar_grupo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <!-- <div class="modal fade" id="modal_editar_grupo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header" style="background: rgb(124, 162, 245);">
@@ -945,7 +965,7 @@
         </form>
         </div>
       </div>
-    </div>
+    </div> -->
     <!--Fin Modal Editar Nombre Grupo.-->
     <!-- Formulario Crear Doctor. -->
     <div class="modal fade" id="modal_form_doctor" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -1088,7 +1108,7 @@
                 </div>
                 <div class="row g-3 align-items-center">
                   <div class="col-auto">
-                    <label for="inputPassword4" class="col-form-label">Seleccionar Clínica</label>
+                    <label for="select_clinica" class="col-form-label">Seleccionar Clínica</label>
                   </div>
                   <div class="col">
                     <select class="form-select" id="select_clinica" onfocus="obtener_clinica()">
@@ -1371,12 +1391,20 @@
                         <input type="password" class="form-control" id="paciente_password" placeholder="Password" style="border-color: rgb(196, 69, 235)">
                       </div>
                       <div class="col-md-6 mb-3"">
-                        <label for="first_name" class="form-label">Nombres</label>
-                        <input type="text" class="form-control" id="adm_paciente_first_name" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
+                        <label for="adm_paciente_primer_nombre" class="form-label">Primer Nombres</label>
+                        <input type="text" class="form-control" id="adm_paciente_primer_nombre" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
                       </div>
                       <div class="col-md-6 mb-3"">
-                        <label for="last_name" class="form-label">Apellidos</label>
-                        <input type="text" class="form-control" id="adm_paciente_last_name" placeholder="Apellidos" style="border-color: rgb(196, 69, 235)">
+                        <label for="adm_paciente_segundo_nombre" class="form-label">Segundo Nombres</label>
+                        <input type="text" class="form-control" id="adm_paciente_segundo_nombre" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="adm_paciente_ap_paterno" class="form-label">Apellido Paterno</label>
+                        <input type="text" class="form-control" id="adm_paciente_ap_paterno" placeholder="Apellidos" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="adm_paciente_ap_materno" class="form-label">Apellido Paterno</label>
+                        <input type="text" class="form-control" id="adm_paciente_ap_materno" placeholder="Apellidos" style="border-color: rgb(196, 69, 235)">
                       </div>
                       <!---->
                       <div class="col-md-6 mb-3"">
@@ -1490,29 +1518,37 @@
             <div class="container mt-5 mt-5 d-flex justify-content-center" id=""  style="background: rgb(231, 230, 229);" style="border-color: rgb(196, 69, 235)">
               <div class="col-md-8 mt-3">
                   <div class="row mb-3">
-                      <div class="col-md-6 mb-3"">
-                        <input type="hidden" id="id_usuuario_pac">
+                      <div class="col-md-6 mb-3">
+                        <input type="hidden" id="id_usuario_pac">
                         <label for="username" class="form-label">Username</label>
                         <input type="text" class="form-control" id="edit_adm_paciente_username" placeholder="Username" style="border-color: rgb(196, 69, 235)">
                       </div>
-                      <div class="col-md-6 mb-3"">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="edit_adm_paciente_pass" placeholder="Password" style="border-color: rgb(196, 69, 235)">
-                      </div>
-                      <div class="col-md-6 mb-3"">
-                        <label for="first_name" class="form-label">Nombres</label>
-                        <input type="text" class="form-control" id="edit_adm_paciente_first_name" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
-                      </div>
-                      <div class="col-md-6 mb-3"">
-                        <label for="last_name" class="form-label">Apellidos</label>
-                        <input type="text" class="form-control" id="edit_adm_paciente_last_name" placeholder="Apellidos" style="border-color: rgb(196, 69, 235)">
-                      </div>
-                      <!---->
-                      <div class="col-md-6 mb-3"">
+                      <div class="col-md-6 mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="edit_adm_paciente_email" placeholder="name@example.com" style="border-color: rgb(196, 69, 235)">
                       </div>
-                      <div class="col-md-6 mb-3"">
+                      <div class="col-md-6 mb-3" style="background: rgb(158, 240, 240);">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="edit_adm_paciente_pass" placeholder="Password" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="edit_adm_paciente_primer_nombre" class="form-label">Primer Nombres</label>
+                        <input type="text" class="form-control" id="edit_adm_paciente_primer_nombre" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="edit_adm_paciente_segundo_nombre" class="form-label">Segundo Nombres</label>
+                        <input type="text" class="form-control" id="edit_adm_paciente_segundo_nombre" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="edit_adm_ap_paterno" class="form-label">Apellido Paterno</label>
+                        <input type="text" class="form-control" id="edit_adm_ap_paterno" placeholder="Apellidos" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="edit_adm_ap_materno" class="form-label">Apellido Materno</label>
+                        <input type="text" class="form-control" id="edit_adm_ap_materno" placeholder="Apellidos" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <!---->
+                      <div class="col-md-6 mb-3">
                         <label for="edad" class="form-label">Edad</label>
                         <input type="number" class="form-control" id="edit_adm_paciente_edad" placeholder="Edad" style="border-color: rgb(196, 69, 235)">
                       </div>
@@ -1530,11 +1566,11 @@
                           </div>
                       </div>
                     </div>
-                      <div class="col-md-6 mb-3"">
+                      <div class="col-md-6 mb-3">
                         <label for="fono" class="form-label">Contacto</label>
                         <input type="text" class="form-control" id="edit_adm_paciente_fono" placeholder="Contacto" style="border-color: rgb(196, 69, 235)">
                       </div>
-                      <div class="col-md-6 mb-3"">
+                      <div class="col-md-6 mb-3">
                         <label for="fono" class="form-label">RUT</label>
                         <input type="text" class="form-control" id="edit_adm_paciente_rut" placeholder="RUT" style="border-color: rgb(196, 69, 235)">
                       </div>
@@ -1555,7 +1591,7 @@
                             </div>
                         </div>
                       </div>
-                      <div class="col-md-6 mb-3"">
+                      <div class="col-md-6 mb-3">
                         <label for="num_vivienda" class="form-label">N° Vivienda</label>
                         <input type="text" class="form-control" id="edit_adm_paciente_num_vivienda" placeholder="Num Vivienda" style="border-color: rgb(196, 69, 235)">
                       </div>
@@ -1658,12 +1694,20 @@
                         <input type="password" class="form-control" id="crear_secretaria_adm_pass" placeholder="Password" style="border-color: rgb(196, 69, 235)">
                       </div>
                       <div class="col-md-6 mb-3"">
-                        <label for="first_name" class="form-label">Nombres</label>
-                        <input type="text" class="form-control" id="crear_secretaria_adm_first_name" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
+                        <label for="crear_secretaria_adm_primer_nombre" class="form-label">Primer Nombre</label>
+                        <input type="text" class="form-control" id="crear_secretaria_adm_primer_nombre" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
                       </div>
                       <div class="col-md-6 mb-3"">
-                        <label for="last_name" class="form-label">Apellidos</label>
-                        <input type="text" class="form-control" id="crear_secretaria_adm_last_name" placeholder="Apellidos" style="border-color: rgb(196, 69, 235)">
+                        <label for="crear_secretaria_adm_segundo_nombre" class="form-label">Segundo Nombre</label>
+                        <input type="text" class="form-control" id="crear_secretaria_adm_segundo_nombre" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="crear_secretaria_adm_ap_paterno" class="form-label">Apellido Paterno</label>
+                        <input type="text" class="form-control" id="crear_secretaria_adm_ap_paterno" placeholder="Apellido Paterno" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="crear_secretaria_adm_ap_materno" class="form-label">Apellido Materno</label>
+                        <input type="text" class="form-control" id="crear_secretaria_adm_ap_materno" placeholder="Apellido Materno" style="border-color: rgb(196, 69, 235)">
                       </div>
                       <!---->
                       <div class="col-md-6 mb-3"">
@@ -1696,55 +1740,14 @@
                         <label for="fono" class="form-label">RUT</label>
                         <input type="text" class="form-control" id="crear_secretaria_rut" placeholder="RUT" style="border-color: rgb(196, 69, 235)">
                       </div>
-                      <div class="col-md-6 mb-3">
-                        <label for="vivienda" class="form-label">Tipo Vivienda</label>
-                        <div class="d-flex flex-column"> <!-- Cambiado a dirección vertical -->
-                            <div class="form-check mb-2"> <!-- Añadido margen inferior -->
-                                <input class="form-check-input" type="radio" name="crear_secretaria_adm_tipo_vivienda" id="crear_secretaria_adm_vivienda" value="Casa" style="border-color: rgb(196, 69, 235)">
-                                <label class="form-check-label" for="crear_secretaria_adm_vivienda"> Casa </label>
-                            </div>
-                            <div class="form-check mb-2"> <!-- Añadido margen inferior -->
-                                <input class="form-check-input" type="radio" name="crear_secretaria_adm_tipo_vivienda" id="crear_secretaria_adm_vivienda_2" value="Condominio" style="border-color: rgb(196, 69, 235)">
-                                <label class="form-check-label" for="crear_secretaria_adm_vivienda_2"> Condominio </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="crear_secretaria_adm_tipo_vivienda" id="crear_secretaria_adm_tipo_vivienda" value="Departamento" style="border-color: rgb(196, 69, 235)">
-                                <label class="form-check-label" for="crear_secretaria_adm_tipo_vivienda"> Departamento </label>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="col-md-6 mb-3"">
-                        <label for="num_vivienda" class="form-label">N° Vivienda</label>
-                        <input type="text" class="form-control" id="crear_secretaria_num_vivienda" placeholder="Num Vivienda" style="border-color: rgb(196, 69, 235)">
-                      </div>
                     </div>
-                    <div class="d-flex flex-column mb-3">
-                      <div class="input-group mb-2">
-                        <label class="input-group-text" for="select1">Región</label>
-                        <select class="form-select" id="secretaria_region" onchange="buscar_ciudad_secretaria(0)" style="border-color: rgb(196, 69, 235)">
-                          <option data-id="0" data-region = "null" value="0" selected="selected">Regiones</option>
-                          <option  id="region_15" data-region ="Arica y Parinacota" value="15">Arica y Parinacota</option>
-                          <option id="region_1" data-region ="Tarapacá" value="1">Tarapacá</option>
-                          <option id="region_2" data-region ="Antofagasta" value="2">Antofagasta</option>
-                          <option id="region_3" data-region ="Atacama" value="3">Atacama</option>
-                          <option id="region_4" data-region ="Coquimbo" value="4">Coquimbo</option>
-                          <option id="region_5" data-region ="Valparaiso" value="5">Valparaiso</option>
-                          <option id="region_13" data-region ="Metropolitana" value="13">Metropolitana</option>
-                          <option id="region_6" data-region ="O'Higgins" value="6">O'Higgins</option>
-                          <option id="region_7" data-region ="Maule" value="7">Maule</option>
-                          <option id="region_16" data-region ="Ñuble" value="16">Ñuble</option>
-                          <option id="region_8" data-region ="Bio - Bio" value="8">Bio - Bio</option>
-                          <option id="region_9" data-region ="Araucania" value="9">Araucania</option>
-                          <option id="region_14" data-region ="Los Rios" value="14">Los Rios</option>
-                          <option id="region_10" data-region ="Los Lagos" value="10">Los Lagos</option>
-                          <option id="region_11" data-region ="Aisen" value="11">Aisen</option>
-                          <option id="region_12" data-region ="Magallanes Y Antártica" value="12">Magallanes Y Antartica</option>
-                        </select>
+                    <div class="row g-3 align-items-center mb-2">
+                      <div class="col-auto">
+                        <label for="select_clinica" class="col-form-label">Seleccionar Clínica</label>
                       </div>
-                      <div class="input-group">
-                        <label class="input-group-text" for="select2">Comuna</label>
-                        <select class="form-control" style="border-color: rgb(196, 69, 235)" name="secretaria_comuna" id="secretaria_comuna">
-                          <option value="0">Comunas por Region</option>
+                      <div class="col">
+                        <select class="form-select" id="select_clinica_secretaria" onfocus="obtener_clinica_secretaria()">
+                          <option value="0" selected>Seleccionar</option>
                         </select>
                       </div>
                     </div>
@@ -1760,7 +1763,93 @@
         </div>
       </div>
     </div>
-    <!-- Fin Modal Listar Secretaria Panel Admin. -->
+    <!-- Modal Obtener Todas Las Clínicas De La Secretaria Panel Admin. -->
+    <div class="modal fade" id="modal_todas_clin_secretaria_panel_admin" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header" style="background: orange;">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Clínicas</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Contenido de la página, incluyendo las cards -->
+            <div class="container">
+              <button class="btn btn-success btn-xl" id="btn_insert_nueva_clin_secret_panel_adm" onclick="insert_nueva_clin_secret_panel_adm()">Agregar Clínica</button>
+              <div class="table-responsive">
+                <table id="tabla_clinica_secret_panel_admin" class="display nowrap" style="width:100%">
+                  <div class="col-md-12">
+                    <div class="d-grid gap-2">
+                      <div class="d-grid gap-2 mb-2">
+                        <input type="hidden" id="id_secret_clin">
+                      </div>
+                    </div>
+                  </div>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer" style="background: orange;">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Fin Modal Obtener Todas Las Clínicas De La Secretaria Panel Admin. -->
+
+    <!-- Modal Obtener Todas Las Clínicas De La Secretaria Panel Admin. -->
+    <div class="modal fade" id="modal_insert_clin_secretaria_panel_admin" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header" style="background: orange;">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Clínicas</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Contenido de la página, incluyendo las cards -->
+            <div class="container">
+              <input type="hidden" id="id_user_secretaria" value="">
+              <div class="row g-3 align-items-center mb-2">
+                <div class="col-auto">
+                  <label for="insert_select_clinica_secretaria" class="col-form-label">Seleccionar Clínica</label>
+                </div>
+                <div class="col">
+                  <select class="form-select" id="insert_select_clinica_secretaria" onfocus="insert_nueva_clinica_secret_panel_adm()">
+                    <option value="0" selected>Seleccionar</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer" style="background: orange;">
+            <button type="button" class="btn btn-success" onclick="enviar_nueva_clinica_secretaria()">Agregar Clínica</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Fin Modal Obtener Todas Las Clínicas De La Secretaria Panel Admin. -->
+
+    <!-- Modal Insertar Nueva Clínica De a La Secretaria Panel Admin. -->
+    <div class="modal fade" id="modal_insert_clin_secretaria_panel_admin" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Clínicas</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Contenido de la página, incluyendo las cards -->
+            <div class="container">
+              
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Fin Modal Insertar Nueva Clínica De a La Secretaria Panel Admin. -->
     <!-- Modal Listar Secretaria Panel Admin. -->
     <div class="modal fade" id="modal_editar_secretaria" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog modal-xl">
@@ -1776,20 +1865,28 @@
                   <div class="row mb-3">
                       <div class="col-md-6 mb-3"">
                         <input type="hidden" id="id_usuario_secretaria">
-                        <label for="username" class="form-label">Username</label>
+                        <label for="edit_adm_secretaria_username" class="form-label">Username</label>
                         <input type="text" class="form-control" id="edit_adm_secretaria_username" placeholder="Username" style="border-color: rgb(196, 69, 235)">
                       </div>
                       <div class="col-md-6 mb-3"">
-                        <label for="password" class="form-label">Password</label>
+                        <label for="edit_adm_secretaria_pass" class="form-label">Password</label>
                         <input type="password" class="form-control" id="edit_adm_secretaria_pass" placeholder="Password" style="border-color: rgb(196, 69, 235)">
                       </div>
                       <div class="col-md-6 mb-3"">
-                        <label for="first_name" class="form-label">Nombres</label>
-                        <input type="text" class="form-control" id="edit_adm_secretaria_first_name" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
+                        <label for="edit_adm_secretaria_primer_nombre" class="form-label">Primer Nombre</label>
+                        <input type="text" class="form-control" id="edit_adm_secretaria_primer_nombre" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
                       </div>
                       <div class="col-md-6 mb-3"">
-                        <label for="last_name" class="form-label">Apellidos</label>
-                        <input type="text" class="form-control" id="edit_adm_secretaria_last_name" placeholder="Apellidos" style="border-color: rgb(196, 69, 235)">
+                        <label for="edit_adm_secretaria_segundo_nombre" class="form-label">Segundo Nombre</label>
+                        <input type="text" class="form-control" id="edit_adm_secretaria_segundo_nombre" placeholder="Nombres" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="edit_adm_secretaria_ap_paterno" class="form-label">Apellido Paterno</label>
+                        <input type="text" class="form-control" id="edit_adm_secretaria_ap_paterno" placeholder="Apellidos" style="border-color: rgb(196, 69, 235)">
+                      </div>
+                      <div class="col-md-6 mb-3"">
+                        <label for="edit_adm_secretaria_ap_materno" class="form-label">Apellido Materno</label>
+                        <input type="text" class="form-control" id="edit_adm_secretaria_ap_materno" placeholder="Apellidos" style="border-color: rgb(196, 69, 235)">
                       </div>
                       <!---->
                       <div class="col-md-6 mb-3"">
@@ -1821,57 +1918,6 @@
                       <div class="col-md-6 mb-3"">
                         <label for="fono" class="form-label">RUT</label>
                         <input type="text" class="form-control" id="edit_adm_secretaria_rut" placeholder="RUT" style="border-color: rgb(196, 69, 235)">
-                      </div>
-                      <div class="col-md-6 mb-3">
-                        <label for="vivienda" class="form-label">Tipo Vivienda</label>
-                        <div class="d-flex flex-column"> <!-- Cambiado a dirección vertical -->
-                            <div class="form-check mb-2"> <!-- Añadido margen inferior -->
-                                <input class="form-check-input" type="radio" name="edit_adm_secretaria_tipo_vivienda" id="edit_adm_secretaria_tipo_vivienda" value="Casa" style="border-color: rgb(196, 69, 235)">
-                                <label class="form-check-label" for="edit_adm_secretaria_tipo_vivienda"> Casa </label>
-                            </div>
-                            <div class="form-check mb-2"> <!-- Añadido margen inferior -->
-                                <input class="form-check-input" type="radio" name="edit_adm_secretaria_tipo_vivienda" id="edit_adm_secretaria_tipo_vivienda2" value="Condominio" style="border-color: rgb(196, 69, 235)">
-                                <label class="form-check-label" for="edit_adm_secretaria_tipo_vivienda2"> Condominio </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="edit_adm_secretaria_tipo_vivienda" id="edit_adm_secretaria_tipo_vivienda_3" value="Departamento" style="border-color: rgb(196, 69, 235)">
-                                <label class="form-check-label" for="edit_adm_secretaria_tipo_vivienda_3"> Departamento </label>
-                            </div>
-                        </div>
-                      </div>
-                      <div class="col-md-6 mb-3"">
-                        <label for="num_vivienda" class="form-label">N° Vivienda</label>
-                        <input type="text" class="form-control" id="edit_adm_secretaria_num_vivienda" placeholder="Num Vivienda" style="border-color: rgb(196, 69, 235)">
-                      </div>
-                    </div>
-                    <div class="d-flex mb-3">
-                      <div class="input-group me-2">
-                        <label class="input-group-text" for="select1">Región</label>
-                        <select class="form-select" id="edit_secretaria_region" onchange="buscar_ciudad_secretaria(1)" style="border-color: rgb(196, 69, 235)">
-                          <option data-id="0" data-region = "null" value="0" selected="selected">Regiones</option>
-                          <option  id="region_15" data-region ="Arica y Parinacota" value="15">Arica y Parinacota</option>
-                          <option id="region_1" data-region ="Tarapacá" value="1">Tarapacá</option>
-                          <option id="region_2" data-region ="Antofagasta" value="2">Antofagasta</option>
-                          <option id="region_3" data-region ="Atacama" value="3">Atacama</option>
-                          <option id="region_4" data-region ="Coquimbo" value="4">Coquimbo</option>
-                          <option id="region_5" data-region ="Valparaiso" value="5">Valparaiso</option>
-                          <option id="region_13" data-region ="Metropolitana" value="13">Metropolitana</option>
-                          <option id="region_6" data-region ="O'Higgins" value="6">O'Higgins</option>
-                          <option id="region_7" data-region ="Maule" value="7">Maule</option>
-                          <option id="region_16" data-region ="Ñuble" value="16">Ñuble</option>
-                          <option id="region_8" data-region ="Bio - Bio" value="8">Bio - Bio</option>
-                          <option id="region_9" data-region ="Araucania" value="9">Araucania</option>
-                          <option id="region_14" data-region ="Los Rios" value="14">Los Rios</option>
-                          <option id="region_10" data-region ="Los Lagos" value="10">Los Lagos</option>
-                          <option id="region_11" data-region ="Aisen" value="11">Aisen</option>
-                          <option id="region_12" data-region ="Magallanes Y Antártica" value="12">Magallanes Y Antartica</option>
-                        </select>
-                      </div>
-                      <div class="input-group">
-                        <label class="input-group-text" for="select2">Comuna</label>
-                        <select class="form-control" style="border-color: rgb(196, 69, 235)" name="edit_secretaria_comuna" id="edit_secretaria_comuna">
-                          <option value="0">Comunas por Region</option>
-                        </select>
                       </div>
                     </div>
                     <div class="d-grid gap-2 mb-2">

@@ -11,3 +11,4 @@ class HistorialClinicoModel(models.Model):
     diagnostico = models.TextField(null=True)
     sintoma = models.CharField(null=True, max_length=200)
     observacion = models.TextField(null=True)
+    reserva_uuid = models.CharField(max_length=250, null=True)

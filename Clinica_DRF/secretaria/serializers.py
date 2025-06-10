@@ -6,4 +6,4 @@ from .models import SecretariaModel
 class SecretariaSerializer(serializers.ModelSerializer):
     class Meta:
         model = SecretariaModel
-        fields = ['id', 'primer_nombre', 'segundo_nombre', 'ap_paterno', 'ap_materno', 'edad', 'sexo', 'rut', 'fono','fk_user','secretaria_uuid']
+        fields = ['id', 'primer_nombre', 'segundo_nombre', 'ap_paterno', 'ap_materno', 'edad', 'sexo', 'rut', 'fono','secretaria_uuid','fk_user']

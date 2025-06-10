@@ -6,4 +6,4 @@ from .models import CustomersUsers
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomersUsers
-        fields = ['id', 'username','password', 'email','usuario_uuid', 'password']
+        fields = ['id', 'username','password', 'email','usuario_uuid']

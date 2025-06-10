@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
 
-
 class SecretariaModel(models.Model):
     primer_nombre = models.CharField(max_length=250, null=True)
     segundo_nombre = models.CharField(max_length=250, null=True)
@@ -14,3 +13,4 @@ class SecretariaModel(models.Model):
     fono = models.TextField(max_length=250, null=True)
     fk_user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     secretaria_uuid = models.CharField(max_length=250, null=True)
+    secretaria_clinica = models.ManyToManyField('comuna_clinica.ComunaClinicaModel')

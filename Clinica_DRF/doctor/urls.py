@@ -14,7 +14,7 @@ urlpatterns = [
     path('doctor/update_doctor/<int:id>/', views.update_doctor, name='update_doctor'),
     path('doctor/esp_doc_list_reserva_panel_adm', views.esp_doc_list_reserva_panel_adm, name='esp_doc_list_reserva_panel_adm'),
     # Panel Doctor.
-    path('doctor/listar_datos_doctor/', views.listar_datos_doctor, name='listar_datos_doctor'),
-    path('doctor/update_panel_doctor/<int:id>/', views.update_doctor, name='update_doctor'),
-    path('doctor/listar_doctor/<str:username>/', views.listar_doctor, name='listar_doctor'),
+    path('doctor/listar_datos_doctor/<str:username>/', views.listar_datos_doctor, name='listar_datos_doctor'),
+    path('doctor/update_panel_doctor/<int:id>/', views.update_panel_doctor, name='update_panel_doctor'),
+    path('doctor/listar_doctor', views.listar_doctor, name='listar_doctor'),
 ]

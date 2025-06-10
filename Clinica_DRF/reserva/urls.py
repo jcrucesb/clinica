@@ -11,7 +11,11 @@ urlpatterns = [
     # Obtener todas las citas registradas..
     path('reserva/historial_reserva', views.historial_reserva, name='historial_reserva'),
     # Obtener todos los pacientes correspondientes al doctor.
-    path('reserva/listar_paciente_doctor/<str:username>/', views.listar_paciente_doctor, name='listar_paciente_doctor'),
+    path('reserva/listar_paciente_doctor', views.listar_paciente_doctor, name='listar_paciente_doctor'),
     # Obtener todos los pacientes correspondientes al doctor.
     path('reserva/listar_paciente_historial_doctor/<int:id>/', views.listar_paciente_historial_doctor, name='listar_paciente_historial_doctor'),
+    # Listar laas clínicas del doctor para que vea sus reservas o citas, Panel
+    path('reserva/listar_clinica_paciente_doctor', views.listar_clinica_paciente_doctor, name='listar_clinica_paciente_doctor'),
+    # Obtener todos los pacientes correspondientes al doctor con citas.
+    path('reserva/listar_paciente_doctor_cita', views.listar_paciente_doctor_cita, name='listar_paciente_doctor_cita'),
 ]

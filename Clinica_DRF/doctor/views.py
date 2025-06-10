@@ -68,20 +68,39 @@ import pdfkit
 @permission_classes([AllowAny])
 def listar_doctor_admin(request):
     try:
-        # Obtener el grupo por nombre
+        # Serializar los usuarios del grupo 'Doctor'
         grupo = Group.objects.get(name='Doctor')
-        print(grupo)
-        # Obtener todos los usuarios del grupo
         usuarios = grupo.user_set.all()
-        # Serializar los datos
-        serializer = CustomUserSerializer(usuarios, many=True)
-        print(serializer.data)
-        return Response({'list_doctor':serializer.data},
-                        # Específicamos el status.
-                        status=status.HTTP_200_OK)
+        arr = []  # Mover fuera del bucle para acumular todos los registros
+        for user in usuarios:
+            usuario_doctor = CustomersUsers.objects.filter(username=user).values("id", "username", "email")
+            if usuario_doctor.exists():  # Verificar si hay datos antes de acceder
+                # Obtener datos
+                username = usuario_doctor[0]["username"]
+                email = usuario_doctor[0]["email"]
+                print(email)
+                print("------/--------")
+                # Filtrar doctores asociados
+                doctor = DoctorModel.objects.filter(fk_user=usuario_doctor[0]["id"])
+                for doctores in doctor:
+                    arr.append({
+                        'id_doctor': doctores.id,
+                        'username': username,
+                        'email': email,
+                        'primer_nombre': doctores.primer_nombre,
+                        'segundo_nombre': doctores.segundo_nombre,
+                        'ap_paterno': doctores.ap_paterno,
+                        'ap_materno': doctores.ap_materno,
+                        'edad': doctores.edad,
+                        'sexo': doctores.sexo,
+                        'rut': doctores.rut,
+                        'fono': doctores.fono,
+                        'doctor_uuid': doctores.doctor_uuid
+                    })
+        return Response({'list_doctor': arr}, status=status.HTTP_200_OK)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
-        return Response({'error': 1}, status=400)
+        return Response({'error': 1}, status=status.HTTP_400_BAD_REQUEST)
 
 #
 @api_view(['POST'])
@@ -127,40 +146,66 @@ def crear_doctor(request):
         dato_serializado = CustomUserSerializer(data=data_user)
         if dato_serializado.is_valid():
             usuario = dato_serializado.save(password=hashed_password)
-            print("usuario")
             group = Group.objects.get(name='Doctor')
             usuario.groups.add(group)  # Añadir usuario al grupo 'Doctor'
+            especialidad = None
+            # Asignar las especialidades al doctor usando add()
+            for especialidad_id in especialidad_ids:  # Iterar sobre la lista de IDs
+                especialidad = Especialidad.objects.get(pk=especialidad_id)
             # Data Doctor.
             data_doctor = {
-                'fk_user': usuario,
+                'fk_user': usuario.id,
                 'primer_nombre': primer_nombre,
                 'segundo_nombre': segundo_nombre,
-                'ap_paterno': ap_paterno,
-                'ap_materno': ap_materno,
                 'edad': edad,
+                'sexo': sexo,
                 'rut': rut,
                 'fono': fono,
-                'sexo': sexo,
+                'doctor_uuid': usuario_uuid,
+                'ap_materno': ap_materno,
+                'ap_paterno': ap_paterno, 
             }
             # Crear instancia de DoctorModel y asignar especialidades
             doctor_serializer  = DoctorSerializer(data=data_doctor)
             if doctor_serializer.is_valid():
-                print("Entramos")
                 doctor = doctor_serializer.save()
-            # Asignar las especialidades al doctor usando add()
-            for especialidad_id in especialidad_ids:  # Iterar sobre la lista de IDs
-                especialidad = Especialidad.objects.get(pk=especialidad_id)
                 # Relacionar especialidades al doctor
                 doctor.especialidades.add(especialidad)
                 # Guardamos los datos en la tabla relacional.
                 clinica = ComunaClinicaModel.objects.get(pk=id_clinica)  # Recuperar instancia de ComunaClinicaModel
-                doctor.doctor_clinica.add(clinica) 
+                doctor.doctor_clinica.add(clinica)
+            else:
+                print("Errores del serializador:", doctor_serializer.errors)
             # Serializar los usuarios del grupo 'Doctor'
-            grupo = Group.objects.get(name='Doctor')
-            usuarios = grupo.user_set.all()
-            serializer = CustomUserSerializer(usuarios, many=True)
-
-            return Response({'list_doctor': serializer.data}, status=status.HTTP_200_OK)
+        grupo = Group.objects.get(name='Doctor')
+        usuarios = grupo.user_set.all()
+        arr = []  # Mover fuera del bucle para acumular todos los registros
+        for user in usuarios:
+            usuario_doctor = CustomersUsers.objects.filter(username=user).values("id", "username", "email")
+            if usuario_doctor.exists():  # Verificar si hay datos antes de acceder
+                # Obtener datos
+                username = usuario_doctor[0]["username"]
+                email = usuario_doctor[0]["email"]
+                print(email)
+                print("------/--------")
+                # Filtrar doctores asociados
+                doctor = DoctorModel.objects.filter(fk_user=usuario_doctor[0]["id"])
+                for doctores in doctor: 
+                    arr.append({
+                        'id_doctor': doctores.id,
+                        'username': username,
+                        'email': email,
+                        'primer_nombre': doctores.primer_nombre,
+                        'segundo_nombre': doctores.segundo_nombre,
+                        'ap_paterno': doctores.ap_paterno,
+                        'ap_materno': doctores.ap_materno,
+                        'edad': doctores.edad,
+                        'sexo': doctores.sexo,
+                        'rut': doctores.rut,
+                        'fono': doctores.fono,
+                        'doctor_uuid': doctores.doctor_uuid
+                    })
+            return Response({'list_doctor': arr}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 2, 'details': dato_serializado.errors}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -173,49 +218,97 @@ def crear_doctor(request):
 @permission_classes([AllowAny])
 def update_doctor(request, id):
     try:
-        # Hacer una copia mutable de request.data
-        # Esto se hace para poder agregar mas data al array de objetos.
+        #
+        dato_user = {}
+        dato_doc = {}
         data = request.data.copy()
+        # Obtener datos básicos
         username = data.get("username")
-        print(username)
-        password = data.get("password")
-        print(password)
-        hashed_password = make_password(password)
-        first_name = data.get("first_name")
-        last_name = data.get("last_name")
         email = data.get("email")
+        password = data.get("password")
+        #
+        if password is not None and password.strip():
+            print("Entramos a Pass")
+            password_hash = make_password(password)
+            dato_user = {
+                'username': username,
+                'email': email,
+                'password': password_hash
+            }
+        #
+        if password is None:
+            print("Entramos is None")
+            dato_user = {
+                'username': username,
+                'email': email,
+            }
+        # Validaciones
+        primer_nombre = data.get("primer_nombre")
+        segundo_nombre = data.get("segundo_nombre")
+        ap_paterno = data.get("ap_paterno")
+        ap_materno = data.get("ap_materno")
         edad = data.get("edad")
         rut = data.get("rut")
         fono = data.get("fono")
         sexo = data.get("sexo")
-        # Validaciones.
-        if not all([username, password, first_name, last_name, email, edad, rut, fono, sexo]):
+        # Pasamos los datos al array para realizar el UPDATE del doctor.
+        dato_doc["primer_nombre"] = primer_nombre
+        dato_doc["segundo_nombre"] = segundo_nombre
+        dato_doc["ap_paterno"] = ap_paterno
+        dato_doc["ap_materno"] = ap_materno
+        dato_doc["edad"] = edad
+        dato_doc["rut"] = rut
+        dato_doc["fono"] = fono
+        dato_doc["sexo"] = sexo
+        # Validamos que ls datos no se encuentre vacíos.
+        if not all([username, primer_nombre, segundo_nombre, email, edad, rut, fono, sexo, ap_paterno, ap_materno]):
             return Response({'error': 0}, status=status.HTTP_400_BAD_REQUEST)
-        #
-        user = CustomersUsers.objects.get(pk=id)
-        # Validar y actualizar datos
-        serializer = CustomUserSerializer(user, data=request.data, partial=True)
-        #
+
+        # Obtener al doctor y su usuario asociado
+        user_doctor = DoctorModel.objects.get(pk=id)
+        user = CustomersUsers.objects.get(username=user_doctor.fk_user)
+
+        # Validar y actualizar datos del usuario
+        serializer = CustomUserSerializer(user, data=dato_user, partial=True)
         if serializer.is_valid():
-            # Hashear contraseña si se proporciona
-            if 'password' in request.data:
-                password = request.data['password']
-                serializer.validated_data['password'] = make_password(password)
-                # Actualizar campos adicionales
-                serializer.save()
-                # Obtener el grupo por nombre
-                grupo = Group.objects.get(name='Doctor')
-                # Obtener todos los usuarios del grupo
-                usuarios = grupo.user_set.all()
-                # Serializar los usuarios del grupo "Doctor"
-                usuarios_serializer = CustomUserSerializer(usuarios, many=True)  # Serializamos múltiples usuarios
-                print(usuarios)
-                return Response({'list_doctor': usuarios_serializer.data}, status=status.HTTP_200_OK)
-            else:
-                return Response({'error': 0}, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save()
+        # Validar y actualizar datos del Doctor.
+        serializers_doc = DoctorSerializer(user_doctor, data=dato_doc, partial=True)
+        if serializers_doc.is_valid():
+            serializers_doc.save()
+        # Serializar los usuarios del grupo "Doctor"
+        grupo = Group.objects.get(name='Doctor')
+        usuarios = grupo.user_set.all()
+        arr = []  # Lista acumuladora
+        #
+        for user in usuarios:
+            usuario_doctor = CustomersUsers.objects.filter(username=user).values("id", "username", "email")
+
+            if usuario_doctor.exists():
+                username = usuario_doctor[0]["username"]
+                email = usuario_doctor[0]["email"]
+                #
+                doctor = DoctorModel.objects.filter(fk_user=usuario_doctor[0]["id"])
+                #
+                for doctores in doctor:
+                    arr.append({
+                        'id_doctor': doctores.id,
+                        'username': username,
+                        'email': email,
+                        'primer_nombre': doctores.primer_nombre,
+                        'segundo_nombre': doctores.segundo_nombre,
+                        'ap_paterno': doctores.ap_paterno,
+                        'ap_materno': doctores.ap_materno,
+                        'edad': doctores.edad,
+                        'sexo': doctores.sexo,
+                        'rut': doctores.rut,
+                        'fono': doctores.fono,
+                        'doctor_uuid': doctores.doctor_uuid
+                    })
+        return Response({'list_doctor': arr}, status=status.HTTP_200_OK)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
-        return Response({'error': 1}, status=400)
+        return Response({'error': 1}, status=status.HTTP_400_BAD_REQUEST)
 
 #
 @api_view(['GET'])
@@ -223,13 +316,11 @@ def update_doctor(request, id):
 def esp_doc_list(request, id):
     try:
         # Obtener el doctor relacionado con el usuario
-        doctor = DoctorModel.objects.get(fk_user=id)  # Obtener el objeto DoctorModel relacionado con el usuario
+        doctor = DoctorModel.objects.get(pk=id)  # Obtener el objeto DoctorModel relacionado con el usuario
         print("Doctor:", doctor)
-
         # Obtener todas las especialidades asociadas al doctor
         especialidades = doctor.especialidades.all()  # Obtener las especialidades relacionadas
         print("Especialidades:", especialidades)
-
         # Preparar los datos para la respuesta
         especialidades_list = [
             {
@@ -253,7 +344,7 @@ def esp_doc_list(request, id):
 def nueva_esp_doctor_admin(request, id):
     try:
         print(id)
-        user = DoctorModel.objects.get(fk_user=id)
+        user = DoctorModel.objects.get(pk=id)
         print(user)
         print("-------- 1")
         especialidad_id = request.data["especialidad_id"]
@@ -288,7 +379,7 @@ def borrar_esp_doctor(request, id):
         #print(id)
         id_especialidad = request.query_params.get('id_especialidad')
         #print(id_especialidad)
-        user = DoctorModel.objects.get(fk_user=id)
+        user = DoctorModel.objects.get(pk=id)
         especialidad = Especialidad.objects.get(pk=id_especialidad)
         #print("Pasamos")
         user.especialidades.remove(especialidad)
@@ -315,17 +406,39 @@ def borrar_esp_doctor(request, id):
 def borrar_doctor(request, id):
     try:
         print(id)
-        usuario = CustomersUsers.objects.get(pk=id)
+        user_doc = DoctorModel.objects.get(pk=id)
+        usuario = CustomersUsers.objects.get(username=user_doc.fk_user)
         usuario.delete()
-        # Obtener el grupo por nombre
+        # Serializar los usuarios del grupo 'Doctor'
         grupo = Group.objects.get(name='Doctor')
-        # Obtener todos los usuarios del grupo
         usuarios = grupo.user_set.all()
-        # Serializar los datos
-        serializer = CustomUserSerializer(usuarios, many=True)
-        return Response({'list_doctor':serializer.data},
-                        # Específicamos el status.
-                        status=status.HTTP_200_OK)
+        arr = []  # Mover fuera del bucle para acumular todos los registros
+        for user in usuarios:
+            usuario_doctor = CustomersUsers.objects.filter(username=user).values("id", "username", "email")
+            if usuario_doctor.exists():  # Verificar si hay datos antes de acceder
+                # Obtener datos
+                username = usuario_doctor[0]["username"]
+                email = usuario_doctor[0]["email"]
+                print(email)
+                print("------/--------")
+                # Filtrar doctores asociados
+                doctor = DoctorModel.objects.filter(fk_user=usuario_doctor[0]["id"])
+                for doctores in doctor:
+                    arr.append({
+                        'id_doctor': doctores.id,
+                        'username': username,
+                        'email': email,
+                        'primer_nombre': doctores.primer_nombre,
+                        'segundo_nombre': doctores.segundo_nombre,
+                        'ap_paterno': doctores.ap_paterno,
+                        'ap_materno': doctores.ap_materno,
+                        'edad': doctores.edad,
+                        'sexo': doctores.sexo,
+                        'rut': doctores.rut,
+                        'fono': doctores.fono,
+                        'doctor_uuid': doctores.doctor_uuid
+                    })
+        return Response({'list_doctor': arr}, status=status.HTTP_200_OK)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         return Response({'error': 3}, status=400)
@@ -336,7 +449,7 @@ def borrar_doctor(request, id):
 def listar_clinica_doc(request, id):
     try:
         # Obtener el doctor relacionado con el usuario
-        doctor = DoctorModel.objects.get(fk_user=id)  # Obtener el objeto DoctorModel relacionado con el usuario
+        doctor = DoctorModel.objects.get(pk=id)  # Obtener el objeto DoctorModel relacionado con el usuario
         print(doctor.doctor_uuid)
         # Obtener las clínicas relacionadas al doctor (a través de la relación ManyToMany)
         clinicas = doctor.doctor_clinica.filter(doctormodel=doctor.id)  # Acceder al campo ManyToMany 'doctor_clinica'
@@ -370,7 +483,7 @@ def doctor_nueva_clinica(request, id):
         print(id)
         print("------------------------------")
         #
-        doctor = DoctorModel.objects.get(fk_user=id)
+        doctor = DoctorModel.objects.get(pk=id)
         print("------------------------------")
         print(doctor)
         #
@@ -408,7 +521,7 @@ def delete_clinica_doctor(request, id):
     try:
         print(id)
         print(request.data)
-        doctor = DoctorModel.objects.get(fk_user=id)
+        doctor = DoctorModel.objects.get(pk=id)
         id_clinica = request.query_params.get("comunaclinicamodel_id")  # Obtener el parámetro de consulta
         if not id_clinica:
             return Response({'error': 0}, status=status.HTTP_400_BAD_REQUEST)
@@ -442,30 +555,34 @@ def esp_doc_list_reserva_panel_adm(request):
     try:
         # Obtener los datos enviados como parámetros en la URL
         id_clinica = request.GET.get("id_clinica")  # Accede al ID de la clínica
+        print(id_clinica)
         id_especialidad = request.GET.get("id_especialidad")  # Accede al ID de la especialidad
-
+        print(id_especialidad)
         # Validar que los parámetros existen
         if not id_clinica or not id_especialidad:
             return Response({'error': 'Faltan parámetros id_clinica o id_especialidad'}, status=status.HTTP_400_BAD_REQUEST)
-
         # Filtrar doctores relacionados con la clínica y la especialidad
         doctores = DoctorModel.objects.filter(doctor_clinica__id=id_clinica, especialidades__id=id_especialidad)
+        print("----------------")
         print(doctores)
         print("----------------")
         # Crear una lista para almacenar los resultados
         datos = []
         for doctor in doctores:
             print(doctor.doctor_uuid)
-            
             # Obtener información del usuario asociado al doctor (fk_user)
             usuario = CustomersUsers.objects.get(username=doctor.fk_user)
+            print(doctor.fk_user)
             datos.append({
-                'id_doc_user': usuario.id,
-                'nombres': usuario.first_name,
-                'apellidos': usuario.last_name,
+                'id_doc_user': doctor.id,
+                'primer_nombre': doctor.primer_nombre,
+                'segundo_nombre': doctor.segundo_nombre,
+                'ap_paterno': doctor.ap_paterno,
+                'ap_materno': doctor.ap_materno,
                 'especialidad': Especialidad.objects.get(pk=id_especialidad).nombre_especialidad,
                 'clinica': ComunaClinicaModel.objects.get(pk=id_clinica).nombre_clinica
             })
+            print(datos)
         # Retornar la lista de doctores con su especialidad y clínica
         return Response({'doctores': datos}, status=status.HTTP_200_OK)
     except DoctorModel.DoesNotExist:
@@ -474,15 +591,28 @@ def esp_doc_list_reserva_panel_adm(request):
 #
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def listar_datos_doctor(request):
+def listar_datos_doctor(request, username):
     try:
         print(request.user.id)
         datos = []
-        dato_doctor = CustomersUsers.objects.filter(pk=request.user.id)
-        dato_doctor_data = CustomUserSerializer(dato_doctor, many=True)
+        dato_doctor = CustomersUsers.objects.get(pk=request.user.id)
+        doctor = DoctorModel.objects.get(fk_user=request.user.id)
+        datos.append({
+            'id_usuario': request.user.id,
+            'username': dato_doctor.username,
+            'email': dato_doctor.email,
+            'primer_nombre': doctor.primer_nombre,
+            'segundo_nombre': doctor.segundo_nombre,
+            'ap_paterno': doctor.ap_paterno,
+            'ap_materno': doctor.ap_materno,
+            'edad': doctor.edad,
+            'sexo': doctor.sexo,
+            'rut': doctor.rut,
+            'fono': doctor.fono,
+        })
         #print(dato_doctor_data.data)
         # Retornar la lista de doctores con su especialidad y clínica
-        return Response({'dato_doctor': dato_doctor_data.data}, status=status.HTTP_200_OK)
+        return Response({'dato_doctor': datos}, status=status.HTTP_200_OK)
     except DoctorModel.DoesNotExist:
         return Response({'error': 'Doctor no encontrado'}, status=status.HTTP_404_NOT_FOUND)
     
@@ -491,38 +621,112 @@ def listar_datos_doctor(request):
 @permission_classes([IsAuthenticated])
 def update_panel_doctor(request, id):
     try:
+        print(id)
+        dato_user = {}
+        dato_doc = {}
+        username = request.data['username']
+        email = request.data['email']
+        password = request.data['password']
+        if password == "0":
+            print("Pass 1")
+            dato_user = {
+                'username': username,
+                'email': email,
+            }
+        if password != "0":
+            print("Pass 2")
+            dato_user = {
+                'username': username,
+                'password': make_password(password),
+                'email': email,
+            }
         # 
+        primer_nombre = request.data['primer_nombre']
+        segundo_nombre = request.data['segundo_nombre']
+        ap_paterno = request.data['ap_paterno']
+        ap_materno = request.data['ap_materno']
+        edad = request.data['edad']
+        sexo = request.data['sexo']
+        rut = request.data['rut']
+        fono = request.data['contacto']
         usuario_doctor = CustomersUsers.objects.get(pk=id)
-        # 
-        update_doctor_datos = CustomUserSerializer(instance=usuario_doctor, data=request.data)
-        #
-        if update_doctor_datos.is_valid():
-            update_doctor_datos.save()
-        dato_usuario_doctor = CustomersUsers.objects.filter(pk=id)
-        usuario_doctor_data = CustomUserSerializer(dato_usuario_doctor, many=True)
+        print("Verificar")
+        print(dato_user)
+        update_user = CustomUserSerializer(usuario_doctor, data=dato_user, partial=True)
+        if update_user.is_valid():
+            print("Entramos")
+            id_update = update_user.save()
+            doctor = DoctorModel.objects.get(fk_user=id_update.id)
+            # Creamos el array de objeto.
+            dato_doc = {
+                'primer_nombre': primer_nombre,
+                'segundo_nombre': segundo_nombre,
+                'edad': edad,
+                'sexo': sexo,
+                'rut': rut,
+                'fono': fono,
+                'ap_materno': ap_materno,
+                'ap_paterno': ap_paterno,
+            }
+            dato_doc = DoctorSerializer(doctor, data=dato_doc, partial=True)
+            arr = []
+            arr.append({
+                'id': id_update.id,
+                'username': username,
+                'email': email,
+                'primer_nombre': primer_nombre,
+                'segundo_nombre': segundo_nombre,
+                'edad': edad,
+                'sexo': sexo,
+                'rut': rut, 
+                'fono': fono,
+                'ap_materno': ap_materno,
+                'ap_paterno': ap_paterno,
+            })
         # Retornar la lista de doctores con su especialidad y clínica
-        return Response({'dato_doctor': usuario_doctor_data.data}, status=status.HTTP_200_OK)
+        return Response({'dato_doctor':arr}, status=status.HTTP_200_OK)
     except DoctorModel.DoesNotExist:
         return Response({'error': 'Doctor no encontrado'}, status=status.HTTP_404_NOT_FOUND)
 
 #
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def listar_doctor(request, username):
+def listar_doctor(request):
     try:
-        # Obtener el usuario del doctor
-        id_user = CustomersUsers.objects.get(username=username)
-        # Obtener el doctor asociado a ese usuario
-        doctor = DoctorModel.objects.get(fk_user=id_user.id)
-        # Obtener todas las clínicas en las que trabaja este doctor
-        clinicas = doctor.doctor_clinica.all()
-        # Obtener todos los doctores que trabajan en esas clínicas
-        doctores = DoctorModel.objects.filter(doctor_clinica__in=clinicas).distinct()
-        print(f"Total de doctores en esas clínicas: {doctores.count()}")
-        #dato_doctor = CustomersUsers.objects.filter(pk=doctores.fk_user)
-        # Extraer la lista de usuarios de los doctores
-        usuarios = [doctor.fk_user for doctor in doctores]  # Extrae solo los objetos CustomersUsers
-        usuarios_serializados = CustomUserSerializer(usuarios, many=True).data
-        return Response({'dato_doctor': usuarios_serializados}, status=status.HTTP_200_OK)
+       # Serializar los usuarios del grupo 'Doctor'
+        grupo = Group.objects.get(name='Doctor')
+        usuarios = grupo.user_set.all()
+        arr = []  # Mover fuera del bucle para acumular todos los registros
+        for user in usuarios:
+            usuario_doctor = CustomersUsers.objects.filter(username=user).values("id", "username", "email")
+            if usuario_doctor.exists():  # Verificar si hay datos antes de acceder
+                # Obtener datos
+                username = usuario_doctor[0]["username"]
+                email = usuario_doctor[0]["email"]
+                # Filtrar doctores asociados
+                doctor = DoctorModel.objects.filter(fk_user=usuario_doctor[0]["id"])
+                for doctores in doctor:
+                    # Obtener las clínicas del doctor
+                    clinicas = doctores.doctor_clinica.all().values("id", "nombre_clinica", "comuna_clinica", "direccion_clinica")
+                    print(clinicas)
+                    # Obtener las especialidades del doctor
+                    especialidades = doctores.especialidades.all().values("id", "nombre_especialidad")
+                    arr.append({
+                        'id_doctor': doctores.id,
+                        'username': username,
+                        'email': email,
+                        'primer_nombre': doctores.primer_nombre,
+                        'segundo_nombre': doctores.segundo_nombre,
+                        'ap_paterno': doctores.ap_paterno,
+                        'ap_materno': doctores.ap_materno,
+                        'edad': doctores.edad,
+                        'sexo': doctores.sexo,
+                        'rut': doctores.rut,
+                        'fono': doctores.fono,
+                        'doctor_uuid': doctores.doctor_uuid,
+                        'clinicas': list(clinicas),
+                        'especialidad': list(especialidades)
+                    })
+        return Response({'list_doctor': arr}, status=status.HTTP_200_OK)
     except DoctorModel.DoesNotExist:
         return Response({'error': 'Doctor no encontrado'}, status=status.HTTP_404_NOT_FOUND)

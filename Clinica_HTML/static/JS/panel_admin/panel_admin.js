@@ -609,25 +609,27 @@ function panel_doctores(){
             var table = $('#listar_doctor').DataTable({
                 data: arr,
                 columns: [
-                    { title: 'ID', data: "id", defaultContent: '' },
+                    { title: 'ID', data: "id_doctor", defaultContent: '' },
                     { title: 'Username', data: "username", defaultContent: '' },
-                    { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
-                    { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                    { title: 'Primer Nombre', data: "primer_nombre", defaultContent: '' },
+                    { title: 'Segundo Nombre', data: "segundo_nombre", defaultContent: '' },
+                    { title: 'Apellido P.', data: "ap_paterno", defaultContent: '' },
+                    { title: 'Apellido M.', data: "ap_materno", defaultContent: '' },
                     { title: 'Email', data: "email", defaultContent: '' },
                     { title: 'Edad', data: "edad", defaultContent: '' },
                     { title: 'Sexo', data: "sexo", defaultContent: '' },
                     { title: 'Contacto', data: "fono", defaultContent: '' },
                     { 
-                        title: 'Acciones', 
+                        title: 'Acciones',
                         data: null,
                         responsivePriority: 1, // Prioridad máxima (no se oculta)
                         className: 'no-wrap', // Clase para evitar saltos de línea
                         orderable: false,
                         render: function(data, type, row) {
-                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_doc" onclick="editar_doctor('+row.id+', \''+row.username+'\',\''+row.password+'\', \''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.rut+'\', \''+row.sexo+'\', \''+row.fono+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_doc" onclick="borrar_user_doctor('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="clinica_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm" style="background:rgb(229, 150, 253)">Clínicas Doc</button>';
+                            return '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_editar_doc" onclick="editar_doctor('+row.id_doctor+', \''+row.username+'\', \''+row.email+'\', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.ap_materno+'\', \''+row.ap_paterno+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                                    '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_borrar_doc" onclick="borrar_user_doctor('+row.id_doctor+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                    '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id_doctor+', \''+row.primer_nombre+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button> ' +
+                                    '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_esp_cli" onclick="clinica_doc('+row.id_doctor+', \''+row.primer_nombre+'\')" class="btn btn-sm" style="background:rgb(229, 150, 253)">Clínicas Doc</button>';
                         }
                     }
                 ],
@@ -751,7 +753,19 @@ function obtener_clinica(e){
     });
 }
 //
-function editar_doctor(id, username, password, nombreDoctor,apellidoDoctor, email, edad, rutDoctor,sexo, fono){
+function editar_doctor(id, username, email, primer_nombre, segundo_nombre, edad, sexo, rut, fono, ap_materno, ap_paterno){
+    // console.log(id)
+    // console.log(username)
+    // console.log(email)
+    // console.log(primer_nombre)
+    // console.log(segundo_nombre)
+    // console.log(edad)
+    // console.log(sexo)
+    // console.log(rut)
+    // console.log(fono)
+    // console.log(ap_materno)
+    // console.log(ap_paterno)
+    // debugger
     //
     let modal_Editar_info_doctor = document.getElementById("modal_Editar_info_doctor")
     // Crea una instancia del modal de Bootstrap
@@ -763,20 +777,23 @@ function editar_doctor(id, username, password, nombreDoctor,apellidoDoctor, emai
     id_doc_user_edit.value = id;
     let edit_doc_username = document.getElementById("edit_doc_username")
     edit_doc_username.value = username;
-    let edit_doc_password = document.getElementById("edit_doc_password")
-    edit_doc_password.value = password;
-    let edit_doc_first_name = document.getElementById("edit_doc_first_name")
-    edit_doc_first_name.value = nombreDoctor;
-    let edit_doc_last_name = document.getElementById("edit_doc_last_name")
-    edit_doc_last_name.value = apellidoDoctor;
+    
+    let edit_doc_first_name = document.getElementById("edit_doc_primer_nombre")
+    edit_doc_first_name.value = primer_nombre;
+    let edit_doc_last_name = document.getElementById("edit_doc_segundo_nombre")
+    edit_doc_last_name.value = segundo_nombre;
     let edit_doc_email = document.getElementById("edit_doc_email")
     edit_doc_email.value = email;
     let edit_doc_edad = document.getElementById("edit_doc_edad")
     edit_doc_edad.value = edad;
     let edit_doc_rut = document.getElementById("edit_doc_rut")
-    edit_doc_rut.value = rutDoctor;
+    edit_doc_rut.value = rut;
     let edit_doc_fono = document.getElementById("edit_doc_fono")
     edit_doc_fono.value = fono;
+    let apellido_paterno = document.getElementById("edit_doc_ap_paterno")
+    apellido_paterno.value = ap_paterno;
+    let apellido_materno = document.getElementById("edit_doc_ap_materno")
+    apellido_materno.value = ap_materno;
     let edit_sexo = document.getElementsByName("edit_doc_genero")
     let valor_radio;
     edit_sexo.forEach(radio => {
@@ -793,9 +810,14 @@ function enviar_datos_edit_doc_adm(){
     //
     let id = document.getElementById("id_doc_user_edit").value
     let edit_doc_username = document.getElementById("edit_doc_username").value
-    let edit_doc_password = document.getElementById("edit_doc_password").value
-    let edit_doc_first_name = document.getElementById("edit_doc_first_name").value
-    let edit_doc_last_name = document.getElementById("edit_doc_last_name").value
+    let edit_doc_password = document.getElementById("edit_doc_pass").value
+    if (edit_doc_password == '') {
+        edit_doc_password = null
+    }
+    let primer_nombre = document.getElementById("edit_doc_primer_nombre").value
+    let segundo_nombre = document.getElementById("edit_doc_segundo_nombre").value
+    let edit_doc_ap_paterno = document.getElementById("edit_doc_ap_paterno").value
+    let edit_doc_ap_materno = document.getElementById("edit_doc_ap_materno").value
     let edit_doc_email = document.getElementById("edit_doc_email").value
     let edit_doc_edad = document.getElementById("edit_doc_edad").value
     let edit_doc_rut = document.getElementById("edit_doc_rut").value
@@ -813,13 +835,15 @@ function enviar_datos_edit_doc_adm(){
     let datos = {
         'username': edit_doc_username,
         'password': edit_doc_password,
-        'first_name': edit_doc_first_name,
-        'last_name': edit_doc_last_name,
+        'primer_nombre': primer_nombre,
+        'segundo_nombre': segundo_nombre,
         'email': edit_doc_email,
         'edad': edit_doc_edad,
         'rut': edit_doc_rut,
         'fono': edit_doc_fono,
         'sexo': valor_radio,
+        'ap_paterno': edit_doc_ap_paterno,
+        'ap_materno': edit_doc_ap_materno
     }
     console.warn(datos)
     //
@@ -848,25 +872,27 @@ function enviar_datos_edit_doc_adm(){
             var table = $('#listar_doctor').DataTable({
                 data: arr,
                 columns: [
-                    { title: 'ID', data: "id", defaultContent: '' },
+                    { title: 'ID', data: "id_doctor", defaultContent: '' },
                     { title: 'Username', data: "username", defaultContent: '' },
-                    { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
-                    { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                    { title: 'Primer Nombre', data: "primer_nombre", defaultContent: '' },
+                    { title: 'Segundo Nombre', data: "segundo_nombre", defaultContent: '' },
+                    { title: 'Apellido P.', data: "ap_paterno", defaultContent: '' },
+                    { title: 'Apellido M.', data: "ap_materno", defaultContent: '' },
                     { title: 'Email', data: "email", defaultContent: '' },
                     { title: 'Edad', data: "edad", defaultContent: '' },
                     { title: 'Sexo', data: "sexo", defaultContent: '' },
                     { title: 'Contacto', data: "fono", defaultContent: '' },
                     { 
-                        title: 'Acciones', 
+                        title: 'Acciones',
                         data: null,
                         responsivePriority: 1, // Prioridad máxima (no se oculta)
                         className: 'no-wrap', // Clase para evitar saltos de línea
                         orderable: false,
                         render: function(data, type, row) {
-                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_doc" onclick="editar_doctor('+row.id+', \''+row.username+'\',\''+row.password+'\', \''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.rut+'\', \''+row.sexo+'\', \''+row.fono+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_doc" onclick="borrar_user_doctor('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="clinica_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm" style="background:rgb(229, 150, 253)">Clínicas Doc</button>';
+                            return '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_editar_doc" onclick="editar_doctor('+row.id_doctor+', \''+row.username+'\', \''+row.email+'\', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.ap_materno+'\', \''+row.ap_paterno+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                                    '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_borrar_doc" onclick="borrar_user_doctor('+row.id_doctor+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                    '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id_doctor+', \''+row.primer_nombre+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button> ' +
+                                    '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_esp_cli" onclick="clinica_doc('+row.id_doctor+', \''+row.primer_nombre+'\')" class="btn btn-sm" style="background:rgb(229, 150, 253)">Clínicas Doc</button>';
                         }
                     }
                 ],
@@ -994,11 +1020,10 @@ function insertar_bd_doctor(e){
     .then(function (response) {
         console.warn(response.data);
         console.warn(response.status)
-        let grupos = response.data.list_doctor
-            grupos.forEach(element => {
-                console.log(element.username)
-                arr.push(element)
-            });
+        let list_doctor = response.data.list_doctor
+        list_doctor.forEach(element => {
+            arr.push(element)
+        });
         console.warn(arr)
         if (response.status == 200) {
             Swal.fire({
@@ -1007,12 +1032,14 @@ function insertar_bd_doctor(e){
                 text: "El doctor fue creado correctamente!",
             });
             var table = $('#listar_doctor').DataTable({
-                data: grupos,
+                data: arr,
                 columns: [
-                    { title: 'ID', data: "id", defaultContent: '' },
+                    { title: 'ID', data: "id_doctor", defaultContent: '' },
                     { title: 'Username', data: "username", defaultContent: '' },
-                    { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
-                    { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                    { title: 'Primer Nombre', data: "primer_nombre", defaultContent: '' },
+                    { title: 'Segundo Nombre', data: "segundo_nombre", defaultContent: '' },
+                    { title: 'Apellido P.', data: "ap_paterno", defaultContent: '' },
+                    { title: 'Apellido M.', data: "ap_materno", defaultContent: '' },
                     { title: 'Email', data: "email", defaultContent: '' },
                     { title: 'Edad', data: "edad", defaultContent: '' },
                     { title: 'Sexo', data: "sexo", defaultContent: '' },
@@ -1020,13 +1047,14 @@ function insertar_bd_doctor(e){
                     { 
                         title: 'Acciones', 
                         data: null,
-                        defaultContent: '',
+                        responsivePriority: 1, // Prioridad máxima (no se oculta)
+                        className: 'no-wrap', // Clase para evitar saltos de línea
                         orderable: false,
                         render: function(data, type, row) {
-                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_grupo" onclick="editar_grupo('+row.id+', \''+row.first_name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_grupo" onclick="borrar_user_doctor('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="clinica_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm" style="background:rgb(229, 150, 253)">Clínicas Doc</button>';
+                            return '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_editar_doc" onclick="editar_doctor('+row.id_doctor+', \''+row.username+'\', \''+row.email+'\', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.ap_materno+'\', \''+row.ap_paterno+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                                    '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_borrar_doc" onclick="borrar_user_doctor('+row.id_doctor+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                    '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id_doctor+', \''+row.primer_nombre+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button> ' +
+                                    '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_esp_cli" onclick="clinica_doc('+row.id_doctor+', \''+row.primer_nombre+'\')" class="btn btn-sm" style="background:rgb(229, 150, 253)">Clínicas Doc</button>';
                         }
                     }
                 ],
@@ -1063,9 +1091,6 @@ function insertar_bd_doctor(e){
                     }
                 }
             });
-            // Realizamos el click automático.
-            // elemento.click();
-            // cerrar_modal_listar_doctor.click();
             reset_input.reset()
         }
     }).catch(error => {
@@ -1226,9 +1251,12 @@ function grupos(e){
     //
     let container_clinica = document.getElementById("container_clinica")
     container_clinica.style.display="none"
-    //
+    //container_secretaria
     let container_grupo = document.getElementById("container_grupo")
     container_grupo.style.display = "block"
+    //
+    let container_secretaria = document.getElementById("container_secretaria")
+    container_secretaria.style.display = "none"
     let modal_grupo = document.getElementById("modal_grupo")
         // let listar_grupo = document.getElementById("listar_grupo")
         // // Crea una instancia del modal de Bootstrap
@@ -1263,8 +1291,7 @@ function grupos(e){
                         defaultContent: '',
                         orderable: false,
                         render: function(data, type, row) {
-                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_editar_grupo" onclick="modal_editar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_borrar_grupo" onclick="borrar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button>';
+                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_borrar_grupo" onclick="borrar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button>';
                         }
                     }
                 ],
@@ -1667,125 +1694,125 @@ function registrar_nueva_clinica_doctor(){
     });
 }
 //
-function modal_editar_grupo(id, nombre){
-    let modal_editar_grupo = document.getElementById("modal_editar_grupo")
-    // Crea una instancia del modal de Bootstrap
-    const modalInstance = new bootstrap.Modal(modal_editar_grupo);
-    // Abre el modal
-    modalInstance.show();
-    let name_edit = document.getElementById("edit_nombre_grupo")
-    name_edit.value = nombre
-    let id_grupo = document.getElementById("id_grupo")
-    id_grupo.value = id
-}
+// function modal_editar_grupo(id, nombre){
+//     let modal_editar_grupo = document.getElementById("modal_editar_grupo")
+//     // Crea una instancia del modal de Bootstrap
+//     const modalInstance = new bootstrap.Modal(modal_editar_grupo);
+//     // Abre el modal
+//     modalInstance.show();
+//     let name_edit = document.getElementById("edit_nombre_grupo")
+//     name_edit.value = nombre
+//     let id_grupo = document.getElementById("id_grupo")
+//     id_grupo.value = id
+// }
 //
-function editar_nombre_grupo_panel_admin(e){
-    //
-    const token = sessionStorage.getItem('token');
-    let btn_editar_nombre_grupo = document.getElementById("btn_editar_nombre_grupo")
-    let id = document.getElementById("id_grupo").value
-    let arr = []
-    let name = document.getElementById("edit_nombre_grupo").value
-    if (name == null || name == "") {
-        Swal.fire({
-            icon: "error",
-            title: "Falta el nombre del grupo",
-            text: "No puede quedar el campo vacio!",
-        });
-    }else{
-        const token = sessionStorage.getItem('token');
-        let datos = {
-            'name':name
-        }
-        //
-        axios.put(`http://127.0.0.1:8000/grupo/editar_grupo/${id}/`,datos, {
-            headers: {
-                'Authorization': `Token ${token}`
-            }
-        })
-        .then(function (response) {
-            console.warn(response.data);
-            console.warn(response.status)
-            if (response.status == 200) {
-                Swal.fire({
-                    icon: "success",
-                    title: "Actualizado Correctamente",
-                    text: "El grupo fue actualizado correctamente!",
-                });
-                let grupos = response.data.grupos
-                grupos.forEach(element => {
-                    console.log(element.name)
-                    arr.push(element)
-                });
-                console.warn(arr)
-                //
-                var table = $('#tabla_grupo').DataTable({
-                    data: arr,
-                    columns: [
-                        { title: 'ID', data: "id", defaultContent: '' },
-                        { title: 'Nombre Grupo', data: "name", defaultContent: '' },
-                        { 
-                            title: 'Acciones', 
-                            data: null,
-                            defaultContent: '',
-                            orderable: false,
-                            render: function(data, type, row) {
-                                return '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_editar_grupo" onclick="modal_editar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
-                                        '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_borrar_grupo" onclick="borrar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button>';
-                            }
-                        }
-                    ],
-                    destroy: true,
-                    "dom": 'Bfrtip',
-                    buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                    "lengthMenu": [
-                        [5,10, 25, 50, -1],
-                        ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
-                    ],
-                    "buttons": {
-                        "pageLength": {
-                            _: "Mostrar %d Registros"
-                        }
-                    },
-                    "language": {
-                        "decimal": "",
-                        "emptyTable": "No hay información",
-                        "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
-                        "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
-                        "infoFiltered": "(Filtrado de _MAX_ total entradas)",
-                        "infoPostFix": "",
-                        "thousands": ",",
-                        "lengthMenu": "Mostrar _MENU_ Documentos",
-                        "loadingRecords": "Cargando...",
-                        "processing": "Procesando...",
-                        "search": "Buscar:",
-                        "zeroRecords": "Sin resultados encontrados",
-                        "paginate": {
-                            "first": "Primero",
-                            "last": "Ultimo",
-                            "next": "Siguiente",
-                            "previous": "Anterior"
-                        }
-                    }
-                });
-            }
-        })
-        .catch(error => {
-            if (error.response) {
-                console.log('Error Response:', error.response.data);
-                console.log('Error Status:', error.response.status);
-                console.log('Error Headers:', error.response.headers);
-                if (error.response.data.error == 3) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "El grupo ya existe",
-                        text: "El grupo fue creado anteriormente!",
-                    });
-                }
-            }
-        });
-    }
-}
+// function editar_nombre_grupo_panel_admin(e){
+//     //
+//     const token = sessionStorage.getItem('token');
+//     let btn_editar_nombre_grupo = document.getElementById("btn_editar_nombre_grupo")
+//     let id = document.getElementById("id_grupo").value
+//     let arr = []
+//     let name = document.getElementById("edit_nombre_grupo").value
+//     if (name == null || name == "") {
+//         Swal.fire({
+//             icon: "error",
+//             title: "Falta el nombre del grupo",
+//             text: "No puede quedar el campo vacio!",
+//         });
+//     }else{
+//         const token = sessionStorage.getItem('token');
+//         let datos = {
+//             'name':name
+//         }
+//         //
+//         axios.put(`http://127.0.0.1:8000/grupo/editar_grupo/${id}/`,datos, {
+//             headers: {
+//                 'Authorization': `Token ${token}`
+//             }
+//         })
+//         .then(function (response) {
+//             console.warn(response.data);
+//             console.warn(response.status)
+//             if (response.status == 200) {
+//                 Swal.fire({
+//                     icon: "success",
+//                     title: "Actualizado Correctamente",
+//                     text: "El grupo fue actualizado correctamente!",
+//                 });
+//                 let grupos = response.data.grupos
+//                 grupos.forEach(element => {
+//                     console.log(element.name)
+//                     arr.push(element)
+//                 });
+//                 console.warn(arr)
+//                 //
+//                 var table = $('#tabla_grupo').DataTable({
+//                     data: arr,
+//                     columns: [
+//                         { title: 'ID', data: "id", defaultContent: '' },
+//                         { title: 'Nombre Grupo', data: "name", defaultContent: '' },
+//                         { 
+//                             title: 'Acciones', 
+//                             data: null,
+//                             defaultContent: '',
+//                             orderable: false,
+//                             render: function(data, type, row) {
+//                                 return '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_editar_grupo" onclick="modal_editar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+//                                         '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_borrar_grupo" onclick="borrar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button>';
+//                             }
+//                         }
+//                     ],
+//                     destroy: true,
+//                     "dom": 'Bfrtip',
+//                     buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+//                     "lengthMenu": [
+//                         [5,10, 25, 50, -1],
+//                         ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+//                     ],
+//                     "buttons": {
+//                         "pageLength": {
+//                             _: "Mostrar %d Registros"
+//                         }
+//                     },
+//                     "language": {
+//                         "decimal": "",
+//                         "emptyTable": "No hay información",
+//                         "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+//                         "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+//                         "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+//                         "infoPostFix": "",
+//                         "thousands": ",",
+//                         "lengthMenu": "Mostrar _MENU_ Documentos",
+//                         "loadingRecords": "Cargando...",
+//                         "processing": "Procesando...",
+//                         "search": "Buscar:",
+//                         "zeroRecords": "Sin resultados encontrados",
+//                         "paginate": {
+//                             "first": "Primero",
+//                             "last": "Ultimo",
+//                             "next": "Siguiente",
+//                             "previous": "Anterior"
+//                         }
+//                     }
+//                 });
+//             }
+//         })
+//         .catch(error => {
+//             if (error.response) {
+//                 console.log('Error Response:', error.response.data);
+//                 console.log('Error Status:', error.response.status);
+//                 console.log('Error Headers:', error.response.headers);
+//                 if (error.response.data.error == 3) {
+//                     Swal.fire({
+//                         icon: "error",
+//                         title: "El grupo ya existe",
+//                         text: "El grupo fue creado anteriormente!",
+//                     });
+//                 }
+//             }
+//         });
+//     }
+// }
 //
 function borrar_grupo(id, nombre_grupo){
     // Obtenemos el id del boton clode.
@@ -1835,8 +1862,7 @@ function borrar_grupo(id, nombre_grupo){
                                 defaultContent: '',
                                 orderable: false,
                                 render: function(data, type, row) {
-                                    return '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_editar_grupo" onclick="modal_editar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
-                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_borrar_grupo" onclick="borrar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button>';
+                                    return '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_borrar_grupo" onclick="borrar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button>';
                                 }
                             }
                         ],
@@ -2438,15 +2464,12 @@ function especialidades_list_doc(id, first_name){
         }
     })
     .then(function (response) {
-        // 
         //console.warn(response.data.grupos[0])
         let grupos = response.data.list_doctor
         grupos.forEach(element => {
             console.log(element.username)
             arr.push(element)
         });
-        console.warn(arr)
-        debugger
         //
         var table = $('#listar_doctor').DataTable({
             data: arr,
@@ -2868,24 +2891,27 @@ function borrar_user_doctor(id_doc, nombres, apellidos){
                     var table = $('#listar_doctor').DataTable({
                         data: arr,
                         columns: [
-                            { title: 'ID', data: "id", defaultContent: '' },
+                            { title: 'ID', data: "id_doctor", defaultContent: '' },
                             { title: 'Username', data: "username", defaultContent: '' },
-                            { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
-                            { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                            { title: 'Primer Nombre', data: "primer_nombre", defaultContent: '' },
+                            { title: 'Segundo Nombre', data: "segundo_nombre", defaultContent: '' },
+                            { title: 'Apellido P.', data: "ap_paterno", defaultContent: '' },
+                            { title: 'Apellido M.', data: "ap_materno", defaultContent: '' },
                             { title: 'Email', data: "email", defaultContent: '' },
                             { title: 'Edad', data: "edad", defaultContent: '' },
                             { title: 'Sexo', data: "sexo", defaultContent: '' },
                             { title: 'Contacto', data: "fono", defaultContent: '' },
                             { 
-                                title: 'Acciones', 
+                                title: 'Acciones',
                                 data: null,
-                                defaultContent: '',
+                                responsivePriority: 1, // Prioridad máxima (no se oculta)
+                                className: 'no-wrap', // Clase para evitar saltos de línea
                                 orderable: false,
                                 render: function(data, type, row) {
-                                    return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_doc" onclick="editar_doctor('+row.id+', \''+row.username+'\', \''+row.password+'\',\''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.rut+'\', \''+row.sexo+'\', \''+row.fono+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
-                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_doc" onclick="borrar_user_doctor('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
-                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button> ' + 
-                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_esp_doc" onclick="clinica_doc('+row.id+', \''+row.first_name+'\')" class="btn btn-sm" style="background:rgb(229, 150, 253)">Especialidades</button>';
+                                    return '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_editar_doc" onclick="editar_doctor('+row.id_doctor+', \''+row.username+'\', \''+row.email+'\', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.ap_materno+'\', \''+row.ap_paterno+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
+                                            '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_borrar_doc" onclick="borrar_user_doctor('+row.id_doctor+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                            '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_esp_doc" onclick="especialidades_list_doc('+row.id_doctor+', \''+row.primer_nombre+'\')" class="btn btn-sm borrar-btn" style="background:rgb(18, 236, 135)">Especialidades</button> ' +
+                                            '<button type="button" data-id="'+row.id_doctor+'" data-name="'+row.primer_nombre+'" id="btn_esp_cli" onclick="clinica_doc('+row.id_doctor+', \''+row.primer_nombre+'\')" class="btn btn-sm" style="background:rgb(229, 150, 253)">Clínicas Doc</button>';
                                 }
                             }
                         ],
@@ -2969,11 +2995,13 @@ function panel_pacientes(){
                 responsive: true,
                 data: arr,
                 columns: [
-                    { title: 'ID', data: "id", defaultContent: '' },
+                    { title: 'ID', data: "id_usuario", defaultContent: '' },
                     { title: 'Username', data: "username", defaultContent: '' },
-                    { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
-                    { title: 'Apellidos', data: "last_name", defaultContent: '' },
                     { title: 'Email', data: "email", defaultContent: '' },
+                    { title: 'Primer Nombre', data: "primer_nombre", defaultContent: '' },
+                    { title: 'Segundo Nombre', data: "segundo_nombre", defaultContent: '' },
+                    { title: 'Ap Paterno', data: "ap_paterno", defaultContent: '' },
+                    { title: 'Ap Materno', data: "ap_materno", defaultContent: '' },
                     { title: 'Edad', data: "edad", defaultContent: '' },
                     { title: 'Sexo', data: "sexo", defaultContent: '' },
                     { title: 'Contacto', data: "fono", defaultContent: '' },
@@ -2981,7 +3009,7 @@ function panel_pacientes(){
                     { title: 'Comuna', data: "comuna", defaultContent: '' },
                     { title: 'Vivienda', data: "vivienda", defaultContent: '' },
                     { title: 'num_vivienda', data: "num_vivienda", defaultContent: '' },
-                    { title: 'Cod. Usuario', data: "usuario_uuid", defaultContent: '' },
+                    { title: 'Cod. Usuario', data: "paciente_uuid", defaultContent: '' },
                     { 
                         title: 'Acciones', 
                         data: null,
@@ -2989,12 +3017,11 @@ function panel_pacientes(){
                         className: 'no-wrap', // Clase para evitar saltos de línea
                         orderable: false,
                         render: function(data, type, row) {
-                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_pac_adm" onclick="editar_paciente('+row.id+', \''+row.username+'\', \''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_historial_pac_adm" onclick="historial_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-info btn-sm ">Historial Citas</button> ';
+                            return  '<button type="button" data-id="'+row.id_usuario+'"  id="btn_editar_pac_adm" onclick="editar_paciente('+row.id_usuario+', \''+row.username+'\', \''+row.email+'\', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.ap_paterno+'\', \''+row.ap_materno+'\',\''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
+                                    '<button type="button" data-id="'+row.id_usuario+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id_usuario+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.ap_paterno+'\', \''+row.ap_materno+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                    '<button type="button" data-id="'+row.id_usuario+'" id="btn_historial_pac_adm" onclick="historial_user_paciente('+row.id_usuario+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.ap_paterno+'\', \''+row.ap_materno+'\')" class="btn btn-info btn-sm ">Historial Citas</button> ';
                         }
                     },
-                    { title: 'Password', data: "password", defaultContent: '' },
                 ],
                 destroy: true,
                 "dom": 'Bfrtip',
@@ -3187,8 +3214,10 @@ function adm_registrar_paciente(){
     //
     let username = document.getElementById("adm_paciente_username").value
     let password = document.getElementById("paciente_password").value
-    let first_name = document.getElementById("adm_paciente_first_name").value
-    let last_name = document.getElementById("adm_paciente_last_name").value
+    let adm_paciente_primer_nombre = document.getElementById("adm_paciente_primer_nombre").value
+    let adm_paciente_segundo_nombre = document.getElementById("adm_paciente_segundo_nombre").value
+    let adm_paciente_ap_paterno = document.getElementById("adm_paciente_ap_paterno").value
+    let adm_paciente_ap_materno = document.getElementById("adm_paciente_ap_materno").value
     let email = document.getElementById("adm_paciente_email").value
     let edad = document.getElementById("adm_paciente_edad").value
     let fono = document.getElementById("adm_paciente_fono").value
@@ -3214,7 +3243,18 @@ function adm_registrar_paciente(){
     //------- Fin Valor Radio Button Vivienda ---------
     //-------------------- Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Región.
     let id_region = document.getElementById("region").value
-    let region = document.getElementById("region_" + id_region).getAttribute("data-region")
+    console.log(id_region)
+    let region = null
+    if (id_region == 0) {
+        Swal.fire({
+                icon: "error",
+                title: "Ooops...",
+                text: "Falta la selección de la Región",
+        });
+    }
+    if (id_region != 0) {
+        region = document.getElementById("region_" + id_region).getAttribute("data-region")
+    }
     //------ Fin Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Comuna.
     let comuna = document.getElementById("comuna").value
     let arr = []
@@ -3223,8 +3263,10 @@ function adm_registrar_paciente(){
     let datos = {
         'username': username ,
         'password': password ,
-        'first_name': first_name ,
-        'last_name': last_name ,
+        'primer_nombre': adm_paciente_primer_nombre,
+        'segundo_nombre': adm_paciente_segundo_nombre,
+        'ap_paterno': adm_paciente_ap_paterno,
+        'ap_materno': adm_paciente_ap_materno ,
         'email': email ,
         'edad': edad ,
         'fono': fono ,
@@ -3260,19 +3302,21 @@ function adm_registrar_paciente(){
                 responsive: true,
                 data: arr,
                 columns: [
-                    { title: 'ID', data: "id", defaultContent: '' },
+                    { title: 'ID', data: "id_usuario", defaultContent: '' },
                     { title: 'Username', data: "username", defaultContent: '' },
-                    { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
-                    { title: 'Apellidos', data: "last_name", defaultContent: '' },
                     { title: 'Email', data: "email", defaultContent: '' },
+                    { title: 'Primer Nombre', data: "primer_nombre", defaultContent: '' },
+                    { title: 'Segundo Nombre', data: "segundo_nombre", defaultContent: '' },
+                    { title: 'Ap Paterno', data: "ap_paterno", defaultContent: '' },
+                    { title: 'Ap Materno', data: "ap_materno", defaultContent: '' },
                     { title: 'Edad', data: "edad", defaultContent: '' },
                     { title: 'Sexo', data: "sexo", defaultContent: '' },
                     { title: 'Contacto', data: "fono", defaultContent: '' },
                     { title: 'Region', data: "region", defaultContent: '' },
                     { title: 'Comuna', data: "comuna", defaultContent: '' },
                     { title: 'Vivienda', data: "vivienda", defaultContent: '' },
-                    { title: 'N° Vivienda', data: "num_vivienda", defaultContent: '' },
-                    { title: 'Cod. Usuario', data: "usuario_uuid", defaultContent: '' },
+                    { title: 'num_vivienda', data: "num_vivienda", defaultContent: '' },
+                    { title: 'Cod. Usuario', data: "paciente_uuid", defaultContent: '' },
                     { 
                         title: 'Acciones', 
                         data: null,
@@ -3280,12 +3324,11 @@ function adm_registrar_paciente(){
                         className: 'no-wrap', // Clase para evitar saltos de línea
                         orderable: false,
                         render: function(data, type, row) {
-                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_pac_adm" onclick="editar_paciente('+row.id+', \''+row.username+'\',\''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\',\''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_historial_pac_adm" onclick="historial_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-info btn-sm ">Historial Citas</button> ';
+                            return  '<button type="button" data-id="'+row.id_usuario+'"  id="btn_editar_pac_adm" onclick="editar_paciente('+row.id_usuario+', \''+row.username+'\', \''+row.email+'\', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.ap_paterno+'\', \''+row.ap_materno+'\',\''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
+                                    '<button type="button" data-id="'+row.id_usuario+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id_usuario+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.ap_paterno+'\', \''+row.ap_materno+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                    '<button type="button" data-id="'+row.id_usuario+'" id="btn_historial_pac_adm" onclick="historial_user_paciente('+row.id_usuario+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.ap_paterno+'\', \''+row.ap_materno+'\')" class="btn btn-info btn-sm ">Historial Citas</button> ';
                         }
                     },
-                    { title: 'Password', data: "password", defaultContent: '' },
                 ],
                 destroy: true,
                 "dom": 'Bfrtip',
@@ -3340,31 +3383,33 @@ function adm_registrar_paciente(){
     //paciente_nombre_clinica_paciente_registrado()
 }
 //
-function editar_paciente(id, username,first_name, last_name, email,edad,sexo,rut,fono,region,comuna,vivienda, num_vivienda,password){
+function editar_paciente(id_pac, username_pac, email, primer_nombre, segundo_nombre, ap_paterno, ap_materno, edad,sexo,rut,fono,region,comuna,vivienda, num_vivienda,password){
     let modal_edit_pac_admin_panel = document.getElementById("modal_edit_pac_admin_panel")
     // Crea una instancia del modal de Bootstrap
     const modalInstance = new bootstrap.Modal(modal_edit_pac_admin_panel);
     // Abre el modal
     modalInstance.show();
     //
-    let id_usuuario_pac = document.getElementById("id_usuuario_pac")
-    id_usuuario_pac.value = id
+    let id_usuuario_pac = document.getElementById("id_usuario_pac")
+    id_usuuario_pac.value = id_pac
     let usernames = document.getElementById("edit_adm_paciente_username")
-    usernames.value = username
-    let passwords = document.getElementById("edit_adm_paciente_pass")
-    passwords.value = password
-    let first_namess = document.getElementById("edit_adm_paciente_first_name")
-    first_namess.value = first_name
-    let edit_adm_paciente_num_viviendalast_names = document.getElementById("edit_adm_paciente_last_name")
-    edit_adm_paciente_num_viviendalast_names.value = last_name
-    let edit_adm_paciente_num_viviendaemail = document.getElementById("edit_adm_paciente_email")
-    edit_adm_paciente_num_viviendaemail.value = email
-    let edit_adm_paciente_num_viviendaedad = document.getElementById("edit_adm_paciente_edad")
-    edit_adm_paciente_num_viviendaedad.value = edad
-    let edit_adm_paciente_num_viviendafono = document.getElementById("edit_adm_paciente_fono")
-    edit_adm_paciente_num_viviendafono.value = fono
-    let edit_adm_paciente_num_viviendarut = document.getElementById("edit_adm_paciente_rut")
-    edit_adm_paciente_num_viviendarut.value = rut
+    usernames.value = username_pac
+    let pac_primer_nombre = document.getElementById("edit_adm_paciente_primer_nombre")
+    pac_primer_nombre.value = primer_nombre
+    let pac_segundo_nombre = document.getElementById("edit_adm_paciente_segundo_nombre")
+    pac_segundo_nombre.value = segundo_nombre
+    let edit_adm_paciente_ap_paterno= document.getElementById("edit_adm_ap_paterno")
+    edit_adm_paciente_ap_paterno.value = ap_paterno
+    let edit_adm_paciente_ap_materno= document.getElementById("edit_adm_ap_materno")
+    edit_adm_paciente_ap_materno.value = ap_materno
+    let edit_adm_paciente_email = document.getElementById("edit_adm_paciente_email")
+    edit_adm_paciente_email.value = email
+    let edit_adm_paciente_edad = document.getElementById("edit_adm_paciente_edad")
+    edit_adm_paciente_edad.value = edad
+    let edit_adm_paciente_fono = document.getElementById("edit_adm_paciente_fono")
+    edit_adm_paciente_fono.value = fono
+    let edit_adm_paciente_rut = document.getElementById("edit_adm_paciente_rut")
+    edit_adm_paciente_rut.value = rut
     let edit_adm_paciente_num_viviendanum_vivienda = document.getElementById("edit_adm_paciente_num_vivienda")
     edit_adm_paciente_num_viviendanum_vivienda.value = num_vivienda
     //---------------------- Vivienda --------------------
@@ -3410,15 +3455,25 @@ function editar_paciente(id, username,first_name, last_name, email,edad,sexo,rut
 }
 //
 function edit_panel_adm_paciente(e){
-    let id_usuuario_pac = document.getElementById("id_usuuario_pac").value
+    let id = document.getElementById("id_usuario_pac").value
+    console.warn(id)
     let username = document.getElementById("edit_adm_paciente_username").value
     console.warn(username)
-    let password = document.getElementById("edit_adm_paciente_pass").value
+
+    let password = null
+    password = document.getElementById("edit_adm_paciente_pass").value
     console.warn(password)
-    let first_name = document.getElementById("edit_adm_paciente_first_name").value
-    console.warn(first_name)
-    let last_name = document.getElementById("edit_adm_paciente_last_name").value
-    console.warn(last_name)
+    if (password == '' || password == null) {
+        password = 0
+    }
+    let adm_paciente_primer_nombre = document.getElementById("edit_adm_paciente_primer_nombre").value
+    console.warn(adm_paciente_primer_nombre)
+    let adm_paciente_segundo_nombre = document.getElementById("edit_adm_paciente_segundo_nombre").value
+    console.warn(adm_paciente_segundo_nombre)
+    let adm_paciente_ap_paterno = document.getElementById("edit_adm_ap_paterno").value
+    console.warn(adm_paciente_ap_paterno)
+    let adm_paciente_ap_materno = document.getElementById("edit_adm_ap_materno").value
+    console.warn(adm_paciente_ap_materno)
     let email = document.getElementById("edit_adm_paciente_email").value
     console.warn(email)
     let edad = document.getElementById("edit_adm_paciente_edad").value
@@ -3428,6 +3483,7 @@ function edit_panel_adm_paciente(e){
     let rut = document.getElementById("edit_adm_paciente_rut").value
     console.warn(rut)
     let num_vivienda = document.getElementById("edit_adm_paciente_num_vivienda").value
+    console.warn(num_vivienda)
     //------- Valor Radio Button Sexo ---------
     let sexo = document.getElementsByName("edit_adm_paciente_sexo")
     let valor_radio;
@@ -3461,8 +3517,8 @@ function edit_panel_adm_paciente(e){
     let datos = {
         'username': username ,
         'password': password ,
-        'first_name': first_name ,
-        'last_name': last_name ,
+        'primer_nombre': adm_paciente_primer_nombre,
+        'segundo_nombre': adm_paciente_segundo_nombre,
         'email': email ,
         'edad': edad ,
         'fono': fono ,
@@ -3472,9 +3528,11 @@ function edit_panel_adm_paciente(e){
         'vivienda': valor_vivienda ,
         'region': region ,
         'comuna': comuna ,
+        'ap_paterno': adm_paciente_ap_paterno,
+        'ap_materno': adm_paciente_ap_materno,
     }
     console.log(datos)
-    axios.put(`http://127.0.0.1:8000/paciente/update_paciente/${id_usuuario_pac}/`,datos, {
+    axios.put(`http://127.0.0.1:8000/paciente/update_paciente/${id}/`,datos, {
         
     })
     .then(function (response) {
@@ -3498,19 +3556,21 @@ function edit_panel_adm_paciente(e){
                 responsive: true,
                 data: arr,
                 columns: [
-                    { title: 'ID', data: "id", defaultContent: '' },
+                    { title: 'ID', data: "id_usuario", defaultContent: '' },
                     { title: 'Username', data: "username", defaultContent: '' },
-                    { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
-                    { title: 'Apellidos', data: "last_name", defaultContent: '' },
                     { title: 'Email', data: "email", defaultContent: '' },
+                    { title: 'Primer Nombre', data: "primer_nombre", defaultContent: '' },
+                    { title: 'Segundo Nombre', data: "segundo_nombre", defaultContent: '' },
+                    { title: 'Ap Paterno', data: "ap_paterno", defaultContent: '' },
+                    { title: 'Ap Materno', data: "ap_materno", defaultContent: '' },
                     { title: 'Edad', data: "edad", defaultContent: '' },
                     { title: 'Sexo', data: "sexo", defaultContent: '' },
                     { title: 'Contacto', data: "fono", defaultContent: '' },
                     { title: 'Region', data: "region", defaultContent: '' },
                     { title: 'Comuna', data: "comuna", defaultContent: '' },
                     { title: 'Vivienda', data: "vivienda", defaultContent: '' },
-                    { title: 'N° Vivienda', data: "num_vivienda", defaultContent: '' },
-                    { title: 'Cod. Paciente', data: "usuario_uuid", defaultContent: '' },
+                    { title: 'num_vivienda', data: "num_vivienda", defaultContent: '' },
+                    { title: 'Cod. Usuario', data: "paciente_uuid", defaultContent: '' },
                     { 
                         title: 'Acciones', 
                         data: null,
@@ -3518,12 +3578,11 @@ function edit_panel_adm_paciente(e){
                         className: 'no-wrap', // Clase para evitar saltos de línea
                         orderable: false,
                         render: function(data, type, row) {
-                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_pac_adm" onclick="editar_paciente('+row.id+', \''+row.username+'\',\''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\',\''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_historial_pac_adm" onclick="historial_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-info btn-sm ">Historial Citas</button> ';
+                            return  '<button type="button" data-id="'+row.id_usuario+'"  id="btn_editar_pac_adm" onclick="editar_paciente('+row.id_usuario+', \''+row.username+'\', \''+row.email+'\', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.ap_paterno+'\', \''+row.ap_materno+'\',\''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
+                                    '<button type="button" data-id="'+row.id_usuario+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id_usuario+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.ap_paterno+'\', \''+row.ap_materno+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                    '<button type="button" data-id="'+row.id_usuario+'" id="btn_historial_pac_adm" onclick="historial_user_paciente('+row.id_usuario+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.ap_paterno+'\', \''+row.ap_materno+'\')" class="btn btn-info btn-sm ">Historial Citas</button> ';
                         }
                     },
-                    { title: 'Password', data: "password", defaultContent: '' },
                 ],
                 destroy: true,
                 "dom": 'Bfrtip',
@@ -3576,11 +3635,11 @@ function edit_panel_adm_paciente(e){
     });
 }
 //
-function borrar_user_paciente(id, first_name, last_name){
+function borrar_user_paciente(id, pac_primer_nombre, pac_segundo_nombre){
     const token = sessionStorage.getItem('token');
     let arr = []
     Swal.fire({
-        title: "¿Desea eliminar al Paciente: " +first_name + ' ' +last_name+ "?",
+        title: "¿Desea eliminar al Paciente: " +pac_primer_nombre + ' ' +pac_segundo_nombre+ "?",
         text: "Se eliminará al doctor.",
         icon: "warning",
         showCancelButton: true,
@@ -3620,11 +3679,13 @@ function borrar_user_paciente(id, first_name, last_name){
                         responsive: true,
                         data: arr,
                         columns: [
-                            { title: 'ID', data: "id", defaultContent: '' },
+                            { title: 'ID', data: "id_usuario", defaultContent: '' },
                             { title: 'Username', data: "username", defaultContent: '' },
-                            { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
-                            { title: 'Apellidos', data: "last_name", defaultContent: '' },
                             { title: 'Email', data: "email", defaultContent: '' },
+                            { title: 'Primer Nombre', data: "primer_nombre", defaultContent: '' },
+                            { title: 'Segundo Nombre', data: "segundo_nombre", defaultContent: '' },
+                            { title: 'Ap Paterno', data: "ap_paterno", defaultContent: '' },
+                            { title: 'Ap Materno', data: "ap_materno", defaultContent: '' },
                             { title: 'Edad', data: "edad", defaultContent: '' },
                             { title: 'Sexo', data: "sexo", defaultContent: '' },
                             { title: 'Contacto', data: "fono", defaultContent: '' },
@@ -3632,7 +3693,7 @@ function borrar_user_paciente(id, first_name, last_name){
                             { title: 'Comuna', data: "comuna", defaultContent: '' },
                             { title: 'Vivienda', data: "vivienda", defaultContent: '' },
                             { title: 'num_vivienda', data: "num_vivienda", defaultContent: '' },
-                            { title: 'Cod. Paciente', data: "usuario_uuid", defaultContent: '' },
+                            { title: 'Cod. Usuario', data: "paciente_uuid", defaultContent: '' },
                             { 
                                 title: 'Acciones', 
                                 data: null,
@@ -3640,12 +3701,11 @@ function borrar_user_paciente(id, first_name, last_name){
                                 className: 'no-wrap', // Clase para evitar saltos de línea
                                 orderable: false,
                                 render: function(data, type, row) {
-                                    return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_pac_adm" onclick="editar_paciente('+row.id+', \''+row.username+'\', \''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
-                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
-                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_historial_pac_adm" onclick="historial_user_paciente('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-info btn-sm ">Historial Citas</button> ';
+                                    return  '<button type="button" data-id="'+row.id_usuario+'"  id="btn_editar_pac_adm" onclick="editar_paciente('+row.id_usuario+', \''+row.username+'\', \''+row.email+'\', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.ap_paterno+'\', \''+row.ap_materno+'\',\''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
+                                            '<button type="button" data-id="'+row.id_usuario+'" id="btn_borrar_pac_adm" onclick="borrar_user_paciente('+row.id_usuario+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.ap_paterno+'\', \''+row.ap_materno+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                            '<button type="button" data-id="'+row.id_usuario+'" id="btn_historial_pac_adm" onclick="historial_user_paciente('+row.id_usuario+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\', \''+row.ap_paterno+'\', \''+row.ap_materno+'\')" class="btn btn-info btn-sm ">Historial Citas</button> ';
                                 }
                             },
-                            { title: 'Password', data: "password", defaultContent: '' },
                         ],
                         destroy: true,
                         "dom": 'Bfrtip',
@@ -3748,7 +3808,7 @@ function historial_user_paciente(id_usuario, nombre, apellido){
                     className: 'no-wrap', // Clase para evitar saltos de línea
                     orderable: false,
                     render: function(data, type, row) {
-                        return '<button type="button" id="btn_borrar_cita_pac_adm" onclick="borrar_cita_user_paciente('+row.fk_usuario+', \''+row.nombre_paciente+'\',\''+row.fecha_reserva+'\', \''+row.especialidad+'\', \''+row.nombre_doctor+'\', \''+row.reserva_uuid+'\', \''+row.comuna_clinica+'\', \''+row.direccion_clinica+'\', \''+row.nombre_clinica+'\', \''+row.hora_inicio+'\', \''+row.hora_termino+'\')" class="btn btn-danger btn-sm">Borrar Cita</button> ';
+                        return '<button type="button" id="btn_borrar_cita_pac_adm" onclick="borrar_cita_user_paciente(\''+row.fk_usuario+'\', \''+row.nombre_paciente+'\',\''+row.fecha_reserva+'\', \''+row.especialidad+'\', \''+row.nombre_doctor+'\', \''+row.reserva_uuid+'\', \''+row.comuna_clinica+'\', \''+row.direccion_clinica+'\', \''+row.nombre_clinica+'\', \''+row.hora_inicio+'\', \''+row.hora_termino+'\')" class="btn btn-danger btn-sm">Borrar Cita</button> ';
                     }
                 },
             ],
@@ -4036,7 +4096,7 @@ function valor_select_esp_adm_pac_registrado(){
             // Crear un NUEVO elemento option en cada iteración
             const elegir_especialidad = document.createElement("option");
             elegir_especialidad.value = element.id_doc_user; // Usar ID como valor (mejor práctica)
-            elegir_especialidad.textContent = element.nombres + ' ' + element.apellidos;
+            elegir_especialidad.textContent = element.primer_nombre + ' ' + element.segundo_nombre + ' ' + element.ap_paterno+ ' ' + element.ap_materno;
             select_adm_esp_pac.appendChild(elegir_especialidad);
         });
     })
@@ -4279,8 +4339,8 @@ function paciente_nombre_clinica_paciente_registrado(){
             console.log(element)
             // Crear un NUEVO elemento option en cada iteración
             const elegir_especialidad = document.createElement("option");
-            elegir_especialidad.value = element.id; // Usar ID como valor (mejor práctica)
-            elegir_especialidad.textContent = element.first_name + ' ' + element.last_name;
+            elegir_especialidad.value = element.id_usuario; // Usar ID como valor (mejor práctica)
+            elegir_especialidad.textContent = element.primer_nombre + ' ' + element.segundo_nombre + ' ' + element.ap_paterno + ' ' + element.ap_materno;
             paciente_registrado.appendChild(elegir_especialidad);
         });
     })
@@ -4640,6 +4700,7 @@ function panel_secretaria(){
     info.addEventListener("click", function(e){
         //
         const token = sessionStorage.getItem('token');
+        console.log(token)
         let arr =[]
         axios.get('http://127.0.0.1:8000/secretaria/listar_secretaria',{
             headers: {
@@ -4647,7 +4708,6 @@ function panel_secretaria(){
             }
         })
         .then(function (response) {
-            // 
             //console.warn(response.data.grupos[0])
             let grupos = response.data.secretarias
             grupos.forEach(element => {
@@ -4660,18 +4720,16 @@ function panel_secretaria(){
                 responsive: true,
                 data: arr,
                 columns: [
-                    { title: 'ID', data: "id", defaultContent: '' },
+                    { title: 'ID', data: "id_user", defaultContent: '' },
                     { title: 'Username', data: "username", defaultContent: '' },
-                    { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
-                    { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                    { title: 'Primer Nombre', data: "primer_nombre", defaultContent: '' },
+                    { title: 'Segundo Nombre', data: "segundo_nombre", defaultContent: '' },
+                    { title: 'Ap. Paterno', data: "ap_paterno", defaultContent: '' },
+                    { title: 'Ap. Materno', data: "ap_materno", defaultContent: '' },
                     { title: 'Email', data: "email", defaultContent: '' },
                     { title: 'Edad', data: "edad", defaultContent: '' },
                     { title: 'Sexo', data: "sexo", defaultContent: '' },
                     { title: 'Contacto', data: "fono", defaultContent: '' },
-                    { title: 'Region', data: "region", defaultContent: '' },
-                    { title: 'Comuna', data: "comuna", defaultContent: '' },
-                    { title: 'Vivienda', data: "vivienda", defaultContent: '' },
-                    { title: 'num_vivienda', data: "num_vivienda", defaultContent: '' },
                     { title: 'Cod. Secretaria', data: "secretaria_uuid", defaultContent: '' },
                     { 
                         title: 'Acciones', 
@@ -4680,11 +4738,11 @@ function panel_secretaria(){
                         className: 'no-wrap', // Clase para evitar saltos de línea
                         orderable: false,
                         render: function(data, type, row) {
-                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_secret_adm" onclick="modal_editar_secretaria('+row.id+', \''+row.username+'\', \''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\', \''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_secret_adm" onclick="borrar_user_secretaria('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                            return '<button type="button" id="btn_editar_secret_adm" onclick="modal_editar_secretaria('+row.id_user+', \''+row.username+'\',\''+row.primer_nombre+'\', \''+row.segundo_nombre+'\',\''+row.ap_paterno+'\',\''+row.ap_materno+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\',\''+row.fono+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
+                                    '<button type="button" id="btn_borrar_secret_adm" onclick="borrar_user_secretaria('+row.id_user+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                    '<button type="button" id="btn_clin_secret_adm" onclick="obtener_clin_secretaria_panel_adm('+row.id_user+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\')" class="btn btn-sm text-white" style="background:rgb(247, 102, 18)">Clínicas</button> ';
                         }
                     },
-                    { title: 'Password', data: "password", defaultContent: '' },
                 ],
                 destroy: true,
                 "dom": 'Bfrtip',
@@ -4730,6 +4788,72 @@ function panel_secretaria(){
     })
 }
 panel_secretaria()
+//
+function obtener_clinica_secretaria(){
+    let select_clinica = document.getElementById("select_clinica_secretaria")
+    const token = sessionStorage.getItem('token');
+    // Evitar múltiples peticiones si ya hay datos
+    if (select_clinica.options.length > 1) return;
+    let arr =[]
+    axios.get('http://127.0.0.1:8000/clinica/listar_clinica_adm',{
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        // 
+        const esp = response.data.list_clinica;
+        //
+        esp.forEach(element => {
+            // Crear un NUEVO elemento option en cada iteración
+            const elegir_clinica = document.createElement("option");
+            elegir_clinica.value = element.id; // Usar ID como valor (mejor práctica)
+            elegir_clinica.setAttribute("data-id", element.id)
+            elegir_clinica.textContent = element.nombre_clinica;
+            select_clinica.appendChild(elegir_clinica);
+        });
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+        }
+    });
+}
+// Funcion para obtener las clinicas y agregarsekla a una secretaria.
+function insert_nueva_clinica_secret_panel_adm(){
+    let select_clinica = document.getElementById("insert_select_clinica_secretaria")
+    const token = sessionStorage.getItem('token');
+    // Evitar múltiples peticiones si ya hay datos
+    if (select_clinica.options.length > 1) return;
+    let arr =[]
+    axios.get('http://127.0.0.1:8000/clinica/listar_clinica_adm',{
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        // 
+        const esp = response.data.list_clinica;
+        //
+        esp.forEach(element => {
+            // Crear un NUEVO elemento option en cada iteración
+            const elegir_clinica = document.createElement("option");
+            elegir_clinica.value = element.id; // Usar ID como valor (mejor práctica)
+            elegir_clinica.setAttribute("data-id", element.id)
+            elegir_clinica.textContent = element.nombre_clinica;
+            select_clinica.appendChild(elegir_clinica);
+        });
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+        }
+    });
+}
 // Modal para Crear Secretaria.
 function nuevo_secretaria(e){
     let modal_crear_secretaria = document.getElementById("modal_crear_secretaria")
@@ -4740,15 +4864,20 @@ function nuevo_secretaria(e){
 }
 //
 function registrar_secretaria(e){
+    const token = sessionStorage.getItem('token');
+    console.warn(token)
     let username = document.getElementById("crear_secretaria_adm_username").value
     let password = document.getElementById("crear_secretaria_adm_pass").value
-    let first_name = document.getElementById("crear_secretaria_adm_first_name").value
-    let last_name = document.getElementById("crear_secretaria_adm_last_name").value
+    let primer_nombre = document.getElementById("crear_secretaria_adm_primer_nombre").value
+    let segundo_nombre = document.getElementById("crear_secretaria_adm_segundo_nombre").value
+    let ap_paterno = document.getElementById("crear_secretaria_adm_ap_paterno").value
+    let ap_materno = document.getElementById("crear_secretaria_adm_ap_materno").value
     let email = document.getElementById("crear_secretaria_adm_email").value
     let edad = document.getElementById("crear_secretaria_adm_edad").value
     let fono = document.getElementById("crear_secretaria_fono").value
     let rut = document.getElementById("crear_secretaria_rut").value
-    let num_vivienda = document.getElementById("crear_secretaria_num_vivienda").value
+    let clinica_secretaria = document.getElementById("select_clinica_secretaria").value
+    console.log(clinica_secretaria)
     //------- Valor Radio Button Sexo ---------
     let sexo = document.getElementsByName("crear_secretaria_adm_sexo")
     let valor_radio;
@@ -4758,42 +4887,28 @@ function registrar_secretaria(e){
         }
     });
     //------- Fin Valor Radio Button Sexo ---------
-    //------- Valor Radio Button Vivienda---------
-    let vivienda = document.getElementsByName("crear_secretaria_adm_tipo_vivienda")
-    let valor_vivienda;
-    vivienda.forEach(radio => {
-        if (radio.checked) {
-            valor_vivienda = radio.value;
-        }
-    });
-    //------- Fin Valor Radio Button Vivienda ---------
-    //-------------------- Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Región.
-    let id_region = document.getElementById("secretaria_region").value
-    let region = document.getElementById("region_" + id_region).getAttribute("data-region")
-    buscar_ciudad_secretaria(0)
-    //------ Fin Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Comuna.
-    let comuna = document.getElementById("secretaria_comuna").value
     let arr = []
     //------ Fin Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Comuna.
     //-----  Creamos el array de bjetos. -------------
     let datos = {
         'username': username ,
         'password': password ,
-        'first_name': first_name ,
-        'last_name': last_name ,
+        'primer_nombre': primer_nombre ,
+        'segundo_nombre': segundo_nombre ,
+        'ap_paterno': ap_paterno,
+        'ap_materno': ap_materno,
         'email': email ,
         'edad': edad ,
         'fono': fono ,
         'rut': rut ,
-        'num_vivienda': num_vivienda ,
         'sexo': valor_radio ,
-        'vivienda': valor_vivienda ,
-        'region': region ,
-        'comuna': comuna ,
+        'id_clinica': clinica_secretaria,
     }
     console.log(datos)
-    axios.post(`http://127.0.0.1:8000/secretaria/crear_secretaria`,datos, {
-        
+    axios.post(`http://127.0.0.1:8000/secretaria/crear_secretaria`,datos,{
+        headers: {
+            'Authorization': `Token ${token}`
+        }
     })
     .then(function (response) {
         console.warn(response.data);
@@ -4801,34 +4916,36 @@ function registrar_secretaria(e){
         if (response.status == 200) {
             Swal.fire({
                 icon: "success",
-                title: "Paciente Registrado  Correctamente",
-                text: "paciente registrado",
+                title: "Secretaria Registrada Correctamente",
+                text: "Secretaria Registrada",
             });
-            //console.warn(response.data.grupos[0])
+            //
             let secretarias = response.data.secretarias
+            console.warn(response.data.secretarias)
             secretarias.forEach(element => {
                 console.log(element.username)
                 arr.push(element)
             });
             console.warn(arr)
             //
+            if ($.fn.DataTable.isDataTable('#tabla_secretaria')) {
+                $('#tabla_secretaria').DataTable().destroy();
+                $('#tabla_secretaria').empty(); // Limpia la tabla antes de inicializarla nuevamente
+            }
             var table = $('#tabla_secretaria').DataTable({
                 responsive: true,
                 data: arr,
                 columns: [
-                    { title: 'ID', data: "id", defaultContent: '' },
+                    { title: 'ID', data: "id_user", defaultContent: '' },
                     { title: 'Username', data: "username", defaultContent: '' },
-                    { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
-                    { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                    { title: 'Primer Nombre', data: "primer_nombre", defaultContent: '' },
+                    { title: 'Segundo Nombre', data: "segundo_nombre", defaultContent: '' },
+                    { title: 'Ap. Paterno', data: "ap_paterno", defaultContent: '' },
+                    { title: 'Ap. Materno', data: "ap_materno", defaultContent: '' },
                     { title: 'Email', data: "email", defaultContent: '' },
                     { title: 'Edad', data: "edad", defaultContent: '' },
                     { title: 'Sexo', data: "sexo", defaultContent: '' },
                     { title: 'Contacto', data: "fono", defaultContent: '' },
-                    { title: 'Region', data: "region", defaultContent: '' },
-                    { title: 'Comuna', data: "comuna", defaultContent: '' },
-                    { title: 'Vivienda', data: "vivienda", defaultContent: '' },
-                    { title: 'N° Vivienda', data: "num_vivienda", defaultContent: '' },
-                    { title: 'Cod. Secretaria', data: "secretaria_uuid", defaultContent: '' },
                     { 
                         title: 'Acciones', 
                         data: null,
@@ -4836,11 +4953,11 @@ function registrar_secretaria(e){
                         className: 'no-wrap', // Clase para evitar saltos de línea
                         orderable: false,
                         render: function(data, type, row) {
-                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_secret_adm" onclick="modal_editar_secretaria('+row.id+', \''+row.username+'\',\''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\',\''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_secret_adm" onclick="borrar_user_secretaria('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                            return '<button type="button" id="btn_editar_secret_adm" onclick="modal_editar_secretaria('+row.id_user+', \''+row.username+'\',\''+row.primer_nombre+'\', \''+row.segundo_nombre+'\',\''+row.ap_paterno+'\',\''+row.ap_materno+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\',\''+row.fono+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
+                                    '<button type="button" id="btn_borrar_secret_adm" onclick="borrar_user_secretaria('+row.id_user+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ' +
+                                    '<button type="button" id="btn_clin_secret_adm" onclick="obtener_clin_secretaria_panel_adm('+row.id_user+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\')" class="btn btn-sm" style="background: #f3d27e">Clínicas</button> ';
                         }
                     },
-                    { title: 'Password', data: "password", defaultContent: '' },
                 ],
                 destroy: true,
                 "dom": 'Bfrtip',
@@ -4892,24 +5009,353 @@ function registrar_secretaria(e){
         }
     });
 }
-//
-function modal_editar_secretaria(id, username,first_name, last_name, email,edad,sexo,rut,fono,region,comuna,vivienda, num_vivienda,password){
-    let modal_editar_secretaria = document.getElementById("modal_editar_secretaria")
-    // Crea una instancia del modal de Bootstrap
-    const modalInstance = new bootstrap.Modal(modal_editar_secretaria);
+// Obtener todas las clinicas a la cual pertenece la secretaria.
+function obtener_clin_secretaria_panel_adm(id_user, primer_nombre, seg_nombre){
+    let id_user_secretaria = document.getElementById("id_user_secretaria")
+    id_user_secretaria.value = id_user
+    //
+    let arr = []
+    const token = sessionStorage.getItem('token');
+    //
+    let modal_todas_clin_secretaria_panel_admin = document.getElementById("modal_todas_clin_secretaria_panel_admin")
+    // Crea una instancia del modal de Bootstrap.
+    const modalInstance = new bootstrap.Modal(modal_todas_clin_secretaria_panel_admin);
     // Abre el modal
     modalInstance.show();
+    axios.get(`http://127.0.0.1:8000/secretaria/obtener_clin_secretaria/${id_user}/`,{
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        console.warn(response.data);
+        console.warn(response.status)
+        if (response.status == 200) {
+            //
+            console.warn(response.data.clinicas)
+            //
+            let clinicas = response.data.clinicas
+            //
+            clinicas.forEach(element => {
+                console.log(element.username)
+                arr.push(element)
+            });
+            console.warn(arr)
+            //
+            if ($.fn.DataTable.isDataTable('#tabla_clinica_secret_panel_admin')) {
+                $('#tabla_clinica_secret_panel_admin').DataTable().destroy();
+                $('#tabla_clinica_secret_panel_admin').empty(); // Limpia la tabla antes de inicializarla nuevamente
+            }
+            var table = $('#tabla_clinica_secret_panel_admin').DataTable({
+                responsive: true,
+                data: arr,
+                columns: [
+                    { title: 'ID', data: "id_clinica", defaultContent: '' },
+                    { title: 'Nombre Clínica', data: "nombre_clinica", defaultContent: '' },
+                    { title: 'Comuna Clínica', data: "comuna_clinica", defaultContent: '' },
+                    { title: 'Dirección Clínica', data: "direccion_clinica", defaultContent: '' },
+                    { 
+                        title: 'Acciones', 
+                        data: null,
+                        responsivePriority: 1, // Prioridad máxima (no se oculta)
+                        className: 'no-wrap', // Clase para evitar saltos de línea
+                        orderable: false,
+                        render: function(data, type, row) {
+                            return '<button type="button" id="btn_borrar_clin_secret_adm" onclick="borrar_clin_secretaria(\''+row.id_clinica+'\', \''+id_user+'\', \''+row.nombre_clinica+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                        }
+                    },
+                ],
+                destroy: true,
+                "dom": 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                "lengthMenu": [
+                    [5,10, 25, 50, -1],
+                    ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+                ],
+                "buttons": {
+                    "pageLength": {
+                        _: "Mostrar %d Registros"
+                    }
+                },
+                "language": {
+                    "decimal": "",
+                    "emptyTable": "No hay información",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                    "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                    "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Mostrar _MENU_ Documentos",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "Sin resultados encontrados",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Ultimo",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
+            });
+        }
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+            if (error.response.data.error == 3) {
+                Swal.fire({
+                    icon: "error",
+                    title: "El usuario ya existe",
+                    text: "El usuario fue creado anteriormente!",
+                });
+            }
+        }
+    });
+}
+// Función para insertar una nueva clinica a una secretaria.
+function insert_nueva_clin_secret_panel_adm(){
+    //
+    const token = sessionStorage.getItem('token');
+    //
+    let modal_insert_clin_secretaria_panel_admin = document.getElementById("modal_insert_clin_secretaria_panel_admin")
+    // Crea una instancia del modal de Bootstrap.
+    const modalInstance = new bootstrap.Modal(modal_insert_clin_secretaria_panel_admin);
+    // Abre el modal
+    modalInstance.show();
+}
+// Funcionar para enviar los datos al Backend e agregar una nueva clinica a la secretaria.
+function enviar_nueva_clinica_secretaria(){
+    let arr = []
+    const token = sessionStorage.getItem('token');
+    let insert_select_clinica_secretaria = document.getElementById("insert_select_clinica_secretaria").value
+    let id_user_secretaria = document.getElementById("id_user_secretaria").value
+    let id_secretaria = '';
+    let datos = {
+        'id_clinica': insert_select_clinica_secretaria,
+        'id_user_secretaria': id_user_secretaria,
+    }
+    //
+    axios.post(`http://127.0.0.1:8000/secretaria/agregar_clin_secretaria_panel_adm`,datos,{
+        headers: {
+            'Authorization': `Token ${token}`
+        }
+    })
+    .then(function (response) {
+        console.warn(response.data);
+        console.warn(response.status)
+        if (response.status == 200) {
+            //
+            console.warn(response.data.clinicas)
+            //
+           
+            //
+            let clinicas = response.data.clinicas
+            //
+            clinicas.forEach(element => {
+                arr.push(element)
+            });
+            console.warn(arr)
+            //
+            var table = $('#tabla_clinica_secret_panel_admin').DataTable({
+                responsive: true,
+                data: arr,
+                columns: [
+                    { title: 'ID', data: "id_clinica", defaultContent: '' },
+                    { title: 'Nombre Clínica', data: "nombre_clinica", defaultContent: '' },
+                    { title: 'Comuna Clínica', data: "comuna_clinica", defaultContent: '' },
+                    { title: 'Dirección Clínica', data: "direccion_clinica", defaultContent: '' },
+                    { 
+                        title: 'Acciones',
+                        data: null,
+                        responsivePriority: 1, // Prioridad máxima (no se oculta)
+                        className: 'no-wrap', // Clase para evitar saltos de línea
+                        orderable: false,
+                        render: function(data, type, row) {
+                            return '<button type="button" id="btn_borrar_clin_secret_adm" onclick="borrar_clin_secretaria(\''+row.id_clinica+'\', \''+id_user_secretaria+'\', \''+row.nombre_clinica+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                        }
+                    },
+                ],
+                destroy: true,
+                "dom": 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                "lengthMenu": [
+                    [5,10, 25, 50, -1],
+                    ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+                ],
+                "buttons": {
+                    "pageLength": {
+                        _: "Mostrar %d Registros"
+                    }
+                },
+                "language": {
+                    "decimal": "",
+                    "emptyTable": "No hay información",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                    "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                    "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Mostrar _MENU_ Documentos",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "Sin resultados encontrados",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Ultimo",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
+            });
+             Swal.fire({
+                icon: "success",
+                title: "Clínca Agregada Correctamente",
+                text: "Se ha agregado la clínica a la secretaria",
+            });
+        }
+    })
+    .catch(error => {
+        if (error.response) {
+            console.log('Error Response:', error.response.data);
+            console.log('Error Status:', error.response.status);
+            console.log('Error Headers:', error.response.headers);
+            if (error.response.data.error == 3) {
+                Swal.fire({
+                    icon: "error",
+                    title: "El usuario ya existe",
+                    text: "El usuario fue creado anteriormente!",
+                });
+            }
+        }
+    });
+}
+// Borrar una clinica unida a la secretaria desde el panel ADM.
+function borrar_clin_secretaria(id_clin, id_user_secret, name_clinica){
+    const token = sessionStorage.getItem('token');
+    let arr = []
+    Swal.fire({
+        title: "¿Desea eliminar a la Clinica: " +name_clinica+ "?",
+        text: "Se eliminará la clínica.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "¡Si, borrar!"
+      }).then((result) => {
+        if (result.isConfirmed) {
+            axios.delete(`http://127.0.0.1:8000/secretaria/delete_clin_secretaria/${id_clin}/${id_user_secret}/`,{
+                headers: {
+                    'Authorization': `Token ${token}`
+                }
+            })
+            .then(function (response) {
+                console.warn(response.data);
+                console.warn(response.status)
+                if (response.status == 200) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Clínica Eliminada Correctamente",
+                        text: "Clínica Eliminada",
+                    });
+                    //console.warn(response.data.grupos[0])
+                    let secretarias = response.data.secretarias
+                    secretarias.forEach(element => {
+                        console.log(element.username)
+                        arr.push(element)
+                    });
+                    console.warn(arr)
+                    //
+                    var table = $('#tabla_clinica_secret_panel_admin').DataTable({
+                        responsive: true,
+                        data: arr,
+                        columns: [
+                            { title: 'ID', data: "id_clinica", defaultContent: '' },
+                            { title: 'Nombre Clínica', data: "nombre_clinica", defaultContent: '' },
+                            { title: 'Comuna Clínica', data: "comuna_clinica", defaultContent: '' },
+                            { title: 'Dirección Clínica', data: "direccion_clinica", defaultContent: '' },
+                            { 
+                                title: 'Acciones',
+                                data: null,
+                                responsivePriority: 1, // Prioridad máxima (no se oculta)
+                                className: 'no-wrap', // Clase para evitar saltos de línea
+                                orderable: false,
+                                render: function(data, type, row) {
+                                    return '<button type="button" id="btn_borrar_clin_secret_adm" onclick="borrar_clin_secretaria(\''+row.id_clinica+'\', \''+id_user_secretaria+'\', \''+row.nombre_clinica+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                                }
+                            },
+                        ],
+                        destroy: true,
+                        "dom": 'Bfrtip',
+                        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+                        "lengthMenu": [
+                            [5,10, 25, 50, -1],
+                            ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
+                        ],
+                        "buttons": {
+                            "pageLength": {
+                                _: "Mostrar %d Registros"
+                            }
+                        },
+                        "language": {
+                            "decimal": "",
+                            "emptyTable": "No hay información",
+                            "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
+                            "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
+                            "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                            "infoPostFix": "",
+                            "thousands": ",",
+                            "lengthMenu": "Mostrar _MENU_ Documentos",
+                            "loadingRecords": "Cargando...",
+                            "processing": "Procesando...",
+                            "search": "Buscar:",
+                            "zeroRecords": "Sin resultados encontrados",
+                            "paginate": {
+                                "first": "Primero",
+                                "last": "Ultimo",
+                                "next": "Siguiente",
+                                "previous": "Anterior"
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                if (error.response) {
+                    console.log('Error Response:', error.response.data);
+                    console.log('Error Status:', error.response.status);
+                    console.log('Error Headers:', error.response.headers);
+                    if (error.response.data.error == 3) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "El grupo ya existe",
+                            text: "El grupo fue creado anteriormente!",
+                        });
+                    }
+                }
+            });
+        }
+    });
+}
+//
+function modal_editar_secretaria(id, username,primer_nombre, segundo_nombre, ap_paterno, ap_materno, email,edad,sexo,rut,fono){
+    
     //
     let id_usuuario_secretaria = document.getElementById("id_usuario_secretaria")
     id_usuuario_secretaria.value = id
     let edit_adm_secretaria_username = document.getElementById("edit_adm_secretaria_username")
     edit_adm_secretaria_username.value = username
-    let edit_adm_secretaria_pass = document.getElementById("edit_adm_secretaria_pass")
-    edit_adm_secretaria_pass.value = password
-    let edit_adm_secretaria_first_name = document.getElementById("edit_adm_secretaria_first_name")
-    edit_adm_secretaria_first_name.value = first_name
-    let edit_adm_secretaria_last_name = document.getElementById("edit_adm_secretaria_last_name")
-    edit_adm_secretaria_last_name.value = last_name
+    let edit_adm_secretaria_primer_nombre = document.getElementById("edit_adm_secretaria_primer_nombre")
+    edit_adm_secretaria_primer_nombre.value = primer_nombre
+    let edit_adm_secretaria_segundo_nombre = document.getElementById("edit_adm_secretaria_segundo_nombre")
+    edit_adm_secretaria_segundo_nombre.value = segundo_nombre
+    let edit_adm_secretaria_ap_paterno = document.getElementById("edit_adm_secretaria_ap_paterno")
+    edit_adm_secretaria_ap_paterno.value = ap_paterno
+    let edit_adm_secretaria_ap_materno = document.getElementById("edit_adm_secretaria_ap_materno")
+    edit_adm_secretaria_ap_materno.value = ap_materno
     let edit_adm_secretaria_email = document.getElementById("edit_adm_secretaria_email")
     edit_adm_secretaria_email.value = email
     let edit_adm_secretaria_edad = document.getElementById("edit_adm_secretaria_edad")
@@ -4918,17 +5364,6 @@ function modal_editar_secretaria(id, username,first_name, last_name, email,edad,
     edit_adm_secretaria_fono.value = fono
     let edit_adm_secretaria_rut = document.getElementById("edit_adm_secretaria_rut")
     edit_adm_secretaria_rut.value = rut
-    let edit_adm_secretaria_num_vivienda = document.getElementById("edit_adm_secretaria_num_vivienda")
-    edit_adm_secretaria_num_vivienda.value = num_vivienda
-    //---------------------- Vivienda --------------------
-    let adm_paciente_tipo_vivienda = document.getElementsByName("edit_adm_secretaria_tipo_vivienda")
-    adm_paciente_tipo_vivienda.forEach(radio => {
-        if (radio.value === vivienda) {
-            console.log(radio)
-                radio.checked = true;
-            }
-    });
-    //---------------------- Fin Vivienda ----------------
     //---------------------- Sexo --------------------
     let edit_sexo = document.getElementsByName("edit_adm_secretaria_sexo")
     edit_sexo.forEach(radio => {
@@ -4938,45 +5373,32 @@ function modal_editar_secretaria(id, username,first_name, last_name, email,edad,
             }
     });
     //---------------------- Fin Sexo ----------------
-    //------- Valor Radio Button Sexo ----------------
-    let edit_region = document.getElementById("edit_secretaria_region")
-    // Iterar sobre las opciones del select
-    for (let i = 0; i < edit_region.options.length; i++) {
-        let option = edit_region.options[i];
-        // Verificar si el texto de la opción es "Valparaiso"
-        if (option.text === region) {
-            // Seleccionar la opción
-            option.selected = true;
-            //buscar_ciudad_secretaria(1)
-            break;
-        }
-    }
-    //
-    buscar_ciudad_secretaria(1)
-    //
-    let edit_comuna = document.getElementById("edit_secretaria_comuna")
-    console.log(edit_comuna)
-    // edit_comuna
-    let option_comuna = edit_comuna.querySelector("option")
-    option_comuna.innerText = comuna
-    option_comuna.value = comuna
-    option_comuna.selected = true
-    
+    let modal_editar_secretaria = document.getElementById("modal_editar_secretaria")
+    // Crea una instancia del modal de Bootstrap
+    const modalInstance = new bootstrap.Modal(modal_editar_secretaria);
+    // Abre el modal
+    modalInstance.show();
 }
 //
 function editando_secretaria(){
     //
-    let id_usuario_secretaria = document.getElementById("id_usuario_secretaria").value
-    let username = document.getElementById("edit_adm_secretaria_username").value
-    let password = document.getElementById("edit_adm_secretaria_pass").value
-    let first_name = document.getElementById("edit_adm_secretaria_first_name").value
-    let last_name = document.getElementById("edit_adm_secretaria_last_name").value
-    let email = document.getElementById("edit_adm_secretaria_email").value
-    let edad = document.getElementById("edit_adm_secretaria_edad").value
-    let fono = document.getElementById("edit_adm_secretaria_fono").value
-    let rut = document.getElementById("edit_adm_secretaria_rut").value
-    let num_vivienda = document.getElementById("edit_adm_secretaria_num_vivienda").value
+    let password = null
+    password = document.getElementById("edit_adm_secretaria_pass").value
     //
+    if (password.trim() === "") {
+        password = "0"
+    }
+    //
+    let id_usuuario_secretaria = document.getElementById("id_usuario_secretaria").value
+    let edit_adm_secretaria_username = document.getElementById("edit_adm_secretaria_username").value
+    let edit_adm_secretaria_primer_nombre = document.getElementById("edit_adm_secretaria_primer_nombre").value
+    let edit_adm_secretaria_segundo_nombre = document.getElementById("edit_adm_secretaria_segundo_nombre").value
+    let edit_adm_secretaria_ap_paterno = document.getElementById("edit_adm_secretaria_ap_paterno").value
+    let edit_adm_secretaria_ap_materno = document.getElementById("edit_adm_secretaria_ap_materno").value
+    let edit_adm_secretaria_email = document.getElementById("edit_adm_secretaria_email").value
+    let edit_adm_secretaria_edad = document.getElementById("edit_adm_secretaria_edad").value
+    let edit_adm_secretaria_fono = document.getElementById("edit_adm_secretaria_fono").value
+    let edit_adm_secretaria_rut = document.getElementById("edit_adm_secretaria_rut").value
     //------- Valor Radio Button Sexo ---------
     let sexo = document.getElementsByName("edit_adm_secretaria_sexo")
     let valor_radio;
@@ -4986,40 +5408,23 @@ function editando_secretaria(){
         }
     });
     //------- Fin Valor Radio Button Sexo ---------
-    //------- Valor Radio Button Vivienda---------
-    let vivienda = document.getElementsByName("edit_adm_secretaria_tipo_vivienda")
-    let valor_vivienda;
-    vivienda.forEach(radio => {
-        if (radio.checked) {
-            valor_vivienda = radio.value;
-        }
-    });
-    //------- Fin Valor Radio Button Vivienda ---------
-    //-------------------- Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Región.
-    let id_region = document.getElementById("edit_secretaria_region").value
-    let region = document.getElementById("region_" + id_region).getAttribute("data-region")
-    buscar_ciudad_secretaria(0)
-    //------ Fin Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Comuna.
-    let comuna = document.getElementById("edit_secretaria_comuna").value
     let arr = []
     //------ Fin Select dinámico, esta es la manera de recorrer el select y obtener el valorInput Comuna.
     //-----  Creamos el array de bjetos. -------------
     let datos = {
-        'username': username ,
+        'username': edit_adm_secretaria_username ,
         'password': password ,
-        'first_name': first_name ,
-        'last_name': last_name ,
-        'email': email ,
-        'edad': edad ,
-        'fono': fono ,
-        'rut': rut ,
-        'num_vivienda': num_vivienda ,
+        'primer_nombre': edit_adm_secretaria_primer_nombre ,
+        'segundo_nombre': edit_adm_secretaria_segundo_nombre ,
+        'email': edit_adm_secretaria_email ,
+        'edad': edit_adm_secretaria_edad ,
+        'fono': edit_adm_secretaria_fono ,
+        'rut': edit_adm_secretaria_rut ,
         'sexo': valor_radio ,
-        'vivienda': valor_vivienda ,
-        'region': region ,
-        'comuna': comuna ,
+        'ap_paterno': edit_adm_secretaria_ap_paterno,
+        'ap_materno': edit_adm_secretaria_ap_materno, 
     }
-    axios.put(`http://127.0.0.1:8000/secretaria/update_secretaria/${id_usuario_secretaria}/`,datos, {
+    axios.put(`http://127.0.0.1:8000/secretaria/update_secretaria/${id_usuuario_secretaria}/`,datos, {
         
     })
     .then(function (response) {
@@ -5043,19 +5448,17 @@ function editando_secretaria(){
                 responsive: true,
                 data: arr,
                 columns: [
-                    { title: 'ID', data: "id", defaultContent: '' },
+                    { title: 'ID', data: "id_user", defaultContent: '' },
                     { title: 'Username', data: "username", defaultContent: '' },
-                    { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
-                    { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                    { title: 'Primer Nombre', data: "primer_nombre", defaultContent: '' },
+                    { title: 'Segundo Nombre', data: "segundo_nombre", defaultContent: '' },
+                    { title: 'Ap. Paterno', data: "ap_paterno", defaultContent: '' },
+                    { title: 'Ap. Materno', data: "ap_materno", defaultContent: '' },
                     { title: 'Email', data: "email", defaultContent: '' },
                     { title: 'Edad', data: "edad", defaultContent: '' },
                     { title: 'Sexo', data: "sexo", defaultContent: '' },
                     { title: 'Contacto', data: "fono", defaultContent: '' },
-                    { title: 'Region', data: "region", defaultContent: '' },
-                    { title: 'Comuna', data: "comuna", defaultContent: '' },
-                    { title: 'Vivienda', data: "vivienda", defaultContent: '' },
-                    { title: 'N° Vivienda', data: "num_vivienda", defaultContent: '' },
-                    { title: 'Cod. Scretaria', data: "secretaria_uuid", defaultContent: '' },
+                    { title: 'Cod. Secretaria', data: "secretaria_uuid", defaultContent: '' },
                     { 
                         title: 'Acciones', 
                         data: null,
@@ -5063,11 +5466,10 @@ function editando_secretaria(){
                         className: 'no-wrap', // Clase para evitar saltos de línea
                         orderable: false,
                         render: function(data, type, row) {
-                            return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_secret_adm" onclick="modal_editar_secretaria('+row.id+', \''+row.username+'\',\''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\',\''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
-                                    '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_secret_adm" onclick="borrar_user_secretaria('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                            return '<button type="button" id="btn_editar_secret_adm" onclick="modal_editar_secretaria('+row.id_user+', \''+row.username+'\',\''+row.primer_nombre+'\', \''+row.segundo_nombre+'\',\''+row.ap_paterno+'\',\''+row.ap_materno+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\',\''+row.fono+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
+                                    '<button type="button" id="btn_borrar_secret_adm" onclick="borrar_user_secretaria('+row.id_user+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
                         }
                     },
-                    { title: 'Password', data: "password", defaultContent: '' },
                 ],
                 destroy: true,
                 "dom": 'Bfrtip',
@@ -5159,18 +5561,16 @@ function borrar_user_secretaria(id, primer_nombre, segundo_nombre){
                         responsive: true,
                         data: arr,
                         columns: [
-                            { title: 'ID', data: "id", defaultContent: '' },
+                            { title: 'ID', data: "id_user", defaultContent: '' },
                             { title: 'Username', data: "username", defaultContent: '' },
-                            { title: 'Primer Nombre', data: "first_name", defaultContent: '' },
-                            { title: 'Apellidos', data: "last_name", defaultContent: '' },
+                            { title: 'Primer Nombre', data: "primer_nombre", defaultContent: '' },
+                            { title: 'Segundo Nombre', data: "segundo_nombre", defaultContent: '' },
+                            { title: 'Ap. Paterno', data: "ap_paterno", defaultContent: '' },
+                            { title: 'Ap. Materno', data: "ap_materno", defaultContent: '' },
                             { title: 'Email', data: "email", defaultContent: '' },
                             { title: 'Edad', data: "edad", defaultContent: '' },
                             { title: 'Sexo', data: "sexo", defaultContent: '' },
                             { title: 'Contacto', data: "fono", defaultContent: '' },
-                            { title: 'Region', data: "region", defaultContent: '' },
-                            { title: 'Comuna', data: "comuna", defaultContent: '' },
-                            { title: 'Vivienda', data: "vivienda", defaultContent: '' },
-                            { title: 'N° Vivienda', data: "num_vivienda", defaultContent: '' },
                             { title: 'Cod. Secretaria', data: "secretaria_uuid", defaultContent: '' },
                             { 
                                 title: 'Acciones', 
@@ -5179,11 +5579,10 @@ function borrar_user_secretaria(id, primer_nombre, segundo_nombre){
                                 className: 'no-wrap', // Clase para evitar saltos de línea
                                 orderable: false,
                                 render: function(data, type, row) {
-                                    return '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_editar_secret_adm" onclick="modal_editar_secretaria('+row.id+', \''+row.username+'\',\''+row.first_name+'\', \''+row.last_name+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\',\''+row.fono+'\', \''+row.region+'\', \''+row.comuna+'\', \''+row.vivienda+'\', \''+row.num_vivienda+'\', \''+row.password+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
-                                            '<button type="button" data-id="'+row.id+'" data-name="'+row.first_name+'" id="btn_borrar_secret_adm" onclick="borrar_user_secretaria('+row.id+', \''+row.first_name+'\', \''+row.last_name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
+                                    return '<button type="button" id="btn_editar_secret_adm" onclick="modal_editar_secretaria('+row.id_user+', \''+row.username+'\',\''+row.primer_nombre+'\', \''+row.segundo_nombre+'\',\''+row.ap_paterno+'\',\''+row.ap_materno+'\', \''+row.email+'\', \''+row.edad+'\', \''+row.sexo+'\', \''+row.rut+'\',\''+row.fono+'\')" class="btn btn-warning btn-sm editar-btn">Editar</button> ' +
+                                            '<button type="button" id="btn_borrar_secret_adm" onclick="borrar_user_secretaria('+row.id_user+', \''+row.primer_nombre+'\', \''+row.segundo_nombre+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button> ';
                                 }
                             },
-                            { title: 'Password', data: "password", defaultContent: '' },
                         ],
                         destroy: true,
                         "dom": 'Bfrtip',
@@ -5431,6 +5830,11 @@ function historial_citas(){
             console.log('Error Response:', error.response.data);
             console.log('Error Status:', error.response.status);
             console.log('Error Headers:', error.response.headers);
+             Swal.fire({
+                icon: "error",
+                title: "No existen reservas",
+                text: "No se encontraron reservas.",
+            });
         }
     });
 }

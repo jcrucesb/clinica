@@ -56,12 +56,16 @@ from django.conf import settings
 #----- Librería para crear PDF -------------------------------------------------
 import pdfkit 
 #----- Fin Librería para crear PDF ---------------------------------------------
+# Verificar si el Grupo del usuario existe o no, modelo de la BD.
+from django.contrib.auth.models import Group
 
 # Create your views here.
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login(request):
     try:
+        print("Ojo")
+        print(request.data['username'])
         # Esta es forma rápida de validarsi el usuario existe.
         user = get_object_or_404(CustomersUsers, username=request.data['username'])
         print(user)
@@ -84,8 +88,27 @@ def login(request):
                              # Específicamos el status.
                             status=status.HTTP_200_OK)
         else:
+            print("Pasamos 1")
+            # Verificamos si existen los grupos creados por el Administrador.
+            # Recordar quelos grupos deben tener el mismo nombre de la BD.
+            grupo_doctor = Group.objects.filter(name="Doctor").exists()
+            if not grupo_doctor:
+                Response({'error': 1},
+                            # Específicamos el status.
+                            status=status.HTTP_404_NOT_FOUND)
+            #
+            grupo_secretaria = Group.objects.filter(name="Secretaria").exists()
+            if not grupo_secretaria:
+                Response({'error': 2},
+                            # Específicamos el status.
+                            status=status.HTTP_404_NOT_FOUND)
+            grupo_paciente = Group.objects.filter(name="Paciente").exists()
+            if not grupo_paciente:
+                Response({'error': 3},
+                            # Específicamos el status.
+                            status=status.HTTP_404_NOT_FOUND)
             # Obtenemos los grupos del usuario
-            grupos_usuario = list(user.groups.values_list('name', flat=True))
+            grupos_usuario = user.groups.values_list('name', flat=True)
             print(grupos_usuario)
             # Creamos una tupla. 
             # ** Recordar que el método get_or_create, es una tupla, por ende, 

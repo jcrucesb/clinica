@@ -11,6 +11,8 @@ from paciente.models import PacienteModel
 from paciente.serializers import PacienteSerializer
 from reserva.models import ReservaModel
 from reserva.serializers import ReservaSerializer
+from historial_clinico.models import HistorialClinicoModel
+from historial_clinico.serializers import HistorialClinicoSerializer
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core import serializers
 from django.http import JsonResponse, HttpResponse
@@ -72,18 +74,22 @@ import pdfkit
 def listar_paciente(request):
     try:
         # Obtener el grupo por nombre
-        grupo = Group.objects.get(name='Pacientes')
+        grupo = Group.objects.get(name='Paciente')
         #print(grupo)
         # Obtener todos los usuarios del grupo
         usuarios = grupo.user_set.all()
         datos = []
         for users in usuarios:
-            nombre_paciente = users.first_name + ' ' + users.last_name
+            user_paciente = users.username + ' ' + users.email
+            print(user_paciente)
             # Serializar los datos
-            serializer_dir = DireccionModel.objects.filter(usuario_id=users.id)
-            for ser in serializer_dir:
-                print(ser.vivienda)
-                datos.append({'id': users.id, 'nombre_paciente': nombre_paciente,'username': users.username, 'first_name': users.first_name, 'last_name': users.last_name, 'email': users.email, 'edad': users.edad, 'sexo': users.sexo, 'rut': users.rut, 'fono': users.fono, 'usuario_uuid':users.usuario_uuid, 'password':users.password,'region': ser.region, 'comuna': ser.comuna, 'vivienda': ser.vivienda, 'num_vivienda': ser.num_vivienda, 'usuario_id': ser.usuario_id})
+            paciente = PacienteModel.objects.filter(fk_user=users.id)
+            for pac in paciente:
+                print("Doctor")
+                serializer_dir = DireccionModel.objects.filter(fk_paciente=pac.id)
+                for dir in serializer_dir:
+                    print(dir.comuna)
+                    datos.append({'id_usuario': users.id, 'username':users.username,'email':users.email, 'id_paciente': pac.id, 'primer_nombre': pac.primer_nombre, 'segundo_nombre': pac.segundo_nombre, 'ap_paterno': pac.ap_paterno, 'ap_materno': pac.ap_materno, 'edad': pac.edad, 'sexo': pac.sexo, 'rut': pac.rut, 'fono': pac.fono, 'paciente_uuid':pac.paciente_uuid, 'region': dir.region, 'comuna': dir.comuna, 'vivienda': dir.vivienda, 'num_vivienda': dir.num_vivienda})
         print(datos)
         print("---------------------///****//")
         return Response({'pacientes':datos},
@@ -107,11 +113,14 @@ def crear_paciente(request):
         username = data.get("username")
         password = data.get("password")
         hashed_password = make_password(password)
-        first_name = data.get("first_name")
-        last_name = data.get("last_name")
+        primer_nombre = data.get("primer_nombre")
+        segundo_nombre = data.get("segundo_nombre")
+        ap_paterno = data.get("ap_paterno")
+        ap_materno = data.get("ap_materno")
         email = data.get("email")
         edad = data.get("edad")
         rut = data.get("rut")
+        print(rut)
         fono = data.get("fono")
         sexo = data.get("sexo")
         vivienda = data.get("vivienda")
@@ -123,49 +132,78 @@ def crear_paciente(request):
         data['usuario_uuid'] = usuario_uuid
         paciente_uuid = str(uuid.uuid4())
         print(data)
+        dato_user = {
+            'username': username,
+            'password': hashed_password,
+            'email': email,
+            'usuario_uuid': usuario_uuid
+        }
         #
-        if not all([username, password, first_name, last_name, email, edad, rut, fono, sexo, vivienda, region, comuna, num_vivienda]):
+        if not all([username, password, primer_nombre, segundo_nombre, ap_paterno, ap_materno, email, edad, rut, fono, sexo, vivienda, region, comuna, num_vivienda]):
             return Response({'error': 0}, status=status.HTTP_400_BAD_REQUEST)
         #
-        if CustomersUsers.objects.filter(rut=rut).exists():
+        if PacienteModel.objects.filter(rut=rut).exists():
             return Response({'error': 4}, status=status.HTTP_400_BAD_REQUEST)
-        dato_serializado = CustomUserSerializer(data=data)
+        dato_serializado = CustomUserSerializer(data=dato_user)
         if dato_serializado.is_valid():
-            usuario = dato_serializado.save(password=hashed_password)
-            # Aquí nos aseguramos de actualizar la copia mutable de los datos
-            data.update({'usuario': usuario.id})
+            usuario = dato_serializado.save()
+            print(usuario.id)
+            usuario_id = CustomersUsers.objects.get(pk=usuario.id)
+            print("Pasamos - 1")
             # Insertar el Paciente.
             paciente_data = {
+                'primer_nombre': primer_nombre,
+                'segundo_nombre':segundo_nombre,
+                'edad': edad,
+                'sexo': sexo,
+                'rut': rut,
+                'fono': fono,
                 'paciente_uuid': paciente_uuid,
-                'fk_user': usuario.id
+                'fk_user': usuario_id.id,
+                'ap_materno': ap_materno,
+                'ap_paterno': ap_paterno,
             }
-            # print("--------------------")
-            # print(paciente_data)
-            # print("--------------------")
+            #
             paciente = PacienteSerializer(data=paciente_data)
             if paciente.is_valid():
-                paciente.save()
-                group = Group.objects.get(name='Pacientes')
+                paciente_instancia = paciente.save()
+                group = Group.objects.get(name='Paciente')
                 usuario.groups.add(group)
-                direccion_dato_serializado = DireccionSerializer(data=data)
+                paciente_id = PacienteModel.objects.get(pk=paciente_instancia.id)
+                print(paciente_id)
+                data_direccion = {
+                    'vivienda':vivienda,
+                    'region':region,
+                    'comuna':comuna,
+                    'num_vivienda':num_vivienda,
+                    'fk_paciente' : paciente_id.id
+                }
+                direccion_dato_serializado = DireccionSerializer(data=data_direccion)
                 #print(direccion_dato_serializado)
                 if direccion_dato_serializado.is_valid():
                     direccion_dato_serializado.save()
-                    #Obtener el grupo por nombre
-                    grupo = Group.objects.get(name='Pacientes')
+                    # Obtener el grupo por nombre
+                    grupo = Group.objects.get(name='Paciente')
                     #print(grupo)
                     # Obtener todos los usuarios del grupo
                     usuarios = grupo.user_set.all()
                     datos = []
-                    # Realizamos el insert a la tabla Reserva.
-                    #reserva = ReservaSerializer(data=)
                     for users in usuarios:
+                        user_paciente = users.username + ' ' + users.email
+                        print(user_paciente)
                         # Serializar los datos
-                        serializer_dir = DireccionModel.objects.filter(usuario_id=users.id)
-                        for ser in serializer_dir:
-                            print(ser.vivienda)
-                            datos.append({'id': users.id, 'usuario_uuid':usuario_uuid,'username': users.username, 'first_name': users.first_name, 'last_name': users.last_name, 'email': users.email, 'edad': users.edad, 'sexo': users.sexo, 'rut': users.rut, 'fono': users.fono, 'password': users.password,'region': ser.region, 'comuna': ser.comuna, 'vivienda': ser.vivienda, 'num_vivienda': ser.num_vivienda, 'usuario_id': ser.usuario_id})
-                    return Response({'pacientes': datos}, status=status.HTTP_200_OK)
+                        paciente = PacienteModel.objects.filter(fk_user=users.id)
+                        for pac in paciente:
+                            print("Doctor")
+                            serializer_dir = DireccionModel.objects.filter(fk_paciente=pac.id)
+                            for dir in serializer_dir:
+                                print(dir.comuna)
+                                datos.append({'id_usuario': users.id, 'username':users.username,'email':users.email, 'id_paciente': pac.id, 'primer_nombre': pac.primer_nombre, 'segundo_nombre': pac.segundo_nombre, 'ap_paterno': pac.ap_paterno, 'ap_materno': pac.ap_materno, 'edad': pac.edad, 'sexo': pac.sexo, 'rut': pac.rut, 'fono': pac.fono, 'paciente_uuid':pac.paciente_uuid, 'region': dir.region, 'comuna': dir.comuna, 'vivienda': dir.vivienda, 'num_vivienda': dir.num_vivienda})
+                    print(datos)
+                    print("---------------------///****//")
+                    return Response({'pacientes':datos},
+                                    # Específicamos el status.
+                                    status=status.HTTP_200_OK)
                 else:
                     print("Errores de validación:", dato_serializado.errors)
                     return Response({'error': 2, 'details': dato_serializado.errors}, status=status.HTTP_400_BAD_REQUEST)
@@ -218,17 +256,25 @@ def historial_user_paciente(request, id_usuario):
 @permission_classes([AllowAny])
 def update_paciente(request, id):
     try:
+        print(id)
         # Hacer una copia mutable de request.data
         # Esto se hace para poder agregar mas data al array de objetos.
         data = request.data.copy()
         username = data.get("username")
         print(username)
+        password = None
         password = data.get("password")
-        print(password)
+        if password == 0:
+            password = None
+        if password != 0:
+            password = make_password(password)
         hashed_password = make_password(password)
-        first_name = data.get("first_name")
-        last_name = data.get("last_name")
         email = data.get("email")
+        primer_nombre = data.get("primer_nombre")
+        segundo_nombre = data.get("segundo_nombre")
+        ap_paterno = data.get("ap_paterno")
+        ap_materno = data.get("ap_materno")
+        
         edad = data.get("edad")
         rut = data.get("rut")
         fono = data.get("fono")
@@ -238,38 +284,74 @@ def update_paciente(request, id):
         comuna = data.get("comuna")
         num_vivienda = data.get("num_vivienda")
         # Validaciones.
-        if not all([username, password, first_name, last_name, email, edad, rut, fono, sexo, vivienda, region, comuna, num_vivienda]):
+        if not all([username, password, primer_nombre, segundo_nombre, ap_paterno, ap_materno, email, edad, rut, fono, sexo, vivienda, region, comuna, num_vivienda]):
             return Response({'error': 0}, status=status.HTTP_400_BAD_REQUEST)
-        #
+        # Creamos e array de objetos para actualizar el usuario.
+        dato_user = {
+            'username': username,
+            'password': password,
+            'email': email
+        }
+        # 
         user = CustomersUsers.objects.get(pk=id)
         # Validar y actualizar datos
-        serializer = CustomUserSerializer(user, data=request.data, partial=True)
+        serializer = CustomUserSerializer(user, data=dato_user, partial=True)
         print("-----------------------------------------------------------------")
         if serializer.is_valid():
-            # Hashear contraseña si se proporciona
-            if 'password' in request.data:
-                password = request.data['password']
-                serializer.validated_data['password'] = make_password(password)
-                # Actualizar campos adicionales
-                serializer.save()
-            # Buscar la instancia de la dirección existente
-            direccion = DireccionModel.objects.filter(usuario_id=user.id).first()
-            direccion_serializer = DireccionSerializer(direccion, data=request.data, partial=True)
-            if direccion_serializer.is_valid():
-                direccion_serializer.save()
-                # Obtener el grupo por nombre
-                grupo = Group.objects.get(name='Pacientes')
-                # Obtener todos los usuarios del grupo
-                usuarios = grupo.user_set.all()
-                datos = []
-                for users in usuarios:
-                    serializer_dir = DireccionModel.objects.filter(usuario_id=users.id)
-                    for ser in serializer_dir:
-                        datos.append({'id': users.id, 'username': users.username, 'first_name': users.first_name, 'last_name': users.last_name, 'email': users.email, 'edad': users.edad, 'sexo': users.sexo, 'rut': users.rut, 'fono': users.fono, 'usuario_uuid': users.usuario_uuid, 'password': users.password, 'region': ser.region, 'comuna': ser.comuna, 'vivienda': ser.vivienda, 'num_vivienda': ser.num_vivienda, 'usuario_id': ser.usuario_id})
-                
-                return Response({'pacientes': datos}, status=status.HTTP_200_OK)
-            else:
-                return Response(direccion_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # Actualizar campos adicionales
+            serializer.save()
+            # Creamos el array de objetos de los deatos a actual del paciente.
+            paciente_dato = {
+                'primer_nombre':primer_nombre,
+                'segundo_nombre':segundo_nombre,
+                'edad':edad,
+                'rut':rut,
+                'fono':fono,
+                'sexo':sexo,
+                'ap_materno':ap_materno,
+                'ap_paterno':ap_paterno,
+            }
+            paciente = PacienteModel.objects.get(fk_user=user.id)
+            update_paciente = PacienteSerializer(paciente, data=paciente_dato, partial=True)
+            if update_paciente.is_valid():
+                id_pac = update_paciente.save()
+                # Buscar la instancia de la dirección existente
+                direccion = DireccionModel.objects.filter(fk_paciente=id_pac.id).first()
+                # Creamos el array de objeto de DIRECCIÓN.
+                direcc_datos = {
+                    'vivienda': vivienda,
+                    'region': region,
+                    'comuna': comuna,
+                    'num_vivienda': num_vivienda,
+                }
+                direccion_serializer = DireccionSerializer(direccion, data=direcc_datos, partial=True)
+                if direccion_serializer.is_valid():
+                    direccion_serializer.save()
+                    print("Pasamos")
+                    # Obtener el grupo por nombre
+                    grupo = Group.objects.get(name='Paciente')
+                    #print(grupo)
+                    # Obtener todos los usuarios del grupo
+                    usuarios = grupo.user_set.all()
+                    datos = []
+                    for users in usuarios:
+                        user_paciente = users.username + ' ' + users.email
+                        print(user_paciente)
+                        # Serializar los datos
+                        paciente = PacienteModel.objects.filter(fk_user=users.id)
+                        for pac in paciente:
+                            print("Doctor")
+                            serializer_dir = DireccionModel.objects.filter(fk_paciente=pac.id)
+                            for dir in serializer_dir:
+                                print(dir.comuna)
+                                datos.append({'id_usuario': users.id, 'username':users.username,'email':users.email, 'id_paciente': pac.id, 'primer_nombre': pac.primer_nombre, 'segundo_nombre': pac.segundo_nombre, 'ap_paterno': pac.ap_paterno, 'ap_materno': pac.ap_materno, 'edad': pac.edad, 'sexo': pac.sexo, 'rut': pac.rut, 'fono': pac.fono, 'paciente_uuid':pac.paciente_uuid, 'region': dir.region, 'comuna': dir.comuna, 'vivienda': dir.vivienda, 'num_vivienda': dir.num_vivienda})
+                    print(datos)
+                    print("---------------------///****//")
+                    return Response({'pacientes':datos},
+                        # Específicamos el status.
+                        status=status.HTTP_200_OK)
+                else:
+                    return Response(direccion_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         return Response({'error': 1}, status=400)
@@ -280,24 +362,28 @@ def update_paciente(request, id):
 def delete_paciente(request, id):
     try:
         user = CustomersUsers.objects.get(pk=id)
-        direccion = DireccionModel.objects.get(usuario=user.id)
-        direccion.delete()
+        #direccion = CustomersUsers.objects.get(pk=user.id)
+        #direccion.delete()
         user.delete()
         # Obtener el grupo por nombre
-        grupo = Group.objects.get(name='Pacientes')
+        grupo = Group.objects.get(name='Paciente')
         #print(grupo)
         # Obtener todos los usuarios del grupo
         usuarios = grupo.user_set.all()
         datos = []
         for users in usuarios:
-            #print(users.id)
+            user_paciente = users.username + ' ' + users.email
+            print(user_paciente)
             # Serializar los datos
-            serializer_dir = DireccionModel.objects.filter(usuario=users.id)
-            for ser in serializer_dir:
-                datos.append({'username': users.username, 'first_name': users.first_name, 'last_name': users.last_name, 'email': users.email, 'edad': users.edad, 'sexo': users.sexo, 'rut': users.rut, 'fono': users.fono, 'usuario_uuid':users.usuario_uuid, 'password':users.password,'region': ser.region, 'comuna': ser.comuna, 'vivienda': ser.vivienda, 'num_vivienda': ser.num_vivienda, 'usuario_id': ser.usuario_id})
-        print("Estamos Pasando")
+            paciente = PacienteModel.objects.filter(fk_user=users.id)
+            for pac in paciente:
+                print("Doctor")
+                serializer_dir = DireccionModel.objects.filter(fk_paciente=pac.id)
+                for dir in serializer_dir:
+                    print(dir.comuna)
+                    datos.append({'id_usuario': users.id, 'username':users.username,'email':users.email, 'id_paciente': pac.id, 'primer_nombre': pac.primer_nombre, 'segundo_nombre': pac.segundo_nombre, 'ap_paterno': pac.ap_paterno, 'ap_materno': pac.ap_materno, 'edad': pac.edad, 'sexo': pac.sexo, 'rut': pac.rut, 'fono': pac.fono, 'paciente_uuid':pac.paciente_uuid, 'region': dir.region, 'comuna': dir.comuna, 'vivienda': dir.vivienda, 'num_vivienda': dir.num_vivienda})
         print(datos)
-        print("Ya pasamos")
+        print("---------------------///****//")
         return Response({'pacientes':datos},
                         # Específicamos el status.
                         status=status.HTTP_200_OK)
@@ -372,35 +458,38 @@ def reserva_paciente_registrado(request):
         print(especialidad.nombre_especialidad)
         #arr.append({'especialidad': especialidad.nombre_especialidad})
         # 
-        usuario = CustomersUsers.objects.get(pk=id_usuario_doctor)
-        print(usuario.first_name + ' ' + usuario.last_name)
-        nombre_doctor = usuario.first_name + ' ' + usuario.last_name
+        usuario = DoctorModel.objects.get(pk=id_usuario_doctor)
+        nombre_completo_doctor = usuario.primer_nombre + ' ' + usuario.segundo_nombre + ' ' + usuario.ap_paterno + ' ' + usuario.ap_materno
         #arr.append({'nombre_doctor': nombre_doctor})
-        #print(arr)
-        #
-        datos_reserva = ReservaModel.objects.filter(especialidad= especialidad.nombre_especialidad, nombre_clinica=nombre_clinica.nombre_clinica, nombre_doctor=nombre_doctor)
-        # print(datos_reserva.count())
+        print("Estamos Acá")
+        datos_reserva = ReservaModel.objects.filter(especialidad= especialidad.nombre_especialidad, nombre_clinica=nombre_clinica.nombre_clinica, nombre_doctor=nombre_completo_doctor)
+        print(datos_reserva)
         res = []
         id = '';
         for datos in datos_reserva:
-            id = datos.fk_usuario_id  # Obtenemos directamente el ID del usuario
+            print("Entramos")
+            id = datos.fk_usuario.id  # Obtenemos directamente el ID del usuario
+            print(id)
             res.append({
                 'especialidad': especialidad.nombre_especialidad,
-                'nombre_doctor': nombre_doctor,
+                'nombre_doctor': nombre_completo_doctor,
                 'fecha_reserva': datos.fecha_reserva,
                 'especialidad': datos.especialidad,
                 'hora_inicio': datos.hora_inicio,
                 'hora_termino': datos.hora_termino,
                 'reserva_uuid': datos.reserva_uuid,
             })
+            print("Ojo----")
+            print(res)
         # Serializar la lista res
-        reserva_data = ReservaSerializer(res, many=True) 
+        reserva_data = ReservaSerializer(res, many=True)
         print("Contenido de reserva_data:", reserva_data.data)
         # Iterar sobre los datos serializados correctamente
         nueva_data = []
-        for reserv in reserva_data.data:  # Aquí accedemos a .data
-            paciente = CustomersUsers.objects.get(pk=id)  # Si necesitas más datos del usuario
-            nombre_paciente = paciente.first_name + " " + paciente.last_name
+        for reserv in reserva_data.data:
+            # Aquí accedemos a .data
+            paciente = PacienteModel.objects.get(fk_user=id)  # Si necesitas más datos del usuario
+            nombre_paciente = paciente.primer_nombre + " " + paciente.segundo_nombre + " " + paciente.ap_paterno + " " + paciente.ap_materno
             nueva_data.append({
                 'title': reserv['especialidad'],  # Usamos 'especialidad' como título del evento
                 'start': f"{reserv['fecha_reserva']}T{reserv['hora_inicio']}",  # Fecha y hora de inicio
@@ -434,9 +523,7 @@ def crear_reserva_pac_registrado(request):
         reserva = str(uuid.uuid4())
         reserva_uuid = reserva
         data['reserva_uuid'] = reserva_uuid
-        print("Pasamos 1")
         print(data)
-        print("Pasamos 1")
         id_usuario_existe = data['fk_usuario']
         especialidad_existe = data['especialidad']
         fecha_reserva = data['fecha_reserva']
@@ -444,7 +531,7 @@ def crear_reserva_pac_registrado(request):
         hoy = date.today()
         verificar = ReservaModel.objects.filter(especialidad=especialidad_existe, fecha_reserva=fecha_reserva,fk_usuario=id_usuario_existe)
         print(verificar.count())
-        if verificar.count() > 0 :
+        if verificar.count() > 0:
             return Response({'error':0},
                     # Específicamos el status.
                     status=status.HTTP_400_BAD_REQUEST)
@@ -455,18 +542,21 @@ def crear_reserva_pac_registrado(request):
             res.save()
             id_reserva_insertada = res.instance.id
             print(id_reserva_insertada)
-            reserva_user = ReservaModel.objects.filter(fk_usuario__id=request.data["fk_usuario"])
-            reserva_user_paciente = ReservaSerializer(reserva_user, many=True)
+            reserva_user = ReservaModel.objects.filter(fk_usuario=request.data["fk_usuario"])
+            print(reserva_user)
+            # Obtenemos los datos del paciente.
+            pac = PacienteModel.objects.get(fk_user=request.data["fk_usuario"])
+            #reserva_user_paciente = ReservaSerializer(reserva_user, many=True)
             # Obtener los datos para el correo.
             reserva_nueva = ReservaModel.objects.get(pk=id_reserva_insertada)
             # Creación del correo.
             subject = "Correo de Verificación de Compras"
             # Crearemos el envío de correos.
             template = render_to_string("pacientes\correo_reserva.html",{
-                'nombre_paciente': id_user_pac.first_name + ' ' + id_user_pac.last_name,
-                'rut_paciente': id_user_pac.rut,
+                'nombre_paciente': pac.primer_nombre + ' ' + pac.segundo_nombre,
+                'rut_paciente': pac.rut,
                 'email_paciente': id_user_pac.email,
-                'fono_paciente': id_user_pac.fono,
+                'fono_paciente': pac.fono,
                 'fecha_reserva': reserva_nueva.fecha_reserva,
                 'especialidad': reserva_nueva.especialidad,
                 'nombre_doctor': reserva_nueva.nombre_doctor,
@@ -509,6 +599,60 @@ def crear_reserva_pac_registrado(request):
         return Response({'pacientes':todas_reservas_data.data},
                 # Específicamos el status.
                 status=status.HTTP_200_OK)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 1}, status=400)
+
+#
+@api_view(['POST'])
+# Para utilizar; IsAuthenticated
+# No olvidar, asi debe venir la peticiondel Front-End; fetch(request_calendar,'Authorization': `Token ${token}`
+@permission_classes([IsAuthenticated])
+def historial_clinico(request):
+    try:
+        print(request.data)
+        print(request.user.id)
+        nombre_paciente = request.data["nombre_paciente"]
+        especialidad = request.data["especialidad"]
+        cod_reserva = request.data["cod_reserva"]
+        sintoma = request.data["sintoma"]
+        diagnostico = request.data["diagnostico"]
+        observacion = request.data["observacion"]
+        #
+        fk_usuario = ReservaModel.objects.get(reserva_uuid=cod_reserva)
+        print("/*/*/****/**/**/*")
+        print(fk_usuario.fk_usuario.id)
+        pac = PacienteModel.objects.get(fk_user=fk_usuario.fk_usuario.id)
+        #
+        dato_historial_pac = {
+            'diagnostico': diagnostico,
+            'sintoma': sintoma,
+            'observacion': observacion,
+            'fk_paciente': pac.id,
+            'reserva_uuid': cod_reserva,
+        }
+        #
+        historial_clinico = HistorialClinicoSerializer(data=dato_historial_pac)
+        if historial_clinico.is_valid():
+            historial_cod_reserva = historial_clinico.save()
+            cerrar_reserva = ReservaModel.objects.get(reserva_uuid=historial_cod_reserva.reserva_uuid)
+            cerrar_reserva.reserva_cerrada = 1  # Modificas el atributo directamente
+            cerrar_reserva.save()  # Guardas los cambios en la base de datos
+            usuario = CustomersUsers.objects.get(pk=request.user.id)
+            #
+            doctor = DoctorModel.objects.filter(fk_user=usuario.id)
+            for doc in doctor:
+                nombre_completo = doc.primer_nombre + ' ' + doc.segundo_nombre + ' ' + doc.ap_paterno + ' ' + doc.ap_materno
+                reserva = ReservaModel.objects.filter(nombre_doctor=nombre_completo)
+                arr = []
+                for res in reserva:
+                    arr.append({'id_reserva': res.id,'title': res.especialidad, 'nombre_doctor':res.nombre_doctor,'nombre_clinica': res.nombre_clinica, 'comuna_clinica':res.comuna_clinica, 'direccion_clinica':res.direccion_clinica,'fecha_reserva': res.fecha_reserva,'hora_inicio':res.hora_inicio, 'hora_termino':res.hora_termino, 'fecha_creacion_reserva':res.fecha_creacion_reserva, 'cod_reserva': res.reserva_uuid,'id_usuario': usuario.id, 'nombre_paciente': nombre_paciente})
+                return Response({'paciente':arr},
+                                # Específicamos el status.
+                                status=status.HTTP_200_OK)
+        else:
+            print("Errores de validación:", historial_clinico.errors)  # Imprime los errores en la consola
+            return Response({"error": historial_clinico.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         return Response({'error': 1}, status=400)

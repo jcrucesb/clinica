@@ -6,4 +6,4 @@ from .models import DireccionModel
 class DireccionSerializer(serializers.ModelSerializer):
     class Meta:
         model = DireccionModel
-        fields = ['id', 'region', 'comuna', 'vivienda','num_vivienda', 'usuario']
+        fields = ['id', 'region', 'comuna', 'vivienda','num_vivienda', 'fk_paciente']

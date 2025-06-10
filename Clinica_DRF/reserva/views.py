@@ -5,6 +5,12 @@ from usuarios.models import CustomersUsers
 from usuarios.serializers import CustomUserSerializer
 from especialidad.models import Especialidad
 from especialidad.serializers import EspecialidadSerializers
+from comuna_clinica.models import ComunaClinicaModel
+from comuna_clinica.serializers import ComunaClinicaSerializer
+from doctor.models import DoctorModel
+from doctor.serializers import DoctorSerializer
+from paciente.models import PacienteModel
+from paciente.serializers import PacienteSerializer
 # Crear un código de Venta.
 import uuid
 # Importamos el status.
@@ -97,9 +103,10 @@ def historial_reserva(request):
         arr = []
         reserva = ReservaModel.objects.all()
         for res in reserva:
-            nombre_usuario = CustomersUsers.objects.get(pk=res.fk_usuario.id)
-            nombre_paciente = nombre_usuario.first_name + ' ' + nombre_usuario.last_name
-            arr.append({'id_reserva': res.id,'fecha_reserva': res.fecha_reserva, 'especialidad': res.especialidad, 'nombre_doctor': res.nombre_doctor, 'tipo_pago': res.tipo_pago, 'reserva_uuid': res.reserva_uuid, 'comuna_clinica': res.comuna_clinica, 'direccion_clinica': res.direccion_clinica, 'nombre_clinica': res.nombre_clinica, 'hora_inicio':res.hora_inicio, 'hora_termino': res.hora_termino, 'fecha_creacion_reserva': res.fecha_creacion_reserva, 'nombre_paciente': nombre_paciente})
+            paciente = PacienteModel.objects.filter(fk_user=res.fk_usuario.id)
+            for pac in paciente:
+                nombre_paciente = pac.primer_nombre + ' ' + pac.segundo_nombre
+                arr.append({'id_reserva': res.id,'fecha_reserva': res.fecha_reserva, 'especialidad': res.especialidad, 'nombre_doctor': res.nombre_doctor, 'tipo_pago': res.tipo_pago, 'reserva_uuid': res.reserva_uuid, 'comuna_clinica': res.comuna_clinica, 'direccion_clinica': res.direccion_clinica, 'nombre_clinica': res.nombre_clinica, 'hora_inicio':res.hora_inicio, 'hora_termino': res.hora_termino, 'fecha_creacion_reserva': res.fecha_creacion_reserva, 'nombre_paciente': nombre_paciente})
         return Response({'reserva':arr},
                         # Específicamos el status.
                         status=status.HTTP_200_OK)
@@ -107,31 +114,129 @@ def historial_reserva(request):
         print(f"Unexpected {err=}, {type(err)=}")
         return Response({'error': 1}, status=400)
 
-#
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def listar_paciente_doctor(request, username):
+def listar_clinica_paciente_doctor(request):
     try:
-        # print(username)
+        # Obtenemos todas las clínicas.
+        clinicas = ComunaClinicaModel.objects.all()
+        cl = []
+        for cli in clinicas:
+            print("Todas las clínicas")
+            print(cli.id)
+            print(cli.nombre_clinica)
+            cl.append({
+                'id': cli.id,
+                'nombre_clinica': cli.nombre_clinica
+            })
+        return Response({'reserva':cl},
+                    # Específicamos el status.
+                    status=status.HTTP_200_OK)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 1}, status=400)
+#
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def listar_paciente_doctor(request):
+    try:
+        print("---****----")
+        print(request.data)
+        print("---****----")
+        usuario = CustomersUsers.objects.get(username=request.data["username"])
+        doctor = DoctorModel.objects.get(fk_user=usuario.id)
+        nombre_doctor = doctor.primer_nombre +' '+ doctor.segundo_nombre +' '+ doctor.ap_paterno +' '+ doctor.ap_materno
+        clinica = ComunaClinicaModel.objects.filter(pk=request.data["id_clinica"])
         arr = []
-        usuario = CustomersUsers.objects.get(username=username)
-        nombre_doc = usuario.first_name + ' ' + usuario.last_name
-        reserva = ReservaModel.objects.filter(nombre_doctor=nombre_doc)
-        arr = []
-        for res in reserva:
-            print(res.fecha_reserva)
-            print(res.nombre_doctor)
-            usuario = CustomersUsers.objects.filter(pk=res.fk_usuario.id)
-            for user in usuario:
-                nombre_paciente = user.first_name + ' ' + user.last_name
-                arr.append({'id_usuario': user.id, 'first_name':user.first_name,'last_name': user.last_name, 'email':user.email, 'edad':user.edad,'sexo':user.sexo, 'rut':user.rut, 'fono':user.fono})
-        return Response({'reserva':arr},
+        for cli in clinica:
+            print(cli.nombre_clinica)
+            usuario = ReservaModel.objects.filter(nombre_doctor=nombre_doctor,nombre_clinica=cli.nombre_clinica)
+            for us in usuario:
+                print(us.fk_usuario)
+                # Obtenemos el nombre del usuario.
+                user_paciente = CustomersUsers.objects.filter(pk=us.fk_usuario.id)
+                for user_pc in user_paciente:
+                    paciente = PacienteModel.objects.filter(fk_user=user_pc.id)
+                    for pc in paciente:
+                        print(pc.primer_nombre)
+                        print(pc.segundo_nombre)
+                        dato_pac_completo = pc.primer_nombre +' '+ pc.segundo_nombre +' '+ pc.ap_paterno +' '+ pc.ap_materno
+                        print(pc.edad)
+                        print(pc.sexo)
+                        print(pc.rut)
+                    arr.append({
+                        'id_reserva': us.id,
+                        'id_paciente': pc.id,
+                        'fecha_reserva': us.fecha_reserva,
+                        'start': us.hora_inicio,
+                        'end': us.hora_termino,
+                        'title': us.especialidad,
+                        'nombre_clinica': us.nombre_clinica,
+                        'nombre_doctor': us.nombre_doctor,
+                        'nombre_paciente': dato_pac_completo,
+                        'edad': pc.edad,
+                        'sexo': pc.sexo,
+                        'rut': pc.rut,
+                        'cod_reserva': us.reserva_uuid,
+                        'reserva_cerrada': us.reserva_cerrada, 
+                    })
+        return Response({'paciente':arr},
                         # Específicamos el status.
                         status=status.HTTP_200_OK)
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         return Response({'error': 1}, status=400)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def listar_paciente_doctor_cita(request):
+    try:
+        #
+        usuario = CustomersUsers.objects.get(pk=request.user.id)
+        doctor = DoctorModel.objects.get(fk_user=usuario.id)
+        nombre_doctor = doctor.primer_nombre + ' ' + doctor.segundo_nombre + ' ' + doctor.ap_paterno + ' ' + doctor.ap_materno
+        #
+        arr = []
+        res = ReservaModel.objects.filter(nombre_doctor=nombre_doctor)
+        for us in res:
+            print(us.fk_usuario)
+            print(us.hora_termino)
+            print(us.id,)
+            # Obtenemos el nombre del usuario.
+            user_paciente = CustomersUsers.objects.filter(pk=us.fk_usuario.id)
+            for user_pc in user_paciente:
+                paciente = PacienteModel.objects.get(fk_user=user_pc.id)
+                #
+                dato_pac_completo = paciente.primer_nombre +' '+ paciente.segundo_nombre +' '+ paciente.ap_paterno +' '+ paciente.ap_materno
+                print(dato_pac_completo)
+                #
+                arr.append({
+                    'id_reserva': us.id,
+                    'id_paciente': paciente.id,
+                    'email': user_pc.email,
+                    'fecha_reserva': us.fecha_reserva,
+                    'hora_inicio': us.hora_inicio,
+                    'hora_termino': us.hora_termino,
+                    'especialidad': us.especialidad,
+                    'nombre_clinica': us.nombre_clinica,
+                    'comuna_clinica': us.comuna_clinica,
+                    'direccion_clinica': us.direccion_clinica,
+                    'nombre_doctor': us.nombre_doctor,
+                    'nombre_paciente': dato_pac_completo,
+                    'edad': paciente.edad,
+                    'sexo': paciente.sexo,
+                    'rut': paciente.rut,
+                    'fono': paciente.fono,
+                    'reserva_uuid': us.reserva_uuid,
+                    'reserva_cerrada': us.reserva_cerrada,
+                })
+        print(arr)
+        return Response({'paciente':arr},
+                        # Específicamos el status.
+                        status=status.HTTP_200_OK)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 1}, status=400)
 
 #
 @api_view(['GET'])
