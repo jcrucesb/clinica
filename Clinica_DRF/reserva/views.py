@@ -310,5 +310,5 @@ def delete_reserva_panel_secretaria(request, id_reserva):
                     # Específicamos el status.
                     status=status.HTTP_200_OK)
     except Exception as err:
-        print(f"Unexpected {err=}, {type(err)=}")
+        print(f"Unexpected {err=}, {type(err)=}") 
         return Response({'error': 1}, status=400)
