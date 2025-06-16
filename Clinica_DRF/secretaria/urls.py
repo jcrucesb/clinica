@@ -9,4 +9,8 @@ urlpatterns = [
     path('secretaria/obtener_clin_secretaria/<int:id_user>/', views.obtener_clin_secretaria, name='obtener_clin_secretaria'),
     path('secretaria/agregar_clin_secretaria_panel_adm', views.agregar_clin_secretaria_panel_adm, name='agregar_clin_secretaria_panel_adm'),
     path('secretaria/delete_clin_secretaria/<int:id_clin>/<int:id_user_secret>/', views.delete_clin_secretaria, name='delete_clin_secretaria'),
+    # Panel Secretaria. secretaria/listar_datos_secretaria
+    path('secretaria/listar_datos_secretaria/<str:username>/', views.listar_datos_secretaria, name='listar_datos_secretaria'),
+    path('secretaria/update_panel_secretaria/<int:id_user>/', views.update_panel_secretaria, name='update_panel_secretaria'),
+    path('secretaria/listar_secretarias_panel_secretaria', views.listar_secretarias_panel_secretaria, name='listar_secretarias_panel_secretaria'),
 ]   

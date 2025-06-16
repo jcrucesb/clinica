@@ -18,4 +18,6 @@ urlpatterns = [
     path('reserva/listar_clinica_paciente_doctor', views.listar_clinica_paciente_doctor, name='listar_clinica_paciente_doctor'),
     # Obtener todos los pacientes correspondientes al doctor con citas.
     path('reserva/listar_paciente_doctor_cita', views.listar_paciente_doctor_cita, name='listar_paciente_doctor_cita'),
+    path('reserva/historial_cli_pac_panel_secretaria/<int:id>/', views.historial_cli_pac_panel_secretaria, name='historial_cli_pac_panel_secretaria'),
+    path('reserva/delete_reserva_panel_secretaria/<int:id_reserva>/', views.delete_reserva_panel_secretaria, name='delete_reserva_panel_secretaria'),
 ]

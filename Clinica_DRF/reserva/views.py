@@ -259,3 +259,56 @@ def listar_paciente_historial_doctor(request, id):
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         return Response({'error': 1}, status=400)
+    
+#
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def historial_cli_pac_panel_secretaria(request, id):
+    try:
+        print(id)
+        arr = []
+        usuario = CustomersUsers.objects.get(pk=id)
+        #
+        reserva = ReservaModel.objects.filter(fk_usuario=usuario.id)
+        print(reserva)
+        arr = []
+        for res in reserva:
+            print("Entramos")
+            arr.append({'id_reserva': res.id,'especialidad': res.especialidad, 'nombre_doctor':res.nombre_doctor,'nombre_clinica': res.nombre_clinica, 'comuna_clinica':res.comuna_clinica, 'direccion_clinica':res.direccion_clinica,'fecha_reserva': res.fecha_reserva,'hora_inicio':res.hora_inicio, 'hora_termino':res.hora_termino, 'fecha_creacion_reserva':res.fecha_creacion_reserva, 'cod_reserva': res.reserva_uuid,'id_usuario': usuario.id})
+        return Response({'reserva':arr},
+                        # Específicamos el status.
+                        status=status.HTTP_200_OK)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 1}, status=400)
+
+#
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_reserva_panel_secretaria(request, id_reserva):
+    try:
+        print(id_reserva)
+        #
+        id_usuario = None
+        arr = []
+        #
+        reserva = ReservaModel.objects.get(pk=id_reserva)
+        arr = []
+        id_usuario = reserva.fk_usuario.id
+        reserva.delete()
+        print("Prueba 1")
+        print(id_usuario)
+        print("Prueba 1")
+        reserva_usuarios = ReservaModel.objects.filter(fk_usuario=id_usuario)
+        print(reserva_usuarios)
+        for res in reserva_usuarios:
+            arr.append({'id_reserva': res.id,'especialidad': res.especialidad, 'nombre_doctor':res.nombre_doctor,'nombre_clinica': res.nombre_clinica, 'comuna_clinica':res.comuna_clinica, 'direccion_clinica':res.direccion_clinica,'fecha_reserva': res.fecha_reserva,'hora_inicio':res.hora_inicio, 'hora_termino':res.hora_termino, 'fecha_creacion_reserva':res.fecha_creacion_reserva, 'cod_reserva': res.reserva_uuid,'id_usuario': id_usuario})
+        print("Array")
+        print(arr)
+        print("Array")
+        return Response({'reserva':arr},
+                    # Específicamos el status.
+                    status=status.HTTP_200_OK)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 1}, status=400)

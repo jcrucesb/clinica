@@ -65,7 +65,7 @@ import pdfkit
 # Create your views here.
 #
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def listar_doctor_admin(request):
     try:
         # Serializar los usuarios del grupo 'Doctor'

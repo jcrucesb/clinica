@@ -11,4 +11,5 @@ urlpatterns = [
     path('paciente/reserva_paciente_registrado', views.reserva_paciente_registrado, name='reserva_paciente_registrado'),
     path('paciente/crear_reserva_pac_registrado', views.crear_reserva_pac_registrado, name='crear_reserva_pac_registrado'),
     path('paciente/historial_clinico', views.historial_clinico, name='historial_clinico'),
+    path('paciente/update_paciente_panel_secretaria/<int:id>/', views.update_paciente_panel_secretaria, name='update_paciente_panel_secretaria'),
 ]

@@ -456,3 +456,222 @@ def delete_clin_secretaria(request, id_clin, id_user_secret):
     except Exception as err:
         print(f"Unexpected {err=}, {type(err)=}")
         return Response({'error': 3}, status=400)
+
+#
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def listar_datos_secretaria(request, username):
+    try:
+        print(username)
+        arr = []
+        usuario = CustomersUsers.objects.get(username=username)
+        print(usuario.id)
+        secretaria = SecretariaModel.objects.get(fk_user=usuario.id)
+        arr.append({
+            'id_user': usuario.id,
+            'email': usuario.email,
+            'username': usuario.username,
+            'primer_nombre': secretaria.primer_nombre,
+            'segundo_nombre': secretaria.segundo_nombre,
+            'edad': secretaria.edad,
+            'sexo': secretaria.sexo,
+            'rut': secretaria.rut,
+            'fono': secretaria.fono,
+            'ap_paterno': secretaria.ap_paterno,
+            'ap_materno': secretaria.ap_materno,
+        })
+        return Response({'secretaria':arr},
+                        # Específicamos el status.
+                        status=status.HTTP_200_OK)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 3}, status=400)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_panel_secretaria(request, id_user):
+    try:
+        print("Prueba 123")
+        print(id_user)
+        print("Prueba 123")
+        # Hacer una copia mutable de request.data
+        # Esto se hace para poder agregar mas data al array de objetos.
+        data = request.data.copy()
+        print("/*/*/*/*/*/*/*/*/*/*//*/*")
+        print(data)
+        print("/*/*/*/*/*/*/*/*/*/*//*/*")
+        cerrar_session = 0
+        id_user_secret = data.get("id_usuario")
+        username = data.get("username")
+        password = data.get("password")
+        email = data.get("email")
+        #
+        user_sec = CustomersUsers.objects.get(pk=id_user)
+        bd_username = user_sec.username
+        # Realizaremos 
+        user_dato = {}
+        #
+        if password == "0" or bd_username == username:
+            # Creaos el array de objetos.
+            user_dato = {
+                'email': email,
+            }
+        #
+        if password == "0" and bd_username != username:
+            cerrar_session = 1
+            # Creaos el array de objetos.
+            user_dato = {
+                'username': username,
+                'email': email,
+            }
+        if password != "0" and bd_username == username:
+            #
+            cerrar_session = 1
+            #
+            hashed_password = make_password(password)
+            # Creaos el array de objetos.
+            user_dato = {
+                'password': hashed_password,
+                'email': email,
+            }
+        if password != "0" and bd_username != username:
+            #
+            cerrar_session = 1
+            # Creaos el array de objetos.
+            hashed_password = make_password(password)
+            user_dato = {
+                'username':username,
+                'email': email,
+                'password': hashed_password,
+            }
+        
+        primer_nombre = data.get("primer_nombre")
+        segundo_nombre = data.get("segundo_nombre")
+        edad = data.get("edad")
+        rut = data.get("rut")
+        fono = data.get("fono")
+        sexo = data.get("sexo")
+        ap_paterno = data.get("ap_paterno")
+        ap_materno = data.get("ap_materno")
+        # Validaciones.
+        if not all([username, primer_nombre, segundo_nombre, ap_paterno, ap_materno, email, edad, rut, fono, sexo]):
+            return Response({'error': 0}, status=status.HTTP_400_BAD_REQUEST)
+        #
+        user = CustomersUsers.objects.get(pk=id_user)
+        serializer = CustomUserSerializer(user, data=user_dato, partial=True)
+        # 
+        if serializer.is_valid():
+            # 
+            id_user = serializer.save()
+            secretaria = SecretariaModel.objects.get(fk_user=id_user)
+            # Creamos el array de objetos.
+            secre_dato = {
+                'primer_nombre': primer_nombre,
+                'segundo_nombre': segundo_nombre,
+                'edad': edad,
+                'rut': rut,
+                'fono': fono,
+                'sexo': sexo,
+                'ap_paterno': ap_paterno,
+                'ap_materno': ap_materno,
+            }
+            sercretaria_serializers = SecretariaSerializer(secretaria, data=secre_dato, partial=True)
+            if sercretaria_serializers.is_valid():
+                sercretaria_serializers.save()
+                # Obtener el grupo por nombre
+                grupo = Group.objects.get(name='Secretaria')
+                #print(grupo)
+                # Obtener todos los usuarios del grupo
+                usuarios = grupo.user_set.all()
+                print("*************")
+                print(usuarios)
+                print("*************")
+                datos = []
+                print("Casi Entramos")
+                for users in usuarios:
+                    print("Entramos")
+                    print(users.id)
+                    serializer_secretaria = SecretariaModel.objects.filter(fk_user=users.id)
+                    for ser in serializer_secretaria:
+                        print(ser.primer_nombre)
+                        datos.append({
+                                'id_user': users.id,
+                                'username': users.username,
+                                'primer_nombre': ser.primer_nombre,
+                                'segundo_nombre': ser.segundo_nombre,
+                                'ap_paterno': ser.ap_paterno,
+                                'ap_materno': ser.ap_materno,
+                                'email': users.email,
+                                'edad': ser.edad,
+                                'sexo': ser.sexo,
+                                'rut': ser.rut,
+                                'fono': ser.fono,
+                                'secretaria_uuid': ser.secretaria_uuid,
+                            })
+                print(datos)
+                #
+                if cerrar_session == 1:
+                    # Eliminar el token actual del usuario
+                    Token.objects.filter(pk=users.id).delete()
+                    # Cerrar sesión en el request
+                    logout(request)
+                    logout_required = True
+                    return Response({'secretarias':datos,
+                                     'cerrar_session': cerrar_session},
+                                # Específicamos el status.
+                                status=status.HTTP_200_OK)
+                if cerrar_session == 0:
+                    logout_required = False
+                    return Response({'secretarias':datos,
+                                     'cerrar_session': cerrar_session},
+                                # Específicamos el status.
+                                status=status.HTTP_200_OK)
+                print("---------------------///****//")
+                
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 1}, status=400)
+    
+#
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def listar_secretarias_panel_secretaria(request):
+    try:
+        # Obtener el grupo por nombre
+        grupo = Group.objects.get(name='Secretaria')
+        #print(grupo)
+        # Obtener todos los usuarios del grupo
+        usuarios = grupo.user_set.all()
+        print(usuarios)
+        datos = []
+        for users in usuarios:
+            print(users.id)
+            serializer_secretaria = SecretariaModel.objects.filter(fk_user=users.id)
+            for ser in serializer_secretaria:
+                # secretaria_clinica = ser.secretaria_clinica.all()
+                # for secretaria in secretaria_clinica:
+                datos.append({
+                        'id_user': users.id,
+                        'username': users.username,
+                        'primer_nombre': ser.primer_nombre,
+                        'segundo_nombre': ser.segundo_nombre,
+                        'ap_paterno': ser.ap_paterno,
+                        'ap_materno': ser.ap_materno,
+                        'email': users.email,
+                        'edad': ser.edad,
+                        'sexo': ser.sexo,
+                        'rut': ser.rut,
+                        # 'fono': ser.fono,
+                        'secretaria_uuid': ser.secretaria_uuid,
+                        # 'nombre_clinica': secretaria.nombre_clinica,
+                        # 'comuna_clinica': secretaria.comuna_clinica,
+                        # 'direccion_clinica': secretaria.direccion_clinica,
+                    })
+        print(datos)
+        print("---------------------///****//")
+        return Response({'secretarias':datos}, 
+                        # Específicamos el status.
+                        status=status.HTTP_200_OK)
+    except Exception as err:
+        print(f"Unexpected {err=}, {type(err)=}")
+        return Response({'error': 1}, status=400)

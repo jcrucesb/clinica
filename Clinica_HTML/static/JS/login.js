@@ -19,6 +19,7 @@ function login(){
             console.warn(response.data.grupo)
             let arr = response.data.grupo
             let grupo = arr.toString()
+            //
             if (response.data.grupo == 'Administrador'){
                 console.log("Administrador")
                 sessionStorage.setItem('token', token);
@@ -26,11 +27,19 @@ function login(){
                 //localStorage.setItem('usuarios', response.data.list_users)
                 window.location.href = 'http://127.0.0.1:5500/static/Templates/Admin/template_admin.html'; // URL para administradores
             }
+            //
             if (response.data.grupo == 'Doctor'){
                 //console.log( response.data.username)
                 sessionStorage.setItem('token', response.data.token);
                 sessionStorage.setItem('username',username)
                 window.location.href = 'http://127.0.0.1:5500/static/Templates/Doctor/template_doctor.html';
+            }
+            //
+            if (response.data.grupo == 'Secretaria'){
+                //console.log( response.data.username)
+                sessionStorage.setItem('token', response.data.token);
+                sessionStorage.setItem('username',username)
+                window.location.href = 'http://127.0.0.1:5500/static/Templates/Secretaria/template_secretaria.html';
             }
         })
         .catch(error => {

@@ -1694,126 +1694,6 @@ function registrar_nueva_clinica_doctor(){
     });
 }
 //
-// function modal_editar_grupo(id, nombre){
-//     let modal_editar_grupo = document.getElementById("modal_editar_grupo")
-//     // Crea una instancia del modal de Bootstrap
-//     const modalInstance = new bootstrap.Modal(modal_editar_grupo);
-//     // Abre el modal
-//     modalInstance.show();
-//     let name_edit = document.getElementById("edit_nombre_grupo")
-//     name_edit.value = nombre
-//     let id_grupo = document.getElementById("id_grupo")
-//     id_grupo.value = id
-// }
-//
-// function editar_nombre_grupo_panel_admin(e){
-//     //
-//     const token = sessionStorage.getItem('token');
-//     let btn_editar_nombre_grupo = document.getElementById("btn_editar_nombre_grupo")
-//     let id = document.getElementById("id_grupo").value
-//     let arr = []
-//     let name = document.getElementById("edit_nombre_grupo").value
-//     if (name == null || name == "") {
-//         Swal.fire({
-//             icon: "error",
-//             title: "Falta el nombre del grupo",
-//             text: "No puede quedar el campo vacio!",
-//         });
-//     }else{
-//         const token = sessionStorage.getItem('token');
-//         let datos = {
-//             'name':name
-//         }
-//         //
-//         axios.put(`http://127.0.0.1:8000/grupo/editar_grupo/${id}/`,datos, {
-//             headers: {
-//                 'Authorization': `Token ${token}`
-//             }
-//         })
-//         .then(function (response) {
-//             console.warn(response.data);
-//             console.warn(response.status)
-//             if (response.status == 200) {
-//                 Swal.fire({
-//                     icon: "success",
-//                     title: "Actualizado Correctamente",
-//                     text: "El grupo fue actualizado correctamente!",
-//                 });
-//                 let grupos = response.data.grupos
-//                 grupos.forEach(element => {
-//                     console.log(element.name)
-//                     arr.push(element)
-//                 });
-//                 console.warn(arr)
-//                 //
-//                 var table = $('#tabla_grupo').DataTable({
-//                     data: arr,
-//                     columns: [
-//                         { title: 'ID', data: "id", defaultContent: '' },
-//                         { title: 'Nombre Grupo', data: "name", defaultContent: '' },
-//                         { 
-//                             title: 'Acciones', 
-//                             data: null,
-//                             defaultContent: '',
-//                             orderable: false,
-//                             render: function(data, type, row) {
-//                                 return '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_editar_grupo" onclick="modal_editar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-primary btn-sm editar-btn">Editar</button> ' +
-//                                         '<button type="button" data-id="'+row.id+'" data-name="'+row.name+'" id="btn_borrar_grupo" onclick="borrar_grupo('+row.id+', \''+row.name+'\')" class="btn btn-danger btn-sm borrar-btn">Borrar</button>';
-//                             }
-//                         }
-//                     ],
-//                     destroy: true,
-//                     "dom": 'Bfrtip',
-//                     buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-//                     "lengthMenu": [
-//                         [5,10, 25, 50, -1],
-//                         ['5 Resultados', '10 Resultados', '50 Resultados', 'Mostrar Todos']
-//                     ],
-//                     "buttons": {
-//                         "pageLength": {
-//                             _: "Mostrar %d Registros"
-//                         }
-//                     },
-//                     "language": {
-//                         "decimal": "",
-//                         "emptyTable": "No hay información",
-//                         "info": "Mostrando _START_ a _END_ de _TOTAL_ Datos",
-//                         "infoEmpty": "Mostrando 0 to 0 of 0 Documentos",
-//                         "infoFiltered": "(Filtrado de _MAX_ total entradas)",
-//                         "infoPostFix": "",
-//                         "thousands": ",",
-//                         "lengthMenu": "Mostrar _MENU_ Documentos",
-//                         "loadingRecords": "Cargando...",
-//                         "processing": "Procesando...",
-//                         "search": "Buscar:",
-//                         "zeroRecords": "Sin resultados encontrados",
-//                         "paginate": {
-//                             "first": "Primero",
-//                             "last": "Ultimo",
-//                             "next": "Siguiente",
-//                             "previous": "Anterior"
-//                         }
-//                     }
-//                 });
-//             }
-//         })
-//         .catch(error => {
-//             if (error.response) {
-//                 console.log('Error Response:', error.response.data);
-//                 console.log('Error Status:', error.response.status);
-//                 console.log('Error Headers:', error.response.headers);
-//                 if (error.response.data.error == 3) {
-//                     Swal.fire({
-//                         icon: "error",
-//                         title: "El grupo ya existe",
-//                         text: "El grupo fue creado anteriormente!",
-//                     });
-//                 }
-//             }
-//         });
-//     }
-// }
-//
 function borrar_grupo(id, nombre_grupo){
     // Obtenemos el id del boton clode.
     const elemento = document.querySelector('#cerrar_modal_listar_grupo');
@@ -3211,6 +3091,7 @@ function abrir_modal_crear_paciente(){
 }
 // Enviar datos a la BD.
 function adm_registrar_paciente(){
+    const token = sessionStorage.getItem('token');
     //
     let username = document.getElementById("adm_paciente_username").value
     let password = document.getElementById("paciente_password").value
@@ -3279,7 +3160,9 @@ function adm_registrar_paciente(){
     }
     console.log(datos)
     axios.post(`http://127.0.0.1:8000/paciente/crear_paciente`,datos, {
-        
+        headers: {
+            'Authorization': `Token ${token}`
+        }
     })
     .then(function (response) {
         console.warn(response.data);
@@ -3455,6 +3338,8 @@ function editar_paciente(id_pac, username_pac, email, primer_nombre, segundo_nom
 }
 //
 function edit_panel_adm_paciente(e){
+    //
+    const token = sessionStorage.getItem('token');
     let id = document.getElementById("id_usuario_pac").value
     console.warn(id)
     let username = document.getElementById("edit_adm_paciente_username").value
@@ -3533,7 +3418,9 @@ function edit_panel_adm_paciente(e){
     }
     console.log(datos)
     axios.put(`http://127.0.0.1:8000/paciente/update_paciente/${id}/`,datos, {
-        
+        headers: {
+            'Authorization': `Token ${token}`
+        }
     })
     .then(function (response) {
         console.warn(response.data);
